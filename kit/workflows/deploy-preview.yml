@@ -86,7 +86,7 @@ jobs:
       - name: Check the artifact's contents
         if: steps.secrets.outputs.ready == 'true'
         run: |
-          top="$(LC_ALL=C ls -A preview | tr '\n' ' ')"
+          top="$(find preview -mindepth 1 -maxdepth 1 -printf '%f\n' | LC_ALL=C sort | tr '\n' ' ')"
           if [ "$top" != "dist " ]; then
             echo "::error::The preview artifact holds unexpected files (top level: '$top'); refusing to deploy it."
             exit 1
