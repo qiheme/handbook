@@ -10,12 +10,12 @@ It usually lives inside a [Web app](web-app.md) or [Static site](static-site.md)
 
 | Layer | Choice | Status |
 | --- | --- | --- |
-| Runtime | **Supabase Edge Functions** (Deno) | Adopted (one repo). Proposed as the default |
-| Language | TypeScript | Adopted |
-| Logic | Pure handlers in `supabase/functions/_shared/`, dependencies injected | Adopted |
-| Tests | Vitest in Node, 100% on `_shared/`. Entry files excluded | Adopted |
-| Validation | zod on every input and every provider response | Adopted |
-| Secrets | Supabase Function secrets | Adopted |
+| Runtime | **Supabase Edge Functions** (Deno) | In use (one repo). Proposed as the default |
+| Language | TypeScript | In use (one repo) |
+| Logic | Pure handlers in `supabase/functions/_shared/`, dependencies injected | In use (one repo) |
+| Tests | Vitest in Node, 100% on `_shared/`. Entry files excluded | In use (one repo) |
+| Validation | zod on every input and every provider response | In use (one repo) |
+| Secrets | Supabase Function secrets | In use (one repo) |
 | Scheduled jobs | Supabase Cron (`pg_cron`) calling the function | Proposed. The one scheduled job today runs on Vercel Cron |
 | Deploy | Supabase CLI: `supabase functions deploy`, run from `release.yml` | Proposed. The reference pipeline deploys the site and the migrations but not the functions, and the repo does not record how they are deployed today |
 

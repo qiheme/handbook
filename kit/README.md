@@ -19,8 +19,8 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`common/package.scripts.json`](common/package.scripts.json) | merged into `package.json` | Node repos | Adjust `dev`, `build`, `preview`, `typecheck` for the framework |
 | [`common/eslint.config.js`](common/eslint.config.js) | `eslint.config.js` | Node repos | Add the TanStack plugins if used |
 | [`common/.prettierrc.json`](common/.prettierrc.json) | `.prettierrc.json` | Node repos (Proposed) | Nothing |
-| [`common/vitest.config.ts`](common/vitest.config.ts) | `vitest.config.ts` | Node repos | Set the environment. Give every exclusion a reason |
-| [`common/playwright.config.ts`](common/playwright.config.ts) | `playwright.config.ts` | Anything with pages | Set `testDir` if specs are not in `e2e/` |
+| [`common/vitest.config.ts`](common/vitest.config.ts) | `vitest.config.ts` | Node repos | Set the environment. Give every exclusion a reason. Static sites: narrow coverage `include` to `src/lib/**` |
+| [`common/playwright.config.ts`](common/playwright.config.ts) | `playwright.config.ts` | Anything with pages | Static sites: set `testDir` to `tests/e2e` |
 | [`common/.husky/pre-commit`](common/.husky/pre-commit), [`pre-push`](common/.husky/pre-push) | `.husky/` | Node repos | Run `npm install` once so `prepare` installs the hooks |
 | [`common/.github/pull_request_template.md`](common/.github/pull_request_template.md) | `.github/pull_request_template.md` | Every repo | Add repo-specific checklist lines |
 | [`common/.github/ISSUE_TEMPLATE/`](common/.github/ISSUE_TEMPLATE/feature.yml) | `.github/ISSUE_TEMPLATE/` | Every repo | Enable Issue Types in the repo settings |

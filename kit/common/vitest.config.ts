@@ -19,7 +19,9 @@ export default defineConfig({
     // Web apps and libraries: change this to 'jsdom' and add
     //   setupFiles: ['./src/test/setup.ts']   (imports @testing-library/jest-dom/vitest)
     environment: 'node',
-    include: ['src/**/*.test.{ts,tsx}'],
+    // Tests sit next to the code in src/. Static sites keep them in tests/
+    // (their end-to-end specs are *.spec.ts under tests/e2e, so they don't match).
+    include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.{ts,tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

@@ -8,16 +8,16 @@ For code that other repos install: a component library, design tokens, shared ut
 
 | Layer | Choice | Status |
 | --- | --- | --- |
-| Build | Vite library mode: ESM and CommonJS output, type declarations from `vite-plugin-dts` | Adopted |
-| Language | TypeScript strict | Adopted |
-| Styles (UI libraries) | CSS Modules. Every value is a design token | Adopted |
-| Unit tests | Vitest + Testing Library + user-event, jsdom, 100% | Adopted |
-| Explorer and visual review | Storybook, with `play` functions as interaction tests | Adopted |
+| Build | Vite library mode: ESM and CommonJS output, type declarations from `vite-plugin-dts` | In use (one repo) |
+| Language | TypeScript strict | In use (one repo) |
+| Styles (UI libraries) | CSS Modules. Every value is a design token | In use (one repo) |
+| Unit tests | Vitest + Testing Library + user-event, jsdom, 100% | In use (one repo) |
+| Explorer and visual review | Storybook, with `play` functions as interaction tests | In use (one repo) |
 | Lint | ESLint flat config | Proposed. The reference repo has no linter yet |
-| Versioning | Changesets | Adopted |
-| Registry | GitHub Packages, scope `@q-labs` | Adopted |
-| Docs host | Storybook on GitHub Pages | Adopted |
-| Peer dependencies | React and React DOM as `peerDependencies` (`>=18`), never `dependencies` | Adopted |
+| Versioning | Changesets | In use (one repo) |
+| Registry | GitHub Packages, scope `@q-labs` | In use (one repo) |
+| Docs host | Storybook on GitHub Pages | In use (one repo) |
+| Peer dependencies | React and React DOM as `peerDependencies` (`>=18`), never `dependencies` | In use (one repo) |
 
 ## Folder layout
 

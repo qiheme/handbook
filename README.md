@@ -93,12 +93,13 @@ The Markdown files are the source of truth. The website at <https://qiheme.githu
 
 ## How to read a status
 
-Every rule carries one of three labels.
+Every rule carries one of four labels.
 
 | Label | Meaning |
 | --- | --- |
 | **Adopted** | Already how two or more active repos work. Follow it. |
-| **Proposed** | A recommendation. One repo or none does it today. Follow it for new work; it is listed in [Decisions](decisions.md) for sign-off. |
+| **In use** | One repo does it, and it works there. It is the standard for that kind of project until a second project confirms or changes it. |
+| **Proposed** | A recommendation that no repo follows yet, or where the repos disagree. Follow it for new work; it is listed in [Decisions](decisions.md) for sign-off. |
 | **Open** | Not decided. The page says who decides and where it is tracked. |
 
 ## Changing the standard

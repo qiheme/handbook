@@ -10,7 +10,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 
 | Repo | Visibility | Blueprint | Overall | Biggest gap |
 | --- | --- | --- | --- | --- |
-| `wish-list` | private | [Full-stack app](blueprints/full-stack-app.md) | 🟡 | No deploy pipeline yet; auth undecided |
+| `wish-list` | private | [Full-stack app](blueprints/full-stack-app.md) | 🟡 | No deploy pipeline yet |
 | `easy-finances` | private | [Web app](blueprints/web-app.md) + [Functions](blueprints/functions.md) + [CLI](blueprints/cli-and-scripts.md) | 🟡 | JavaScript, no Cobalt |
 | `Travel-OS` | public | [Web app](blueprints/web-app.md) | 🟡 | Hosted on Vercel, with server code in Vercel Functions |
 | `cloud129-site` | private | [Static site](blueprints/static-site.md) | 🟡 | No coverage gate, no linter, no hooks |
@@ -40,7 +40,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | `.npmrc` holds only the registry line | 🟢 | — | 🟢 | 🟡 also an auth line (an env-var reference, no secret) | 🟢 | — |
 | Netlify, built on Actions | 🔴 not deployed | 🟢 reference | 🔴 Vercel | 🟢 reference | — Pages | 🔴 Vercel |
 | PR preview | 🔴 | 🟢 | 🟡 not in the repo; left to Vercel | 🟢 | — | 🟡 not in the repo; left to Vercel |
-| Release: tag on merge | 🔴 planned differently | 🟢 | 🔴 none | 🟢 | 🟢 Changesets | 🔴 none |
+| Release: tag on merge | 🔴 none yet | 🟢 | 🔴 none | 🟢 | 🟢 Changesets | 🔴 none |
 | Migrations in CI and on release | 🟡 CI only | 🟢 both | 🔴 applied by hand | — | — | — |
 | `CLAUDE.md` | 🟢 | 🟢 | 🟢 | 🔴 | 🟢 | 🔴 |
 | Agent pointer files, not copies | 🟡 none | 🔴 a copy | 🔴 a copy | 🔴 none | 🔴 a copy | 🔴 none |

@@ -10,17 +10,17 @@ For sites that are mostly content: a studio site, a portfolio, a blog, a landing
 | --- | --- | --- |
 | Framework | Astro, `output: 'static'` | Adopted |
 | Language | TypeScript, `astro/tsconfigs/strict` | Adopted |
-| Design | `@q-labs/cobalt`: tokens always, components rendered to HTML with no client JavaScript | Adopted |
+| Design | `@q-labs/cobalt`: tokens always, components rendered to HTML with no client JavaScript | Tokens from the package: In use (one repo). Components in Astro: Proposed, shown working only in Cobalt's own example |
 | Layout CSS | Tailwind v4 on Cobalt tokens for new sites. Plain CSS on tokens is fine where it already exists | Proposed |
-| Interactivity | Vanilla script in `public/` for small things (theme, menu). A React island (`client:*`) only for a real widget | Adopted |
-| Content | Astro content collections: Markdown and YAML in `src/content/`, typed by a schema | Adopted |
-| Editing by non-developers | Sveltia CMS at `/admin/`, committing to Git | Adopted (one repo). Optional |
-| Forms | Netlify Forms | Adopted (one repo) |
-| SEO | `@astrojs/sitemap`, an RSS endpoint, canonical and Open Graph tags from the layout | Adopted |
-| Unit tests | Vitest on pure helpers in `src/lib/`, 100% coverage of that folder | Coverage gate is Proposed |
-| End-to-end | Playwright against `astro preview` of `dist/`, desktop and mobile | Adopted |
-| Type check | `astro check` | Adopted |
-| Host | Netlify, prebuilt | Adopted (one repo). One site is still on Vercel |
+| Interactivity | Vanilla script in `public/` for small things (theme, menu). A React island (`client:*`) only for a real widget | In use (one repo) |
+| Content | Astro content collections: Markdown and YAML in `src/content/`, typed by a schema | In use (one repo) |
+| Editing by non-developers | Sveltia CMS at `/admin/`, committing to Git | In use (one repo). Optional |
+| Forms | Netlify Forms | In use (one repo) |
+| SEO | `@astrojs/sitemap`, an RSS endpoint, canonical and Open Graph tags from the layout | In use (one repo) |
+| Unit tests | Vitest on pure helpers in `src/lib/`, 100% coverage of that folder. Tests live in `tests/` | In use (one repo). The coverage gate is Proposed |
+| End-to-end | Playwright against `astro preview` of `dist/`, desktop and mobile | In use (one repo) |
+| Type check | `astro check` | In use (one repo) |
+| Host | Netlify, prebuilt | In use (one repo). One site is still on Vercel |
 
 ## Create it
 

@@ -39,7 +39,7 @@ index.html          The website viewer (Docsify from a CDN). _sidebar.md is its 
 
 1. **Issue first.** Every change starts with an issue in this repo. Commits and the PR reference it; the PR body says `Closes #<n>`.
 2. **The standard changes here, by PR.** A repo that wants to work differently either lists a deviation in its own `CLAUDE.md` or proposes a change to this handbook. It does not just diverge.
-3. **Label every rule.** `Adopted` only when two or more active repos already do it. Otherwise `Proposed`, with a row in [`decisions.md`](decisions.md). Never present a recommendation as established practice.
+3. **Label every rule.** `Adopted` only when two or more active repos already do it. `In use (one repo)` when exactly one does and it works there. Otherwise `Proposed`, with a row in [`decisions.md`](decisions.md). Never present a recommendation, or one repo's practice, as established everywhere.
 4. **Say where a fact came from.** Claims about a repo are checked against that repo, not remembered. Claims about tool versions are checked against the registry. If you could not check, say "not verified".
 5. **A rule and its kit file change together.** So do a rule and the rows in [`adoption.md`](adoption.md) it affects.
 6. **Every page is listed** in `README.md`, `_sidebar.md` and `llms.txt`. Add a page to all three or to none.
@@ -51,7 +51,7 @@ index.html          The website viewer (Docsify from a CDN). _sidebar.md is its 
 GitHub Pages publishes whatever is on the default branch. Anything pushed to any branch is public immediately.
 
 - **No secret values.** Names of secrets (`NETLIFY_AUTH_TOKEN`) are fine.
-- **No internals of private projects.** Name a private repo and state its stack. Do not describe its features, data model, security design, vulnerabilities, project IDs or URLs.
+- **No internals of private projects.** Name a private repo and state its stack. Do not describe its features, data model, security design, open decisions, vulnerabilities, project IDs or URLs.
 - **A gap that is a security weakness is never written here.** File it as an issue in the affected repo.
 - **No personal details**: no email addresses, no account IDs.
 

@@ -2,7 +2,7 @@
 
 One choice per layer. Each row says what we use, whether it is settled, and why.
 
-Status labels: **Adopted** (two or more active repos already do this), **Proposed** (recommended, needs sign-off in [Decisions](../decisions.md)), **Open** (undecided).
+Status labels: **Adopted** (two or more active repos already do this), **In use** (one repo does it and it works there), **Proposed** (recommended, needs sign-off in [Decisions](../decisions.md)), **Open** (undecided).
 
 ## Language and runtime
 
@@ -22,12 +22,12 @@ Status labels: **Adopted** (two or more active repos already do this), **Propose
 | --- | --- | --- | --- |
 | Content sites | **Astro**, static output | Adopted | Both content sites. Ships no JavaScript by default |
 | Apps | **React** + **Vite** | Adopted | Every app |
-| Full-stack apps | **TanStack Start** (React, Vite, server functions) | Adopted (one repo) | Use only when the server must own the data. See [Full-stack app](../blueprints/full-stack-app.md) |
+| Full-stack apps | **TanStack Start** (React, Vite, server functions) | In use (one repo) | Use only when the server must own the data. See [Full-stack app](../blueprints/full-stack-app.md) |
 | Routing | **TanStack Router** for new apps | Proposed | Same router as TanStack Start, so a web app can grow into a full-stack app without a rewrite. An existing React Router app stays as it is |
 | Server data in the browser | **TanStack Query** | Proposed | Caching, retries and loading states written once. Replaces hand-rolled fetch-in-effect code |
 | Design system | **Cobalt** (`@q-labs/cobalt`). Use its components before writing your own | Adopted | Three repos. See [UI](ui.md) |
-| Styling | **Tailwind v4** for layout, with Cobalt's tokens mapped into the Tailwind theme. No raw hex values | Adopted for apps, Proposed for content sites | One styling approach everywhere. Existing plain-CSS-on-tokens sites are fine as they are |
-| Inside Cobalt itself | CSS Modules, tokens only | Adopted | A library must not force Tailwind on its consumers |
+| Styling | **Tailwind v4** for layout, with Cobalt's tokens mapped into the Tailwind theme. No raw hex values | In use (one repo). Proposed for content sites | One styling approach everywhere. One other app uses Tailwind without the tokens, and one uses the tokens without Tailwind. Existing plain-CSS-on-tokens sites are fine as they are |
+| Inside Cobalt itself | CSS Modules, tokens only | In use (one repo) | A library must not force Tailwind on its consumers |
 | Component structure | Atomic design: atoms, molecules, organisms, templates, pages. A level imports from its own level or below | Adopted | Three repos. One repo enforces it with a test |
 | Formatting | **Prettier**: no semicolons, single quotes | Proposed | No active repo has a formatter, and the repos disagree on style. A formatter ends the argument and shrinks diffs |
 
@@ -38,10 +38,10 @@ Status labels: **Adopted** (two or more active repos already do this), **Propose
 | Database | **Supabase** Postgres | Adopted | Every app with data |
 | Auth | **Supabase Auth** | Adopted for web apps, Open for full-stack apps | See [Data](data.md#auth) |
 | Data access, web app | `supabase-js` from the browser, protected by row-level security | Adopted | Two repos |
-| Data access, full-stack app | **Drizzle** over a direct connection. Supabase's Data API switched off | Adopted (one repo) | For data that policies alone should not guard |
-| Server-side code | **Supabase Edge Functions**, logic in pure modules tested with Vitest | Adopted (one repo), Proposed as the default | Sits next to the data. Secrets stay in Supabase. See [Functions](../blueprints/functions.md) |
+| Data access, full-stack app | **Drizzle** over a direct connection. Supabase's Data API switched off | In use (one repo) | For data that policies alone should not guard |
+| Server-side code | **Supabase Edge Functions**, logic in pure modules tested with Vitest | In use (one repo), Proposed as the default | Sits next to the data. Secrets stay in Supabase. See [Functions](../blueprints/functions.md) |
 | Validation | **zod** at every boundary: forms, function inputs, provider responses | Adopted | Two repos |
-| AI calls | Behind a provider adapter with a mock. Model name and key come from configuration | Adopted | Two repos call a model; one has the full pattern |
+| AI calls | Behind a provider adapter with a mock. Model name and key come from configuration | In use (one repo) | Two repos call a model; one has the full pattern |
 
 ## Quality
 
@@ -52,7 +52,7 @@ Status labels: **Adopted** (two or more active repos already do this), **Propose
 | End-to-end | **Playwright**, Chromium, against the built output | Adopted | Two repos |
 | Lint | **ESLint** flat config + `typescript-eslint` + `react-hooks`, `--max-warnings 0` | Adopted | Two repos on the flat config. The rest need it |
 | Type check | `npm run typecheck` (`tsc --noEmit`, or `astro check` for Astro) | Adopted | Vitest does not typecheck |
-| Git hooks | **husky**. Commit: lint staged files. Push: typecheck and coverage | Adopted | Push-time gates let the red commit of a TDD cycle be committed |
+| Git hooks | **husky**. Commit: lint staged files. Push: typecheck and coverage | Adopted (husky, three repos). This exact split is in use in one | Push-time gates let the red commit of a TDD cycle be committed |
 
 More: [Testing](testing.md).
 
@@ -64,7 +64,7 @@ More: [Testing](testing.md).
 | Hosting | **Netlify**. Built on GitHub Actions and uploaded prebuilt. Netlify never builds | Adopted | Two repos have the full pipeline. Two repos still deploy to Vercel |
 | Previews | One preview per PR, deployed by a trusted workflow that never runs PR code | Adopted | Two repos |
 | App releases | Version bumped by hand in the PR. Merge tags `v<version>` and deploys | Adopted | Two repos |
-| Library releases | **Changesets**, published to GitHub Packages | Adopted | Cobalt |
+| Library releases | **Changesets**, published to GitHub Packages | In use (one repo) | Cobalt is the only library |
 | Docs and Storybook | GitHub Pages | Adopted | Cobalt's Storybook, this handbook |
 | Dependency updates | **Dependabot**, weekly, grouped | Proposed | Vitest is on four different majors across the repos. Nothing keeps them moving together |
 

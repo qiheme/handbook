@@ -2,7 +2,7 @@
 
 > One standard for how Cloud 12Nine and Q-Labs projects are built: the stack, the workflow, the pipelines, and a kit of files to copy. Every page is plain Markdown at the URL listed. In a repo that follows this handbook, that repo's own CLAUDE.md wins where it differs.
 
-Each rule is labelled Adopted (two or more repos already do it), Proposed (recommended, awaiting sign-off) or Open (undecided).
+Each rule is labelled Adopted (two or more repos already do it), In use (one repo does it and it works there), Proposed (recommended, awaiting sign-off) or Open (undecided).
 
 ## Start
 

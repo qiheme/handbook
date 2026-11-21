@@ -10,18 +10,18 @@ This is the default for anything with a login. Choose [Full-stack app](full-stac
 
 | Layer | Choice | Status |
 | --- | --- | --- |
-| Framework | React 19 + Vite | Adopted |
+| Framework | React 19 + Vite | Adopted. Both reference repos are still on React 18 |
 | Language | TypeScript strict | Adopted (one of the two reference repos is still JavaScript) |
 | Routing | TanStack Router | Proposed. One repo uses React Router 6 and stays there |
 | Server data | TanStack Query | Proposed |
-| Design | Cobalt components, Tailwind v4 on Cobalt tokens | Adopted across the two repos, not yet both in one |
+| Design | Cobalt components, Tailwind v4 on Cobalt tokens | Each half is in use in one web app; neither has both yet |
 | Data | `supabase-js` from the browser, row-level security on every table | Adopted |
 | Auth | Supabase Auth | Adopted |
-| Server-side code | Supabase Edge Functions. See [Functions](functions.md) | Adopted (one repo) |
+| Server-side code | Supabase Edge Functions. See [Functions](functions.md) | In use (one repo) |
 | Validation | zod | Adopted |
 | Unit tests | Vitest + Testing Library, jsdom, 100% | Adopted |
-| End-to-end | Playwright against the built app | Adopted (one repo) |
-| Host | Netlify, prebuilt, with a single-page-app redirect | Adopted (one repo). One app is still on Vercel |
+| End-to-end | Playwright against the built app | In use (one repo) |
+| Host | Netlify, prebuilt, with a single-page-app redirect | In use (one repo). One app is still on Vercel |
 
 ## Create it
 

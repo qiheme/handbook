@@ -28,8 +28,8 @@ Build it as a web app first. If it must be a desktop program, that is a decision
 
 | Kind | Use | Status |
 | --- | --- | --- |
-| A handbook or internal docs | Markdown in a repo, read on GitHub, with a no-build viewer on GitHub Pages. This repo is the example | Adopted (this repo) |
-| A component library's docs | Storybook on GitHub Pages | Adopted (Cobalt) |
+| A handbook or internal docs | Markdown in a repo, read on GitHub, with a no-build viewer on GitHub Pages. This repo is the example | In use (this repo) |
+| A component library's docs | Storybook on GitHub Pages | In use (Cobalt) |
 | Public product documentation with many pages, search and versions | An Astro docs theme, following [Static site](static-site.md) | Proposed |
 
 Why this handbook has no build step: its main readers are agents, who read the Markdown files directly. A build would add dependencies to keep current and nothing they need.

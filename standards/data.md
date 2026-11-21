@@ -13,7 +13,7 @@ There are two ways to reach the data. Pick one per project.
 | What protects the data | Row-level security (RLS) policies: rules in the database that decide which rows each signed-in user may see | The server's own code. Supabase's Data API is switched off |
 | Server-side logic | Supabase Edge Functions | Server functions in the app |
 | Schema lives in | SQL files in `supabase/migrations/` | `src/db/schema.ts` (Drizzle), with generated SQL in `drizzle/` |
-| Status | Adopted (two repos) | Adopted (one repo) |
+| Status | Adopted (two repos) | In use (one repo) |
 
 ### Which one
 
@@ -69,7 +69,7 @@ How the files are made:
 | Pattern | Create a migration | Apply | Status |
 | --- | --- | --- | --- |
 | A. Browser-direct | Hand-written SQL in `supabase/migrations/`, named by the Supabase CLI: `supabase migration new <name>` | `npm run db:migrate`, which wraps `supabase db push --db-url "$DIRECT_URL"` | Proposed for new repos. Not yet proven in a repo |
-| B. Server-only | Edit `src/db/schema.ts`, then `npm run db:generate`. Commit the generated `drizzle/` files | `npm run db:migrate` | Adopted |
+| B. Server-only | Edit `src/db/schema.ts`, then `npm run db:generate`. Commit the generated `drizzle/` files | `npm run db:migrate` | In use (one repo) |
 
 One existing repo uses its own naming (`YYYYMMDD_NNN_name.sql`) and its own runner, and requires every file to be safe to apply twice. That is an accepted variant: it works, it is tested, and renaming applied history is risk for no gain. New repos use the table above.
 
@@ -104,7 +104,7 @@ Astro sites use `PUBLIC_` where Vite apps use `VITE_`.
 | Pattern | Standard | Status |
 | --- | --- | --- |
 | A. Browser-direct | **Supabase Auth**: magic link, password, and OAuth providers as needed | Adopted |
-| B. Server-only | Supabase Auth or Better-Auth | **Open.** The one repo on this pattern has Better-Auth's tables in its schema and an open issue to decide. Until that closes, new pattern-B projects should use Supabase Auth so there is one sign-in system to operate |
+| B. Server-only | Supabase Auth or Better-Auth | **Open.** Not decided for this pattern. Until it is, new server-only projects should use Supabase Auth, so there is one sign-in system to operate |
 
 Whichever is used: add every redirect URL (local and production) to the allow-list, and keep the session check inside every server handler.
 
