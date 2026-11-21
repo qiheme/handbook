@@ -106,7 +106,7 @@ Changesets. Every PR that changes behaviour, API or tokens adds a changeset (`np
 
 Repos with a database have a second CI job. It starts a throwaway Postgres 17 and:
 
-1. Creates stand-ins for the roles Supabase ships, so the migrations have something real to act on.
+1. Creates stand-ins for what Supabase ships and plain Postgres lacks: the Data API roles, and the `auth` schema with `auth.users` and `auth.uid()` that policies and foreign keys refer to.
 2. Applies every migration to the empty database.
 3. Applies them again and checks that nothing changes.
 4. Drizzle repos: regenerates from the schema and fails if a new file appears (the schema changed without a migration).
@@ -137,7 +137,7 @@ Never put a real secret in a `VITE_*` or `PUBLIC_*` name. Anything with those pr
 | `persist-credentials: false` on checkouts that run untrusted code | The token is not left on disk |
 | `HUSKY: '0'` in CI | `npm ci` would install hooks; a tag push would run them |
 | Pin the Netlify CLI to an exact version | A CLI release cannot break deploys on its own |
-| `concurrency` cancels superseded PR runs. Production deploys are serialised and never cancelled mid-upload | |
+| `concurrency` cancels superseded PR runs. Runs on `main` each get their own group. Production deploys are serialised and never cancelled mid-upload | A shared group keeps only one pending run, so a burst of merges would silently drop one's CI run and its tag |
 | The deploy skips itself if `main` has moved on | Runs can finish out of order; an old commit must not overwrite a newer one |
 | Secrets are scoped to the single step that needs them | `npm ci` and the build never see the database URL |
 | Never rely on a check that could pass vacuously | A failed lookup must stop the job, not read as "nothing to do" |

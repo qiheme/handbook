@@ -19,7 +19,7 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`common/package.scripts.json`](common/package.scripts.json) | merged into `package.json` | Node repos | Adjust `dev`, `build`, `preview`, `typecheck` for the framework |
 | [`common/eslint.config.js`](common/eslint.config.js) | `eslint.config.js` | Node repos | Add the TanStack plugins if used |
 | [`common/.prettierrc.json`](common/.prettierrc.json) | `.prettierrc.json` | Node repos (Proposed) | Nothing |
-| [`common/vitest.config.ts`](common/vitest.config.ts) | `vitest.config.ts` | Node repos | Set the environment. Give every exclusion a reason. Static sites: narrow coverage `include` to `src/lib/**` |
+| [`common/vitest.config.ts`](common/vitest.config.ts) | `vitest.config.ts` | Node repos | Set the environment. Give every exclusion a reason. Static sites: narrow coverage `include` to `src/lib/**`. Tools under `scripts/<tool>/` are already discovered and covered, except their `bin/` entry points |
 | [`common/playwright.config.ts`](common/playwright.config.ts) | `playwright.config.ts` | Anything with pages | Static sites: set `testDir` to `tests/e2e` |
 | [`e2e/quality.spec.ts`](e2e/quality.spec.ts) | `e2e/quality.spec.ts` (`tests/e2e/` in a static site) | Anything with pages (Proposed) | Install `@axe-core/playwright`. List every route in `PAGES`. Set `INDEXABLE` to `false` for an app behind a login |
 | [`common/.husky/pre-commit`](common/.husky/pre-commit), [`pre-push`](common/.husky/pre-push) | `.husky/` | Node repos | Run `npm install` once so `prepare` installs the hooks |
@@ -34,6 +34,7 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`netlify/_headers`](netlify/_headers) | `public/_headers` | Anything deployed to Netlify (Proposed) | Write the app's Content-Security-Policy, starting from the commented line |
 | [`ui/app.css`](ui/app.css) | `src/styles/app.css` | Apps using Cobalt with Tailwind | Import it once from the app entry |
 | [`db/supabase-roles.sql`](db/supabase-roles.sql) | `scripts/ci/supabase-roles.sql` | Repos with migrations | Nothing |
+| [`db/supabase-auth-stub.sql`](db/supabase-auth-stub.sql) | `scripts/ci/supabase-auth-stub.sql` | Repos whose migrations use `auth.uid()` or `auth.users` (every browser-direct app) | Add anything else of Supabase's your migrations refer to |
 | [`db/api-role-grants.sql`](db/api-role-grants.sql) | `scripts/ci/api-role-grants.sql` | Server-only (Drizzle) repos | Call it from CI and from a test |
 
 Files whose names end in `.template.md` are renamed on copy. They carry that suffix here so agents working in this handbook do not mistake them for this repo's own instructions.
@@ -50,7 +51,7 @@ Files whose names end in `.template.md` are renamed on copy. They carry that suf
 | `netlify/_headers` | ✓ | ✓ | ✓ | | |
 | `e2e/quality.spec.ts` | ✓ | ✓ | ✓ | | |
 | `ui/app.css` | ✓ | ✓ | ✓ | | |
-| `db/*.sql` | | ✓ roles | ✓ both | | |
+| `db/*.sql` | | ✓ roles and auth stub | ✓ roles and grants check | | |
 
 A library keeps its own release and Storybook workflows. Copy those from the `cobalt` repo: they are specific to publishing a package.
 
@@ -77,6 +78,7 @@ Copying files is not enough. Each of these is a setting somewhere else.
 | `playwright.config.ts` | Generalised from one repo. The `executablePath` line for cloud sessions is new |
 | `.prettierrc.json`, `dependabot.yml`, `_redirects` | **Proposed.** Not taken from a repo, and not yet deployed anywhere |
 | `netlify/_headers` | The long-cache rule for fingerprinted files is in use in one repo. The security headers are **Proposed** and have not been deployed anywhere |
+| `db/supabase-auth-stub.sql` | Generalised from one repo's CI stand-in. Run here against Postgres 16: a migration with a foreign key to `auth.users` and an `auth.uid()` policy fails without it and applies with it; the policy then shows each user only their own rows. Safe to apply twice |
 | `e2e/quality.spec.ts` | **Proposed.** New. Run here with Playwright 1.63 and axe 4.14 against a good page (7 tests pass) and a deliberately bad page (20 distinct failures reported). Typechecks under strict mode. Not yet run in a repo |
 | `CLAUDE.template.md`, issue forms, PR template | Merged from the four existing rulebooks |
 

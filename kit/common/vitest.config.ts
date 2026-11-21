@@ -20,17 +20,22 @@ export default defineConfig({
     //   setupFiles: ['./src/test/setup.ts']   (imports @testing-library/jest-dom/vitest)
     environment: 'node',
     // Tests sit next to the code in src/. Static sites keep them in tests/
-    // (their end-to-end specs are *.spec.ts under tests/e2e, so they don't match).
-    include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.{ts,tsx}'],
+    // (their end-to-end specs are *.spec.ts under tests/e2e, so they don't
+    // match). Tools that ship with the repo live in scripts/<tool>/.
+    include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.{ts,tsx}', 'scripts/**/*.test.{ts,js}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
-      include: ['src/**/*.{ts,tsx}'],
+      // A folder that does not exist is ignored, so one config fits every repo.
+      include: ['src/**/*.{ts,tsx}', 'scripts/**/*.{ts,js}'],
       // Every exclusion needs a reason a reviewer would accept, written here.
       // When a coverage gap appears, ask what behaviour is untested and add
       // that test. Do not exclude the file.
       exclude: [
-        '**/*.test.{ts,tsx}',
+        '**/*.test.{ts,tsx,js}',
+        // Tool entry points: they build the real file system, network and
+        // clock, then hand off. Every decision is in the modules beside them.
+        'scripts/**/bin/**',
         // Test helpers and setup.
         'src/test/**',
         // Entry point: mounts the app and nothing else.

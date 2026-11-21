@@ -22,9 +22,11 @@ permissions:
   contents: read
 
 # A newer push to the same PR supersedes the run still in flight. Runs on main
-# are never cancelled: release.yml needs each one to finish so no tag is lost.
+# each get a group of their own: a shared group keeps only ONE pending run and
+# replaces the rest even with cancel-in-progress off, so three quick merges
+# would drop the middle one's CI run, and with it the tag release.yml cuts.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -172,6 +174,14 @@ jobs:
       # real. The file is in the kit: kit/db/supabase-roles.sql.
       - name: Stand in for Supabase's Data API roles
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f scripts/ci/supabase-roles.sql
+
+      # Migrations for a browser-direct app write policies with auth.uid() and
+      # foreign keys to auth.users. Plain Postgres has neither, so they would
+      # fail here while working on Supabase. The file is in the kit:
+      # kit/db/supabase-auth-stub.sql. Server-only (Drizzle) repos that never
+      # refer to the auth schema can delete this step.
+      - name: Stand in for Supabase Auth
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f scripts/ci/supabase-auth-stub.sql
 
       - name: Apply migrations to an empty database
         run: npm run db:migrate
