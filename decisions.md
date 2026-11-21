@@ -26,6 +26,9 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 | D12 | Protect `main` | **Require the CI check; no direct pushes** | No protection | The gate that cannot be skipped should not be skippable | Every repo |
 | D13 | `stock-cerebro-client` | **Archive it** | Rebuild it on the Web app blueprint | Untouched since 2022, on an unmaintained toolchain | That repo |
 | D14 | This handbook is public | **Keep it public**, with stack-level facts only | Make the repo private, or move the handbook to a private repo | Agents and new developers can read it with no access setup. The cost is care about what goes in | This repo |
+| D15 | Front-end quality bar | **Adopt the Front-End Checklist** (frontendchecklist.io). Critical rules block a merge; High rules are required for new work and before launch | Keep the five-line accessibility baseline and nothing else | A maintained, prioritised list that agents can read and audit against. The cost is an audit of each existing site | Every repo with an interface |
+| D16 | Automate the checkable rules | **`quality.spec.ts` in every Playwright suite**, which adds `@axe-core/playwright` as a dev dependency | Rely on agent review alone | A check that runs on every PR does not depend on anyone remembering. One new dependency | Every repo with pages |
+| D17 | Security headers | **A `_headers` file in every Netlify site**, plus a Content-Security-Policy per app | Set headers in `netlify.toml`; or leave Netlify's defaults | A file in `public/` travels with the prebuilt upload, so previews and production get the same headers | Every deployed repo |
 
 ## Open
 
@@ -36,6 +39,9 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 | O3 | How Edge Functions are deployed | By the release workflow, or by hand | Not recorded in any repo today. Needs writing down first, then automating |
 | O4 | Mobile | Installable web app first; Expo if the device is needed | Decide on the first real mobile project. See [Not built yet](blueprints/other.md#mobile-app) |
 | O5 | Scheduled jobs | Supabase Cron | Decide when the one existing scheduled job moves off Vercel |
+| O6 | Error monitoring in production | A hosted error tracker, or none | The checklist rates it High and no repo has it. A new vendor and a new dependency, so it starts with an issue |
+| O7 | Browsers in end-to-end tests | Chromium only, or add Firefox and WebKit | The checklist rates cross-browser testing High. More browsers means slower CI. Decide per project, starting with the public sites |
+| O8 | Performance budget in CI | Lighthouse CI or a bundle-size check, or measure by hand at launch | The checklist rates Core Web Vitals High. Nothing measures them automatically today |
 
 ## Already settled
 

@@ -44,6 +44,7 @@
 - [ ] Linked the issue(s) above with `Closes` / `Part of`
 - [ ] Version bumped (`npm version <patch|minor|major> --no-git-tag-version`) if this is a user-facing change to a deployed app
 - [ ] Schema change? The migration is in this PR, only adds things, and every new table has row-level security on
+- [ ] UI change? Reviewed against the Front-End Checklist; Critical and High findings fixed (say what was reviewed under Verification)
 - [ ] No secret, token or private URL is in the diff
 - [ ] Out-of-scope discoveries were filed as issues, not implemented here
 - [ ] `README.md` / `docs/architecture.md` updated where behaviour, structure or setup changed

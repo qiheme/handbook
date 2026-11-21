@@ -109,6 +109,7 @@ In CI these are GitHub Actions **variables**, passed to the build step. Secrets 
 The standard pipeline: [CI/CD](../standards/ci-cd.md). Two things are specific to a web app.
 
 - **Single-page-app redirect.** Add `public/_redirects` containing `/*  /index.html  200`. It is copied into `dist/`, so the prebuilt upload carries its own routing rule.
+- **Security headers.** Add `public/_headers` from the kit and write the app's Content-Security-Policy. See [Front-end checklist](../standards/frontend-checklist.md).
 - **Migrations.** `release.yml` applies pending files before the deploy. See [Data](../standards/data.md#migrations).
 
 ## When this blueprint stops fitting

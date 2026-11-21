@@ -42,6 +42,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | PR preview | 🔴 | 🟢 | 🟡 not in the repo; left to Vercel | 🟢 | — | 🟡 not in the repo; left to Vercel |
 | Release: tag on merge | 🔴 none yet | 🟢 | 🔴 none | 🟢 | 🟢 Changesets | 🔴 none |
 | Migrations in CI and on release | 🟡 CI only | 🟢 both | 🔴 applied by hand | — | — | — |
+| [Front-End Checklist](standards/frontend-checklist.md): audited, `quality.spec.ts` in CI | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited |
 | `CLAUDE.md` | 🟢 | 🟢 | 🟢 | 🔴 | 🟢 | 🔴 |
 | Agent pointer files, not copies | 🟡 none | 🔴 a copy | 🔴 a copy | 🔴 none | 🔴 a copy | 🔴 none |
 | `verify` skill | 🟢 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |
@@ -91,23 +92,25 @@ Small, mechanical, low risk. One PR per repo.
 | 12 | Tests, CI, and `@q-labs/cobalt/tokens` instead of the copied file | portfolio | M |
 | 13 | Update Cobalt to 0.3 | wish-list, cloud129-site | XS to S |
 | 14 | Add a `verify` skill | every repo that runs | XS each |
+| 15 | Add `quality.spec.ts` and `_headers` from the kit; fix what the spec reports | every repo with pages | S each, more where it finds a lot |
+| 16 | Audit the public sites against every Critical and High rule of the [Front-End Checklist](standards/frontend-checklist.md) | cloud129-site, portfolio | M each |
 
 ### Wave 3: one host
 
 | # | Change | Repo | Size |
 | --- | --- | --- | --- |
-| 15 | Vercel → Netlify: drop the adapter, add the three workflows | portfolio | S |
-| 16 | Move `api/` and the daily cron to Supabase Edge Functions, then Vercel → Netlify, then add the release workflow and automatic migrations. Steps: [Functions](blueprints/functions.md#moving-off-vercel-functions) | Travel-OS | L |
-| 17 | First deploy: choose the host, prove the pipeline for a server-rendered app, update the blueprint | wish-list | M to L |
+| 17 | Vercel → Netlify: drop the adapter, add the three workflows | portfolio | S |
+| 18 | Move `api/` and the daily cron to Supabase Edge Functions, then Vercel → Netlify, then add the release workflow and automatic migrations. Steps: [Functions](blueprints/functions.md#moving-off-vercel-functions) | Travel-OS | L |
+| 19 | First deploy: choose the host, prove the pipeline for a server-rendered app, update the blueprint | wish-list | M to L |
 
 ### Wave 4: the long ones
 
 | # | Change | Repo | Size |
 | --- | --- | --- | --- |
-| 18 | JavaScript → TypeScript, file by file, starting with the pure modules | easy-finances | L |
-| 19 | Adopt Cobalt and map its tokens into Tailwind | easy-finances | L |
-| 20 | Tailwind token mapping; TanStack Query for server data | Travel-OS | M each. Optional: do it when those areas are next touched |
-| 21 | Framework majors: React 19, Vite 8, Vitest 5, Astro 7, Storybook 10 | where behind | S to M each. Dependabot would turn this into a steady trickle |
+| 20 | JavaScript → TypeScript, file by file, starting with the pure modules | easy-finances | L |
+| 21 | Adopt Cobalt and map its tokens into Tailwind | easy-finances | L |
+| 22 | Tailwind token mapping; TanStack Query for server data | Travel-OS | M each. Optional: do it when those areas are next touched |
+| 23 | Framework majors: React 19, Vite 8, Vitest 5, Astro 7, Storybook 10 | where behind | S to M each. Dependabot would turn this into a steady trickle |
 
 ### Not worth doing
 

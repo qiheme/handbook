@@ -1,0 +1,29 @@
+# Security headers for every response. Put this file at public/_headers so the
+# build copies it into dist/ and the prebuilt upload carries it.
+# Standard: https://qiheme.github.io/#/standards/frontend-checklist
+#
+# These cover the Front-End Checklist's header rules: HSTS, X-Frame-Options,
+# X-Content-Type-Options, Referrer-Policy and Permissions-Policy.
+#
+# A Content-Security-Policy is required too, but it is specific to each app: it
+# must list the app's own API and font hosts. Add the line below to the block,
+# watch the browser console on a preview deploy, then rename the header to
+# Content-Security-Policy once nothing is reported.
+#
+#   Content-Security-Policy-Report-Only: default-src 'self'; connect-src 'self' https://*.supabase.co; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; img-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+#
+# The two rules at the bottom let browsers keep fingerprinted build files for a
+# year: Vite writes them to /assets/, Astro to /_astro/. Their names change
+# whenever their content does, so they are safe to cache forever.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

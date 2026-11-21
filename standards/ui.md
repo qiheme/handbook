@@ -118,10 +118,13 @@ When the work is on the library itself, different rules apply. See [Library](../
 
 ## Accessibility
 
-The baseline for every interface. The first and last are already checked by an end-to-end suite; the rest are review items until a test covers them.
+The full rules are the Accessibility category of the [Front-end checklist](frontend-checklist.md): 95 rules, 9 of them Critical. The short version, for when you are in the middle of building something:
 
 - One `<h1>` per page, and headings in order.
-- Everything interactive is reachable and usable by keyboard.
-- Forms have labels.
+- Everything interactive is reachable and usable by keyboard, with a visible focus style.
+- Every input has a label. Every button and link has a name that says what it does.
+- Text meets the minimum contrast ratio. Cobalt's tokens are chosen to; your own combinations may not.
+- Respect `prefers-reduced-motion`.
 - Pages work without JavaScript where the content does not need it.
-- End-to-end tests fail on console errors.
+
+[`quality.spec.ts`](../kit/e2e/quality.spec.ts) runs axe on every route and fails on a violation. axe cannot test keyboard flow or how a page sounds in a screen reader; those are checked by hand before launch.

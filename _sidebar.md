@@ -9,6 +9,7 @@
   - [Data](/standards/data.md)
   - [Security](/standards/security.md)
   - [UI and Cobalt](/standards/ui.md)
+  - [Front-end checklist](/standards/frontend-checklist.md)
   - [Agents](/standards/agents.md)
 
 - **Blueprints**

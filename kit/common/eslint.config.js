@@ -38,6 +38,10 @@ export default defineConfig([
       globals: { ...globals.browser, ...globals.node },
     },
     rules: {
+      // Front-End Checklist, Critical: never run strings as code.
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
       // A leading underscore marks a deliberately unused name.
       '@typescript-eslint/no-unused-vars': [
         'error',

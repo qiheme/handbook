@@ -41,6 +41,10 @@ await page.screenshot({ path: 'verify.png' })
 await browser.close()
 ```
 
+## Check UI changes against the Front-End Checklist
+
+For a change users can see: run `npm run test:e2e` (it includes `quality.spec.ts`), then review the changed components and pages with the Front-End Checklist MCP server or skills. Fix Critical and High findings from this change. File the rest as issues.
+
 ## What to check for this repo
 
 <The flows that matter here, as a short list. For each: where to click, what you should see.>

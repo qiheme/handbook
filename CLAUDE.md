@@ -21,16 +21,19 @@ You are working in another repo and came here for the rules.
 
 ```
 README.md           Landing page and chooser
-standards/          One page per topic: stack, repo-contract, workflow, testing, ci-cd, data, security, ui, agents
+standards/          One page per topic: stack, repo-contract, workflow, testing, ci-cd, data, security, ui,
+                    frontend-checklist, agents
 blueprints/         One page per kind of project
 kit/                Files other repos copy. Not active in this repo
   common/           Configs, hooks, templates. *.template.md files are renamed on copy
   workflows/        ci.yml, deploy-preview.yml, release.yml
-  netlify/ ui/ db/  Netlify config, the Tailwind + Cobalt stylesheet, SQL for CI
+  e2e/              quality.spec.ts: the automated part of the Front-End Checklist
+  netlify/ ui/ db/  Netlify config and headers, the Tailwind + Cobalt stylesheet, SQL for CI
 adoption.md         Where each existing repo stands
 decisions.md        What is proposed or open
 llms.txt            Index for agents
 index.html          The website viewer (Docsify from a CDN). _sidebar.md is its navigation
+viewer.js viewer.css  Its configuration, plugins and styles. No inline script or style in index.html
 .nojekyll           Tells GitHub Pages to serve files as they are
 .github/workflows/  This repo's own CI: link check and workflow lint
 ```
@@ -79,8 +82,9 @@ There are no tests to run. Before opening a PR:
 
 1. **Links:** every relative link resolves. CI runs a link checker; locally, open the changed pages on GitHub or in the viewer and click them.
 2. **Workflows:** `actionlint kit/workflows/*.yml .github/workflows/*.yml`.
-3. **Viewer:** serve the folder (`python3 -m http.server`) and open it. New pages appear in the sidebar. Diagrams render.
-4. **Privacy:** reread the diff against the "public" rules above.
+3. **Viewer:** serve the folder (`python3 -m http.server`) and open it. New pages appear in the sidebar. Diagrams render. The browser console shows no errors (a Content-Security-Policy or integrity failure appears there).
+4. **Viewer dependencies:** a third-party file's version and its `integrity` hash change together. Compute the hash from the published file: `openssl dgst -sha384 -binary <file> | openssl base64 -A`. A wrong hash blocks the file and the page shows its fallback message.
+5. **Privacy:** reread the diff against the "public" rules above.
 
 ## Deviations from its own standard
 
@@ -89,4 +93,7 @@ There are no tests to run. Before opening a PR:
 | Default branch `main` | `master` | Not renamed yet. See [`adoption.md`](adoption.md) |
 | Node toolchain, Vitest, ESLint, hooks | None | No code. The content is Markdown and the viewer is one HTML file |
 | Netlify hosting | GitHub Pages | A `username.github.io` repo is served by Pages directly |
-| Cobalt via the npm package | A few token values copied into `index.html` | No build step to import the package. Marked as a snapshot in the file |
+| Cobalt via the npm package | A few token values copied into `viewer.css` | No build step to import the package. Marked as a snapshot in the file |
+| Front-End Checklist: search-engine rules | No `robots.txt` or sitemap | Reference material, not a site meant to rank. Whether it should be indexed at all is the owner's call |
+| Front-End Checklist: page weight | A page with a diagram loads a 3.5 MB library | Loaded only on those pages. No smaller pinned build to swap in yet |
+| `quality.spec.ts` in CI | Run by hand against the viewer | No Node toolchain here. Re-run it when `index.html`, `viewer.js` or `viewer.css` change |

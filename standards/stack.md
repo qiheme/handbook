@@ -50,6 +50,7 @@ Status labels: **Adopted** (two or more active repos already do this), **In use*
 | Unit tests | **Vitest** + Testing Library | Adopted | Every tested repo |
 | Coverage | **100%** lines, branches, functions, statements, enforced by `npm run test:coverage` | Adopted | Four repos |
 | End-to-end | **Playwright**, Chromium, against the built output | Adopted | Two repos |
+| Front-end quality | The **Front-End Checklist** ([frontendchecklist.io](https://frontendchecklist.io)). Critical and High rules are required | Proposed | A maintained, prioritised list that agents can read. See [Front-end checklist](frontend-checklist.md) |
 | Lint | **ESLint** flat config + `typescript-eslint` + `react-hooks`, `--max-warnings 0` | Adopted | Two repos on the flat config. The rest need it |
 | Type check | `npm run typecheck` (`tsc --noEmit`, or `astro check` for Astro) | Adopted | Vitest does not typecheck |
 | Git hooks | **husky**. Commit: lint staged files. Push: typecheck and coverage | Adopted (husky, three repos). This exact split is in use in one | Push-time gates let the red commit of a TDD cycle be committed |

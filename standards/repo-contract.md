@@ -17,6 +17,8 @@ What every repo contains, and what every repo's commands are called. If these ar
 | `eslint.config.js` | Flat config | [`kit/common/eslint.config.js`](../kit/common/eslint.config.js) |
 | `vitest.config.ts` | Tests and the 100% thresholds | [`kit/common/vitest.config.ts`](../kit/common/vitest.config.ts) |
 | `.husky/pre-commit`, `.husky/pre-push` | Local gates | [`kit/common/.husky/`](../kit/common/.husky/pre-push) |
+| `e2e/quality.spec.ts` | The automated part of the [Front-end checklist](frontend-checklist.md). Anything with pages (Proposed) | [`kit/e2e/quality.spec.ts`](../kit/e2e/quality.spec.ts) |
+| `public/_headers` | Security headers. Anything deployed to Netlify (Proposed) | [`kit/netlify/_headers`](../kit/netlify/_headers) |
 | `.github/workflows/ci.yml` | CI | [`kit/workflows/ci.yml`](../kit/workflows/ci.yml) |
 | `.github/workflows/deploy-preview.yml`, `release.yml` | Anything that deploys | [`kit/workflows/`](../kit/workflows/release.yml) |
 | `.github/pull_request_template.md` | | [`kit/common/.github/pull_request_template.md`](../kit/common/.github/pull_request_template.md) |

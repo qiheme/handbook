@@ -87,6 +87,7 @@ Start with these specs. They catch the failures a content site actually has.
 | `forms` | A form losing the attributes Netlify needs (submissions would vanish silently) |
 | `seo` | The 404 page, feed, sitemap and `robots.txt` |
 | `links` | Any internal link pointing at a page that does not exist |
+| `quality` | The checkable rules of the [Front-end checklist](../standards/frontend-checklist.md), with an accessibility scan, on every page. From the kit; not in either site yet |
 
 Every test also fails on a console error. The suite starts its own preview server on a port the dev server does not use.
 

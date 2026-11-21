@@ -30,6 +30,8 @@ Short rules that apply to every repo. Most of them answer one question: where do
 | **Stored third-party tokens are encrypted**, in a table with RLS on and no policies | Only the service role can read it |
 | **Row-level security on every table** | [Data](data.md#rules-for-every-table) |
 | **Links saved from user input are `http(s)` only** | A stored `javascript:` URL becomes a clickable attack |
+| **Every site sends security headers**: HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, and a Content-Security-Policy written for that app. Start from [`kit/netlify/_headers`](../kit/netlify/_headers) | The Security rules of the [Front-end checklist](frontend-checklist.md). Proposed |
+| **External scripts and styles carry an integrity hash**, and are pinned to an exact version | A changed file on someone else's CDN cannot run on our pages |
 | **No new dependency without discussion.** Open an issue first | Every package is code you run with your secrets |
 
 ## Fetching URLs that users supply

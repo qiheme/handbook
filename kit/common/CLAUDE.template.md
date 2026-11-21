@@ -86,6 +86,7 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 - **Cobalt first.** If `@q-labs/cobalt` has the component, import it. Colours, type, radius and shadow come from its tokens. No raw hex values.
 - <if the repo has a database> **Every table has row-level security on.** Schema changes are migration files in this PR; they only add things. Never change the schema through the dashboard or an MCP tool.
 - <if the repo has server code> **Every server endpoint authenticates inside the handler.** Failures are returned as `{ ok: false, error: { code, message } }`; only the code and message cross the wire.
+- <if the repo has an interface> **UI meets the Front-End Checklist** ([frontendchecklist.io](https://frontendchecklist.io)): Critical rules always, High rules for anything new. `e2e/quality.spec.ts` automates the checkable ones; review the rest with the checklist's MCP server or skills before opening a PR that changes what users see.
 - **Anything prefixed `VITE_` or `PUBLIC_` is public.** Secrets live in Supabase Function secrets or GitHub Actions secrets, never in the repo.
 
 ### Do not break

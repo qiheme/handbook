@@ -91,6 +91,7 @@ One repo writes the issue first, as `feat(#7): add wizard`. That is an accepted 
 | Build | `npm run build` |
 | End-to-end, if the repo has it | `npm run test:e2e` |
 | It works in the running app | The repo's `verify` skill, or by hand |
+| UI changes meet the [Front-end checklist](frontend-checklist.md) | Agent review against the checklist: Critical and High findings fixed |
 
 ### Answering review comments
 

@@ -19,6 +19,7 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 - [Data](https://qiheme.github.io/standards/data.md): Supabase, browser-direct versus server-only access, table rules, migrations, connection strings, auth
 - [Security](https://qiheme.github.io/standards/security.md): where each secret goes, endpoint rules, fetching user-supplied URLs, model providers
 - [UI and Cobalt](https://qiheme.github.io/standards/ui.md): the Cobalt design system, tokens, Tailwind mapping, atomic design, accessibility baseline
+- [Front-end checklist](https://qiheme.github.io/standards/frontend-checklist.md): frontendchecklist.io as the quality bar; which priorities are required, what is automated, how agents review, known gaps
 - [Agents](https://qiheme.github.io/standards/agents.md): CLAUDE.md as the rulebook, what every agent must do, skills, cloud sessions, AI features in apps
 
 ## Blueprints
@@ -40,6 +41,7 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 - [ci.yml](https://qiheme.github.io/kit/workflows/ci.yml): lint, typecheck, coverage, build, end-to-end, migrations
 - [deploy-preview.yml](https://qiheme.github.io/kit/workflows/deploy-preview.yml): trusted per-PR preview deploy to Netlify
 - [release.yml](https://qiheme.github.io/kit/workflows/release.yml): tag on merge, migrate, deploy to production, rollback
+- [quality.spec.ts](https://qiheme.github.io/kit/e2e/quality.spec.ts): Playwright spec that automates the checkable Front-End Checklist rules
 
 ## Status
 

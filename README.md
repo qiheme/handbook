@@ -17,6 +17,7 @@ One standard for how Cloud 12Nine and Q-Labs projects are built: the stack, the 
 | Add a table, a migration, auth | [Data](standards/data.md) |
 | Handle a key, token or secret | [Security](standards/security.md) |
 | Build UI | [UI and Cobalt](standards/ui.md) |
+| Know what "good" means for a page | [Front-end checklist](standards/frontend-checklist.md) |
 | Set up an agent or a cloud session | [Agents](standards/agents.md) |
 | Bring an existing repo up to standard | [Adoption](adoption.md) |
 | See what is still undecided | [Decisions](decisions.md) |
@@ -59,6 +60,7 @@ Something else (mobile, browser extension, docs)? See [Not built yet](blueprints
 | Backend | Supabase: Postgres, Auth, Edge Functions |
 | Tests | Vitest, 100% coverage on all four metrics. Playwright for end-to-end |
 | Lint | ESLint flat config, zero warnings |
+| Front-end quality | The [Front-End Checklist](https://frontendchecklist.io): Critical and High rules required |
 | Git hooks | husky: lint staged files on commit, typecheck and coverage on push |
 | CI/CD | GitHub Actions builds. Netlify hosts. Netlify never builds |
 | Releases | Version bumped in the PR, tagged on merge. Libraries use Changesets |

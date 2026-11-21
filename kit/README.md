@@ -21,6 +21,7 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`common/.prettierrc.json`](common/.prettierrc.json) | `.prettierrc.json` | Node repos (Proposed) | Nothing |
 | [`common/vitest.config.ts`](common/vitest.config.ts) | `vitest.config.ts` | Node repos | Set the environment. Give every exclusion a reason. Static sites: narrow coverage `include` to `src/lib/**` |
 | [`common/playwright.config.ts`](common/playwright.config.ts) | `playwright.config.ts` | Anything with pages | Static sites: set `testDir` to `tests/e2e` |
+| [`e2e/quality.spec.ts`](e2e/quality.spec.ts) | `e2e/quality.spec.ts` (`tests/e2e/` in a static site) | Anything with pages (Proposed) | Install `@axe-core/playwright`. List every route in `PAGES`. Set `INDEXABLE` to `false` for an app behind a login |
 | [`common/.husky/pre-commit`](common/.husky/pre-commit), [`pre-push`](common/.husky/pre-push) | `.husky/` | Node repos | Run `npm install` once so `prepare` installs the hooks |
 | [`common/.github/pull_request_template.md`](common/.github/pull_request_template.md) | `.github/pull_request_template.md` | Every repo | Add repo-specific checklist lines |
 | [`common/.github/ISSUE_TEMPLATE/`](common/.github/ISSUE_TEMPLATE/feature.yml) | `.github/ISSUE_TEMPLATE/` | Every repo | Enable Issue Types in the repo settings |
@@ -30,6 +31,7 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`workflows/release.yml`](workflows/release.yml) | `.github/workflows/release.yml` | Anything deployed to Netlify | Delete the migrate step if there is no database. Set the build variables |
 | [`netlify/netlify.toml`](netlify/netlify.toml) | `netlify.toml` | Anything deployed to Netlify | Nothing |
 | [`netlify/_redirects`](netlify/_redirects) | `public/_redirects` | Single-page apps only | Nothing |
+| [`netlify/_headers`](netlify/_headers) | `public/_headers` | Anything deployed to Netlify (Proposed) | Write the app's Content-Security-Policy, starting from the commented line |
 | [`ui/app.css`](ui/app.css) | `src/styles/app.css` | Apps using Cobalt with Tailwind | Import it once from the app entry |
 | [`db/supabase-roles.sql`](db/supabase-roles.sql) | `scripts/ci/supabase-roles.sql` | Repos with migrations | Nothing |
 | [`db/api-role-grants.sql`](db/api-role-grants.sql) | `scripts/ci/api-role-grants.sql` | Server-only (Drizzle) repos | Call it from CI and from a test |
@@ -45,6 +47,8 @@ Files whose names end in `.template.md` are renamed on copy. They carry that suf
 | `workflows/deploy-preview.yml`, `release.yml` | ✓ | ✓ | adjust the artifact | Changesets instead | |
 | `netlify/netlify.toml` | ✓ | ✓ | ✓ | | |
 | `netlify/_redirects` | | ✓ | | | |
+| `netlify/_headers` | ✓ | ✓ | ✓ | | |
+| `e2e/quality.spec.ts` | ✓ | ✓ | ✓ | | |
 | `ui/app.css` | ✓ | ✓ | ✓ | | |
 | `db/*.sql` | | ✓ roles | ✓ both | | |
 
@@ -69,9 +73,11 @@ Copying files is not enough. Each of these is a setting somewhere else.
 | Files | State |
 | --- | --- |
 | `workflows/*.yml` | Generalised from two repos where they run in production. Checked with `actionlint`. The combined form here (one CI file feeding both preview and release, with a `main` default branch and the optional migrate step) has **not** run end to end in a repo yet. Expect to fix small things on first use, and send the fix back here |
-| `eslint.config.js`, `vitest.config.ts`, hooks, `app.css`, `db/*.sql` | Taken from a repo where they run. The lint and test configs were run against a scratch project |
+| `eslint.config.js`, `vitest.config.ts`, hooks, `app.css`, `db/*.sql` | Taken from a repo where they run. The lint and test configs were run against a scratch project. The three `no-eval` rules in the lint config are an addition, checked the same way |
 | `playwright.config.ts` | Generalised from one repo. The `executablePath` line for cloud sessions is new |
-| `.prettierrc.json`, `dependabot.yml`, `_redirects` | **Proposed.** No repo uses them yet |
+| `.prettierrc.json`, `dependabot.yml`, `_redirects` | **Proposed.** Not taken from a repo, and not yet deployed anywhere |
+| `netlify/_headers` | The long-cache rule for fingerprinted files is in use in one repo. The security headers are **Proposed** and have not been deployed anywhere |
+| `e2e/quality.spec.ts` | **Proposed.** New. Run here with Playwright 1.63 and axe 4.14 against a good page (7 tests pass) and a deliberately bad page (20 distinct failures reported). Typechecks under strict mode. Not yet run in a repo |
 | `CLAUDE.template.md`, issue forms, PR template | Merged from the four existing rulebooks |
 
 ## Changing the kit

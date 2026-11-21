@@ -96,6 +96,8 @@ Component tests use Testing Library and `@testing-library/user-event`. Test what
 | `reducedMotion: 'reduce'` | No waiting on animations |
 | Trace on first retry, screenshot on failure, report uploaded as a CI artifact | Debuggable failures |
 | Visual snapshots are optional. If used, regenerate deliberately and commit the images in the same PR | |
+| Include [`quality.spec.ts`](../kit/e2e/quality.spec.ts): document basics, images, clean loading, and an axe accessibility scan on every route | It automates the checkable part of the [Front-end checklist](frontend-checklist.md). Proposed |
+| Chromium only, for now | The checklist asks for all major browsers. Adding Firefox and WebKit is an open decision |
 
 Apps behind a login use a dev-only bypass flag that the Playwright web server sets. It must be gated on the dev build so it cannot exist in production.
 

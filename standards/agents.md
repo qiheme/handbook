@@ -44,7 +44,8 @@ These are in the template. They are the same in every repo.
 8. **No new dependency without discussion.**
 9. **No schema changes through a dashboard or an MCP tool.** Migrations go in the PR.
 10. **Never put a secret in a file, a commit or the chat.**
-11. **Say what you did not do.** Skipped steps, failing tests and unverified claims are reported, not hidden.
+11. **Review UI changes against the [Front-end checklist](frontend-checklist.md).** Fix Critical and High findings the PR introduced; file the rest.
+12. **Say what you did not do.** Skipped steps, failing tests and unverified claims are reported, not hidden.
 
 ## Skills
 
@@ -53,6 +54,7 @@ A skill is a folder with a `SKILL.md` that an agent loads when the task matches.
 | Skill | Every repo? | What it holds |
 | --- | --- | --- |
 | `verify` | Yes, for anything that runs | How to build, start and drive this app to prove a change works: ports, commands, how to stop it, what the sandbox cannot do. Template: [`kit/common/claude-skill-verify/SKILL.template.md`](../kit/common/claude-skill-verify/SKILL.template.md) |
+| Front-End Checklist skills, or its MCP server | Anything with an interface | How to review code and pages against the checklist. See [Front-end checklist](frontend-checklist.md#agent-review) |
 | Vendor skills (for example Supabase's) | Where relevant | Pinned in a lock file. **The repo's own conventions win** where they differ, and `CLAUDE.md` says which |
 | Task skills | As needed | A recurring, multi-step job specific to the repo |
 
