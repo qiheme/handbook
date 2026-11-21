@@ -1,0 +1,13 @@
+# No [build] command here on purpose: the site is built on GitHub Actions
+# (.github/workflows/ci.yml and release.yml) and deployed prebuilt with the
+# Netlify CLI. Standard: https://qiheme.github.io/#/standards/ci-cd
+#
+# This file alone can't stop Netlify from building. That also requires builds
+# to be stopped in the Netlify project (or the project left unlinked from Git),
+# which is an account-side setting. `publish` only documents the output
+# directory for local `netlify deploy` runs; CI always passes --dir explicitly.
+#
+# Single-page apps: the redirect rule lives in public/_redirects (copied into
+# dist/ by the build), so the prebuilt upload carries its own routing.
+[build]
+  publish = "dist"

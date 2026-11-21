@@ -1,0 +1,41 @@
+# Weekly dependency updates. Minor and patch updates arrive as one grouped PR;
+# each major update arrives on its own and is treated as a Task.
+# Standard: https://qiheme.github.io/#/standards/ci-cd
+#
+# To let Dependabot install @q-labs/cobalt, add COBALT_PACKAGES_TOKEN under
+# Settings → Secrets and variables → Dependabot as well as Actions.
+version: 2
+
+registries:
+  github-packages:
+    type: npm-registry
+    url: https://npm.pkg.github.com
+    token: ${{ secrets.COBALT_PACKAGES_TOKEN }}
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    registries:
+      - github-packages
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - '*'

@@ -1,0 +1,44 @@
+name: CI
+
+# This repo is Markdown plus a kit of files other repos copy, so CI checks the
+# two things that can break: links between pages, and the kit's workflows.
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Links and workflows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # Offline: only links between files in this repo are checked, so a
+      # third-party site being down never fails the build. kit/common holds
+      # templates whose links only resolve once copied into another repo.
+      # --root-dir resolves the sidebar's links, which start with "/".
+      - name: Check links between pages
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress --root-dir ${{ github.workspace }} --exclude-path kit/common './**/*.md'
+          fail: true
+
+      # The kit's workflows are inert here (GitHub only runs the ones in
+      # .github/workflows), so nothing else would notice a mistake in them.
+      - name: Lint the kit's workflows
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+        run: |
+          curl -fsSL "https://raw.githubusercontent.com/rhysd/actionlint/v${ACTIONLINT_VERSION}/scripts/download-actionlint.bash" -o download-actionlint.bash
+          bash download-actionlint.bash "$ACTIONLINT_VERSION"
+          ./actionlint -color kit/workflows/*.yml .github/workflows/*.yml

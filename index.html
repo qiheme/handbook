@@ -1,14 +1,216 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Quincy's Portfolio</title>
-    </head>
-    <body>
-        <h1>
-            Hello World!!!!!
-        </h1>
-        <p>
-            This is Quincy's portfolio.
-        </p>
-    </body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Engineering Handbook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="One standard for how Cloud 12Nine and Q-Labs projects are built: the stack, the workflow, the pipelines, and a kit of files to copy."
+    />
+
+    <!--
+      This page is only a viewer. The handbook is the Markdown files in this
+      repository; Docsify fetches and renders them in the browser. There is no
+      build step. Agents should read the .md files directly (see llms.txt).
+
+      Third-party scripts are pinned to exact versions on purpose.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@5.1.0/dist/themes/core.min.css" />
+
+    <style>
+      /*
+       * Cobalt look for the viewer.
+       *
+       * The values below are a SNAPSHOT of @q-labs/cobalt 0.3.0's tokens, kept
+       * under Cobalt's own token names. Apps must import the package instead
+       * (see standards/ui.md); this repo has no build step, so it cannot.
+       * Dark is the default, as in Cobalt. Light follows the reader's system.
+       */
+      :root {
+        --bg-base: #040508;
+        --bg-surface: #080a0f;
+        --bg-raised: #111318;
+        --text-primary: #eef0f5;
+        --text-secondary: #8b95a8;
+        --text-accent: #60a5fa;
+        --accent-default: #2563eb;
+        --border-default: rgba(255, 255, 255, 0.09);
+        --font-display: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+        --font-body: 'DM Sans', 'Helvetica Neue', sans-serif;
+        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        color-scheme: dark;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg-base: #f7f8fa;
+          --bg-surface: #ffffff;
+          --bg-raised: #f1f5f9;
+          --text-primary: #0d0f14;
+          --text-secondary: #3d4a5c;
+          --text-accent: #1d4ed8;
+          --border-default: rgba(0, 0, 0, 0.08);
+          color-scheme: light;
+        }
+      }
+
+      /* Map the tokens onto Docsify's theme variables. */
+      :root {
+        --color-bg: var(--bg-base);
+        --color-text: var(--text-primary);
+        --theme-color: var(--accent-default);
+        --font-family: var(--font-body);
+        --font-family-mono: var(--font-mono);
+        --font-weight: 400;
+        --border-color: var(--border-default);
+        --border-radius: 6px;
+        --heading-color: var(--text-primary);
+        --strong-color: var(--text-primary);
+        --link-color: var(--text-accent);
+        --sidebar-background: var(--bg-surface);
+        /* Wide enough for the comparison tables. */
+        --content-max-width: 96ch;
+      }
+
+      .markdown-section :is(h1, h2, h3, h4),
+      .app-name-link {
+        font-family: var(--font-display);
+        letter-spacing: -0.01em;
+      }
+
+      .markdown-section table {
+        display: block;
+        overflow-x: auto;
+        font-size: 0.925em;
+      }
+
+      .markdown-section :is(th, td) {
+        vertical-align: top;
+      }
+
+      .markdown-section th {
+        background: var(--bg-raised);
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      .markdown-section :not(pre) > code {
+        background: var(--bg-raised);
+      }
+
+      .markdown-section pre {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-default);
+      }
+
+      /* Diagrams: centred on a quiet panel, scrollable when wide. */
+      .markdown-section .mermaid {
+        margin-block: 1.5rem;
+        padding: 1rem;
+        overflow-x: auto;
+        text-align: center;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-default);
+        border-radius: 6px;
+      }
+
+      .markdown-section .mermaid svg {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">Loading the handbook…</div>
+
+    <noscript>
+      <p>
+        This viewer needs JavaScript. The handbook itself is plain Markdown:
+        <a href="https://github.com/qiheme/qiheme.github.io#readme">read it on GitHub</a>.
+      </p>
+    </noscript>
+
+    <script>
+      ;(function () {
+        var REPO = 'qiheme/qiheme.github.io'
+        // HEAD follows the default branch, so links survive a branch rename.
+        var BLOB = 'https://github.com/' + REPO + '/blob/HEAD/'
+
+        /**
+         * Kit files and other non-page files are meant to be read as source,
+         * not rendered. Rewrite relative Markdown links to them so they open
+         * on GitHub. Links between pages (*.md outside kit/) are left alone
+         * for Docsify to turn into routes.
+         */
+        function sourceLinks(hook, vm) {
+          hook.beforeEach(function (markdown) {
+            var page = new URL(vm.route.file, 'https://handbook.invalid/')
+            return markdown.replace(/\]\(([^)\s]+)\)/g, function (match, href) {
+              if (/^([a-z][a-z0-9+.-]*:|\/\/|#|\?)/i.test(href)) return match
+              var target = new URL(href, page)
+              var path = target.pathname.slice(1)
+              var isPage = /\.md$/.test(path) && !/^kit\/(?!README\.md$)/.test(path)
+              return isPage ? match : '](' + BLOB + path + target.hash + ')'
+            })
+          })
+        }
+
+        /** Render ```mermaid code fences as diagrams. */
+        function diagrams(hook) {
+          hook.doneEach(function () {
+            if (!window.mermaid) return
+            var blocks = document.querySelectorAll('.markdown-section pre[data-lang="mermaid"]')
+            var nodes = Array.prototype.map.call(blocks, function (pre) {
+              var figure = document.createElement('div')
+              figure.className = 'mermaid'
+              figure.textContent = pre.textContent
+              pre.replaceWith(figure)
+              return figure
+            })
+            if (nodes.length) window.mermaid.run({ nodes: nodes })
+          })
+        }
+
+        window.$docsify = {
+          name: 'Engineering Handbook',
+          repo: REPO,
+          homepage: 'README.md',
+          loadSidebar: true,
+          // One sidebar for every folder. Its links start with "/" because
+          // relativePath would otherwise resolve them against the open page.
+          alias: { '/.*/_sidebar.md': '/_sidebar.md' },
+          relativePath: true,
+          auto2top: true,
+          subMaxLevel: 2,
+          search: {
+            placeholder: 'Search the handbook',
+            noData: 'No results',
+            depth: 3,
+          },
+          plugins: [sourceLinks, diagrams],
+        }
+      })()
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js"></script>
+    <script>
+      if (window.mermaid) {
+        window.mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'strict',
+          theme: window.matchMedia('(prefers-color-scheme: light)').matches ? 'neutral' : 'dark',
+        })
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@5.1.0/dist/docsify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@5.1.0/dist/plugins/search.min.js"></script>
+  </body>
 </html>

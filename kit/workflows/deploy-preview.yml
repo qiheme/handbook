@@ -1,0 +1,141 @@
+name: Deploy Preview
+
+# Step 2 of 2 for PR previews. TRUSTED. Netlify never builds this repo, so
+# previews deploy from here, same as production.
+#
+# workflow_run always runs the copy of this file on main, never the PR's, so
+# the Netlify token is only ever handed to reviewed code. This job never checks
+# out, installs or runs anything from the PR: it installs the Netlify CLI,
+# downloads the build CI produced, checks it holds only build output, and
+# uploads it as a draft deploy to a stable alias,
+#
+#   https://pr-<number>--<site>.netlify.app
+#
+# then keeps one sticky PR comment pointing at it. A draft alias deploy can
+# never touch production.
+#
+# Note: workflow_run only fires once this file exists on main, so previews
+# start working after the PR that adds the pipeline has merged.
+#
+# Standard: https://qiheme.github.io/#/standards/ci-cd
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
+env:
+  # Pinned on purpose. Bump it deliberately, in its own PR.
+  NETLIFY_CLI: netlify-cli@27.10.2
+  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+  NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+jobs:
+  deploy:
+    name: Netlify preview
+    # Same-repo PRs only: for fork PRs workflow_run carries no PR, and fork
+    # code must not reach a credentialed deploy anyway.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.pull_requests[0].number
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-preview-${{ github.event.workflow_run.pull_requests[0].number }}
+      cancel-in-progress: true
+    env:
+      PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      # Until the two Netlify secrets exist, skip with a notice rather than
+      # failing every PR.
+      - name: Check Netlify secrets
+        id: secrets
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "::notice::NETLIFY_AUTH_TOKEN / NETLIFY_SITE_ID not set. Skipping the preview deploy. See README \"Deployment\"."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Installed here, before any artifact exists on disk: the artifact is
+      # PR-controlled, so npm must never run inside it (a planted .npmrc could
+      # point it at a different registry and swap the CLI).
+      - name: Install the Netlify CLI
+        if: steps.secrets.outputs.ready == 'true'
+        run: npm install --global --no-fund --no-audit "$NETLIFY_CLI"
+
+      # The artifact unpacks to preview/dist.
+      - uses: actions/download-artifact@v4
+        if: steps.secrets.outputs.ready == 'true'
+        with:
+          name: preview
+          path: preview
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The artifact is untrusted: accept exactly what ci.yml uploads (dist/)
+      # and nothing else. No netlify.toml, .npmrc or other config the CLI could
+      # pick up from its working directory.
+      - name: Check the artifact's contents
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          top="$(LC_ALL=C ls -A preview | tr '\n' ' ')"
+          if [ "$top" != "dist " ]; then
+            echo "::error::The preview artifact holds unexpected files (top level: '$top'); refusing to deploy it."
+            exit 1
+          fi
+
+      # Run from inside the artifact's directory with the CLI installed above,
+      # not anything from the artifact. A single-page app carries its own
+      # redirect rule in dist/_redirects, so no netlify.toml is needed here.
+      - name: Deploy to the PR alias
+        id: deploy
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          (cd preview && netlify deploy \
+            --no-build \
+            --dir dist \
+            --alias "pr-$PR_NUMBER" \
+            --message "PR #$PR_NUMBER @ ${HEAD_SHA::7}" \
+            --json) > deploy.json
+          echo "url=$(jq -r '.deploy_url' deploy.json)" >> "$GITHUB_OUTPUT"
+          echo "logs=$(jq -r '.logs' deploy.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Comment the preview URL on the PR
+        if: steps.secrets.outputs.ready == 'true'
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+          LOGS_URL: ${{ steps.deploy.outputs.logs }}
+        with:
+          script: |
+            const marker = '<!-- netlify-preview -->'
+            const body = [
+              marker,
+              '### 🔍 Deploy preview ready',
+              '',
+              '| | |',
+              '|---|---|',
+              `| **Preview** | ${process.env.PREVIEW_URL} |`,
+              `| **Commit** | \`${process.env.HEAD_SHA.slice(0, 7)}\` |`,
+              `| **Netlify deploy** | ${process.env.LOGS_URL} |`,
+              '',
+              '_Updated on every push to this PR._',
+            ].join('\n')
+            const { owner, repo } = context.repo
+            const issue_number = Number(process.env.PR_NUMBER)
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+            const existing = comments.find((c) => c.body?.includes(marker))
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body })
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body })
+            }
+            core.summary.addRaw(`Preview: ${process.env.PREVIEW_URL}`).write()

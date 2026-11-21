@@ -1,0 +1,227 @@
+name: Release & Deploy
+
+# Merge → CI → tag → (migrate) → deploy. Netlify never builds this repo, so
+# production deploys run from here with the Netlify CLI.
+#
+#   merge to main ──► CI ──► green?
+#                       ├─► release: tag v<package.json version> + GitHub Release
+#                       │   (only if that tag is new; notes generated from the
+#                       │   PRs merged since the previous tag)
+#                       └─► deploy:  migrate the database (database repos)
+#                                    → build → netlify deploy --prod
+#                           (every merge, so production always matches main)
+#
+#   Actions tab → "Release & Deploy" → Run workflow (tag: v1.2.0)
+#                  ──► deploy only, from that tag. This is the rollback path.
+#                      No migrations: rolling code back never rolls the schema
+#                      back. Leave the tag empty to redeploy main as-is.
+#
+# Gated on CI via workflow_run rather than on the push itself, so a commit that
+# breaks the build is never tagged or deployed. workflow_run always runs main's
+# copy of this file; the `event == 'push'` check keeps CI runs from PRs
+# (including a fork branch that happens to be named "main") out.
+#
+# The version is bumped by hand in a PR (`npm version <patch|minor|major>
+# --no-git-tag-version`); a merge without a bump still deploys, it just doesn't
+# cut a new tag.
+#
+# Standard: https://qiheme.github.io/#/standards/ci-cd
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)deploy to production, e.g. v1.2.0. Empty = current main.'
+        required: false
+
+permissions:
+  contents: write
+
+# No workflow-level concurrency group on purpose: GitHub keeps only ONE pending
+# run per group and cancels the rest, so three quick merges would silently drop
+# the middle one's tag. Every merge's `release` job runs; it is idempotent and
+# tolerates racing another run for the same tag. Only `deploy` is serialized
+# (job-level group below), and it skips if main has moved on.
+
+env:
+  # Pinned on purpose. Bump it deliberately, in its own PR.
+  NETLIFY_CLI: netlify-cli@27.10.2
+  # npm ci runs `prepare` → husky, and the tag push below would fire
+  # .husky/pre-push. Every real gate already ran on the PR.
+  HUSKY: '0'
+
+jobs:
+  release:
+    name: Tag & release
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      # The commit CI tested. (On workflow_run, github.sha is main's tip when
+      # CI finished, which may already be a newer merge.)
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      # Idempotent, and each half checked on its own: a merge with no version
+      # bump finds both present and no-ops; a run that pushed the tag but died
+      # before the release retries just the release.
+      - name: Ensure tag and GitHub Release exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          TAG="v$VERSION"
+
+          if git tag -l "$TAG" | grep -q .; then
+            echo "$TAG already exists. No version bump in this merge, nothing to tag."
+          else
+            echo "Tagging $TAG at $(git rev-parse --short HEAD)"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Release $VERSION"
+            # A concurrent run for the same version may win the push; that's fine.
+            git push origin "$TAG" || git ls-remote --exit-code --tags origin "refs/tags/$TAG"
+          fi
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "GitHub Release $TAG already exists."
+          else
+            gh release create "$TAG" --title "$TAG" --generate-notes --verify-tag \
+              || gh release view "$TAG" >/dev/null
+          fi
+
+  deploy:
+    name: Deploy to production
+    needs: release
+    # Runs after a successful release, or on its own for a manual redeploy.
+    # `release` is also skipped when CI failed or ran for a PR, so a skipped
+    # release only counts on a manual run.
+    if: >-
+      !cancelled() && (
+        needs.release.result == 'success' ||
+        (needs.release.result == 'skipped' && github.event_name == 'workflow_dispatch')
+      )
+    runs-on: ubuntu-latest
+    # Serialize production deploys; never cancel one mid-upload.
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    # Add required reviewers to this environment (Settings → Environments) to
+    # put a click in front of every production deploy and its migrations.
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    steps:
+      - name: Check deploy secrets
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "::error::NETLIFY_AUTH_TOKEN / NETLIFY_SITE_ID are not set. See README \"Deployment\"."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      # Runs can finish out of order: if a newer merge already landed on main,
+      # its own run deploys it. Don't let this older commit overwrite it.
+      # (Manual redeploys skip this check by design.)
+      - name: Skip if main has moved on
+        id: fresh
+        if: github.event_name == 'workflow_run'
+        # Asks the API rather than `git ls-remote`: the checkout above drops
+        # its credentials, and an unauthenticated ls-remote fails on a private
+        # repo. A failed lookup must stop the job, never read as "main moved
+        # on" (which would silently skip the deploy).
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
+          if [ -z "$MAIN_SHA" ]; then
+            echo "::error::Couldn't look up main's current commit."
+            exit 1
+          fi
+          if [ "$MAIN_SHA" != "$HEAD_SHA" ]; then
+            echo "::notice::main is now at ${MAIN_SHA::7}; skipping deploy of ${HEAD_SHA::7} (the newer run deploys it)."
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.fresh.outputs.stale != 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@q-labs'
+
+      - name: Install dependencies
+        if: steps.fresh.outputs.stale != 'true'
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.COBALT_PACKAGES_TOKEN }}
+
+      # DATABASE REPOS ONLY. Delete this step if the repo has no migrations.
+      #
+      # Before the build, so a failed migration stops the deploy and the
+      # current production keeps running. Migrations only add things, so the
+      # code already live keeps working against the migrated database.
+      #
+      # The database secret is scoped to this step only, so npm ci (and any
+      # dependency install script) and the build never see it. DIRECT_URL is
+      # the Supabase session pooler string: GitHub's runners are IPv4-only and
+      # can't reach the direct connection. Not run on a manual redeploy.
+      - name: Migrate database
+        if: steps.fresh.outputs.stale != 'true' && github.event_name == 'workflow_run'
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          if [ -z "$DIRECT_URL" ]; then
+            echo "::error::DIRECT_URL is not set, so migrations can't run. See README \"Deployment\"."
+            exit 1
+          fi
+          npm run db:migrate
+
+      # Same public build-time variables as ci.yml. Values set on the
+      # `production` environment override the repository-level ones.
+      - name: Build
+        if: steps.fresh.outputs.stale != 'true'
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Deploy
+        id: deploy
+        if: steps.fresh.outputs.stale != 'true'
+        env:
+          REDEPLOY: ${{ github.event_name == 'workflow_dispatch' && ' (manual redeploy)' || '' }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          npx --yes "$NETLIFY_CLI" deploy \
+            --prod \
+            --no-build \
+            --dir dist \
+            --message "v$VERSION @ $(git rev-parse --short HEAD)$REDEPLOY" \
+            --json > deploy.json
+          URL="$(jq -r '.url' deploy.json)"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          {
+            echo "### 🚀 Deployed v$VERSION to production"
+            echo ""
+            echo "- **Site:** $URL"
+            echo "- **Commit:** \`$(git rev-parse --short HEAD)\`"
+            echo "- **Netlify deploy:** $(jq -r '.logs' deploy.json)"
+          } >> "$GITHUB_STEP_SUMMARY"

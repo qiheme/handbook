@@ -1,0 +1,189 @@
+name: CI
+
+# Lint, types, coverage, build, end-to-end. Also step 1 of 2 for PR previews.
+#
+# On a pull request this runs the PR's own code (npm ci lifecycle scripts, the
+# build) with a read-only token and no deploy credentials. It hands its build
+# output off as the `preview` artifact; step 2, deploy-preview.yml, picks it up
+# from a workflow_run that always executes main's trusted copy.
+#
+# release.yml is gated on this workflow passing on main, so a commit that fails
+# here is never tagged or deployed. Keep the workflow name "CI": both of the
+# other workflows refer to it by name.
+#
+# Standard: https://qiheme.github.io/#/standards/ci-cd
+on:
+  push:
+    branches: [main]
+  # Any base branch, so a PR stacked on another feature branch is checked too.
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same PR supersedes the run still in flight. Runs on main
+# are never cancelled: release.yml needs each one to finish so no tag is lost.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Lint, types, tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          # @q-labs/cobalt is on GitHub Packages. setup-node writes the .npmrc
+          # that sends the @q-labs scope there and reads NODE_AUTH_TOKEN.
+          registry-url: https://npm.pkg.github.com
+          scope: '@q-labs'
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          # A token with read:packages. The built-in GITHUB_TOKEN can't read a
+          # package owned by a different account. It is the only secret this
+          # job sees, and fork PRs don't get it.
+          NODE_AUTH_TOKEN: ${{ secrets.COBALT_PACKAGES_TOKEN }}
+          HUSKY: '0'
+
+      - name: Lint
+        run: npm run lint
+
+      # Vitest strips types without checking them, so this is its own gate.
+      - name: Type check
+        run: npm run typecheck
+
+      # `vitest run` alone skips the thresholds, so coverage could silently
+      # erode. test:coverage makes the 100% floor a hard failure.
+      - name: Test (100% coverage gate)
+        run: npm run test:coverage
+
+      # Build-time values come from repository *variables*, not secrets: every
+      # VITE_* / PUBLIC_* value ends up in the public bundle anyway. Delete the
+      # ones this repo does not use, and never put a real secret here.
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+
+      # End-to-end tests run against the build above (playwright.config.ts
+      # starts a preview server on it). Delete these steps, down to "Stage the
+      # preview", if the repo has no Playwright suite yet.
+      #
+      # If Playwright reports that it does not support the runner's Ubuntu
+      # release, bump @playwright/test. Pinning runs-on to an older image is
+      # the fallback, not the fix.
+      - name: Get the Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Playwright's Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      # The browser binary is cached, but its system libraries aren't.
+      - name: Install Playwright's system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+      # The artifact is staged under preview/ so it unpacks to dist/ (a lone
+      # path would be uploaded as its contents). deploy-preview.yml checks for
+      # exactly that layout and refuses anything else.
+      - name: Stage the preview
+        if: github.event_name == 'pull_request'
+        run: mkdir preview && cp -R dist preview/dist
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request'
+        with:
+          name: preview
+          path: preview/
+          include-hidden-files: true
+          retention-days: 7
+
+  # DATABASE REPOS ONLY. Delete this job if the repo has no migrations.
+  #
+  # Applies the real migrations to a throwaway Postgres (same major version as
+  # the hosted databases) so a broken migration fails the PR, not the deploy.
+  migrations:
+    name: Migrations
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      DIRECT_URL: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@q-labs'
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.COBALT_PACKAGES_TOKEN }}
+          HUSKY: '0'
+
+      # A Supabase project ships three Data API roles and auto-grants them
+      # every new table. Create them first so the migrations act on something
+      # real. The file is in the kit: kit/db/supabase-roles.sql.
+      - name: Stand in for Supabase's Data API roles
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f scripts/ci/supabase-roles.sql
+
+      - name: Apply migrations to an empty database
+        run: npm run db:migrate
+
+      # Add a repo-specific assertion here that nothing changed (for example,
+      # compare the count of applied migrations with the count of files).
+      - name: Applying again succeeds
+        run: npm run db:migrate
+
+      # DRIZZLE REPOS ONLY. `generate` writes a new migration if schema.ts has
+      # changes no migration covers, which shows up as a new file under drizzle/.
+      - name: schema.ts has no changes missing a migration
+        run: |
+          npm run db:generate
+          test -z "$(git status --porcelain -- drizzle)"

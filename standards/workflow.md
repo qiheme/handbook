@@ -1,0 +1,115 @@
+# Workflow
+
+How a piece of work goes from idea to production. The same in every repo.
+
+```mermaid
+flowchart LR
+    issue["1 Issue"] --> branch["2 Branch"]
+    branch --> red["3 Red<br/>failing test"]
+    red --> green["4 Green<br/>minimum code"]
+    green --> refactor["5 Refactor"]
+    refactor -->|"next unit"| red
+    refactor --> pr["6 Pull request"]
+    pr --> ci{"CI green?<br/>Preview checked?"}
+    ci -->|no| red
+    ci -->|yes| merge["7 Squash merge"]
+    merge --> release["8 Tag + deploy"]
+```
+
+## 1. Every piece of work starts with an issue
+
+- No issue, no code. If none exists, open one first. The issue is the description of the work.
+- Use the form: **Feature** (users can see it), **Bug** (something is broken), **Task** (refactor, tooling, tests, infrastructure). Set the Issue Type.
+- Attach it to its parent issue as a sub-issue when there is one.
+- **Out-of-scope discoveries are filed, not fixed.** If you find something that should change but is not this task, open an issue and carry on. Reference it in a code comment if it matters right there: `// TODO: see #42`.
+
+## 2. Branch from the issue
+
+`feat/<issue>-short-slug` or `fix/<issue>-short-slug`. Example: `feat/12-share-page`.
+
+Agents working in a cloud session use the branch the session assigns them.
+
+## 3 to 5. Test first: red, green, refactor
+
+Applies to every piece of logic. Layout, copy and styling changes are exempt. Any component with a condition or a computed value is logic.
+
+1. **Red.** Write the failing test first, with a stub that compiles but returns the wrong answer. Run it. It must fail *for the reason you intended*, not because a file is missing.
+2. **Green.** Write the minimum code that passes. Reach 100% coverage on the files you touched before moving on.
+3. **Refactor.** Clean up with the tests green. No new behaviour.
+
+The cycle is per unit of work, not per PR. One behaviour goes all the way round before the next starts.
+
+Commit each phase. This is why quality gates run on push, not on commit: the red commit has to be committable.
+
+More: [Testing](testing.md).
+
+## Commits
+
+Conventional commits, with the issue number at the end.
+
+```
+type(scope): short description (#issue)
+```
+
+| Type | Use for |
+| --- | --- |
+| `feat` | New behaviour |
+| `fix` | A bug fix |
+| `test` | Tests only. The red phase: `test(cart): red — empty cart totals zero (#9)` |
+| `refactor` | No behaviour change |
+| `docs` | Documentation only |
+| `chore` | Tooling, dependencies, config |
+| `ci` | Workflow files |
+
+Examples:
+
+```
+test(cart): red — discount never drops the total below zero (#6)
+feat(cart): green — clamp discounted total at zero (#6)
+refactor(cart): extract price rounding (#6)
+```
+
+One repo writes the issue first, as `feat(#7): add wizard`. That is an accepted older form. New repos use the shape above.
+
+## 6. Pull request
+
+- **Title:** conventional commit style. It becomes the squash commit.
+- **Body:** follow the PR template. It must contain:
+  - `Closes #<n>` (or `Part of #<n>` when the issue stays open).
+  - **Evidence it works at runtime.** Not "CI is green". What you ran, what you saw, and a screenshot for anything visible.
+- **Version bump** in the PR when the repo is a deployed app and the change is user-facing. See [CI/CD](ci-cd.md#releases).
+- **Docs** updated in the same PR when behaviour, structure, setup or conventions change.
+- Open it ready for review, not as a draft, unless you are asking for early feedback.
+
+### Before you ask for review
+
+| Check | Command |
+| --- | --- |
+| Lint | `npm run lint` |
+| Types | `npm run typecheck` |
+| Tests and coverage | `npm run test:coverage` |
+| Build | `npm run build` |
+| End-to-end, if the repo has it | `npm run test:e2e` |
+| It works in the running app | The repo's `verify` skill, or by hand |
+
+### Answering review comments
+
+1. Reply to the comment: what changed and why. If you disagree, say so and explain.
+2. React: 👍 when the feedback was right, 👎 with a short reason when it does not apply.
+3. Resolve the thread once the fix is pushed.
+
+## 7. Merge
+
+Squash merge when CI is green and the preview has been looked at. Delete the branch.
+
+Never, to get a green check: skip, disable or delete a test. Lower a coverage threshold. Add a coverage exclusion without a written reason a reviewer would accept.
+
+## 8. Release
+
+Merging to `main` deploys. If the PR bumped the version, the merge also creates the tag and the GitHub Release. Nothing is deployed by hand. See [CI/CD](ci-cd.md).
+
+## Planning
+
+- Larger efforts are an **Epic** issue with sub-issues. Each PR links its issue.
+- Issues carry Priority, Effort and Project fields on the roadmap board where the repo is on it.
+- A **Spike** is a time-boxed question. Its output is a decision written into the issue, not code.
