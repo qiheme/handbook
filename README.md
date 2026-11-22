@@ -19,6 +19,7 @@ One standard for how Cloud 12Nine and Q-Labs projects are built: the stack, the 
 | Build UI | [UI and Cobalt](standards/ui.md) |
 | Know what "good" means for a page | [Front-end checklist](standards/frontend-checklist.md) |
 | Set up an agent or a cloud session | [Agents](standards/agents.md) |
+| Have an agent audit a repo, or start a new one | [How an agent meets the handbook](standards/agents.md#how-an-agent-meets-the-handbook) |
 | Bring an existing repo up to standard | [Adoption](adoption.md) |
 | See what is still undecided | [Decisions](decisions.md) |
 
@@ -75,6 +76,7 @@ Details, reasons and status for each row: [The stack](standards/stack.md).
 standards/    The rules. One page per topic.
 blueprints/   One page per kind of project: what to use and how to set it up.
 kit/          Files to copy into a repo: workflows, hooks, configs, templates.
+skills/       Agent skills: audit a repo against the handbook; start a new project from it.
 adoption.md   Where each existing repo stands, and the order to fix them in.
 decisions.md  Every choice that still needs a yes or no.
 CLAUDE.md     Rules for agents (and people) changing this handbook.
@@ -92,6 +94,8 @@ The Markdown files are the source of truth. The website at <https://qiheme.githu
 4. **Copy the kit**: follow the table in [`kit/README.md`](kit/README.md).
 5. **Fill in `CLAUDE.md`** from the template. List anything that differs from the standard under "Deviations".
 6. **Add the repo to [Adoption](adoption.md)** with a PR to this handbook.
+
+An agent does all six from one request: see [Starting a new project](standards/agents.md#starting-a-new-project).
 
 ## How to read a status
 

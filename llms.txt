@@ -43,6 +43,12 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 - [release.yml](https://qiheme.github.io/kit/workflows/release.yml): tag on merge, migrate, deploy to production, rollback
 - [quality.spec.ts](https://qiheme.github.io/kit/e2e/quality.spec.ts): Playwright spec that automates the checkable Front-End Checklist rules
 
+## Skills
+
+- [handbook-audit](https://qiheme.github.io/skills/handbook-audit/SKILL.md): audit the current repository against this handbook; modes quick, full and fix
+- [audit.mjs](https://qiheme.github.io/skills/handbook-audit/scripts/audit.mjs): the conformance script the audit runs; Node only, JSON output, exit code for CI
+- [handbook-new-project](https://qiheme.github.io/skills/handbook-new-project/SKILL.md): start a new project from a blueprint, step by step
+
 ## Status
 
 - [Adoption](https://qiheme.github.io/adoption.md): where each existing repo stands and the suggested order of migration

@@ -4,7 +4,7 @@ Rules for Claude Code, other agents and humans working in this repository.
 
 **What this is:** the standard for how Cloud 12Nine and Q-Labs projects are built. Markdown pages (the source of truth), a kit of files other repos copy, and a no-build website that displays the pages at <https://qiheme.github.io>.
 
-**There is no build, no `package.json`, and no dependency.** Do not add one without an issue that says why.
+**There is no build, no `package.json`, and no dependency.** Do not add one without an issue that says why. The conformance script uses only Node's standard library and built-in test runner for the same reason.
 
 ## If you are here to use the handbook
 
@@ -24,6 +24,8 @@ README.md           Landing page and chooser
 standards/          One page per topic: stack, repo-contract, workflow, testing, ci-cd, data, security, ui,
                     frontend-checklist, agents
 blueprints/         One page per kind of project
+skills/             Agent skills other repos install into .claude/skills/: handbook-audit (with the
+                    conformance script and its tests) and handbook-new-project
 kit/                Files other repos copy. Not active in this repo
   common/           Configs, hooks, templates. *.template.md files are renamed on copy
   workflows/        ci.yml, deploy-preview.yml, release.yml
@@ -75,10 +77,14 @@ The readers are a new developer and an agent. Both read every word.
 - Templates that would be live if named normally (`CLAUDE.md`, `AGENTS.md`, `SKILL.md`) carry a `.template.md` suffix here, so this repo's agents do not load them as instructions.
 - Placeholders are written `<LIKE THIS>`.
 - Workflows in `kit/workflows/` must pass `actionlint`. CI checks it.
+- A rule the conformance script checks changes in three places together: the standards page, the script and its test.
+- Skills live in `skills/<name>/SKILL.md`, not `.claude/skills/`, so they are not active in this repo. Other repos install them.
 
 ## Checking your work
 
-There are no tests to run. Before opening a PR:
+Before opening a PR:
+
+0. **The conformance script:** `node --test 'skills/**/*.test.mjs'`. It is the one piece of logic here and it is tested like any other: test first, 100% coverage, enforced in CI. A new rule gets a test that passes on the conforming fixture and fails when the rule is broken.
 
 1. **Links:** every relative link resolves. CI runs a link checker; locally, open the changed pages on GitHub or in the viewer and click them.
 2. **Workflows:** `actionlint kit/workflows/*.yml .github/workflows/*.yml`.
@@ -91,7 +97,7 @@ There are no tests to run. Before opening a PR:
 | Standard | This repo | Reason |
 | --- | --- | --- |
 | Default branch `main` | `master` | Not renamed yet. See [`adoption.md`](adoption.md) |
-| Node toolchain, Vitest, ESLint, hooks | None | No code. The content is Markdown and the viewer is one HTML file |
+| Node toolchain, Vitest, ESLint, hooks | None, except Node's built-in test runner for the conformance script | No dependencies to install or keep current. The script must also run in any repo with nothing but Node |
 | Netlify hosting | GitHub Pages | A `username.github.io` repo is served by Pages directly |
 | Cobalt via the npm package | A few token values copied into `viewer.css` | No build step to import the package. Marked as a snapshot in the file |
 | Front-End Checklist: search-engine rules | No `robots.txt` or sitemap | Reference material, not a site meant to rank. Whether it should be indexed at all is the owner's call |

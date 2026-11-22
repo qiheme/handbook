@@ -12,6 +12,7 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`common/AGENTS.template.md`](common/AGENTS.template.md) | `AGENTS.md` | Every repo | Nothing |
 | [`common/.github/copilot-instructions.md`](common/.github/copilot-instructions.md) | `.github/copilot-instructions.md` | Every repo | Nothing |
 | [`common/claude-skill-verify/SKILL.template.md`](common/claude-skill-verify/SKILL.template.md) | `.claude/skills/verify/SKILL.md` | Anything that runs | Write the real commands and ports |
+| The handbook skills in [`../skills/`](../skills/handbook-audit/SKILL.md) | `.claude/skills/handbook-audit/`, `.claude/skills/handbook-new-project/` | Every repo | Install with `npx skills add qiheme/qiheme.github.io --agent claude-code --skill '*' --copy`, or copy the two folders. Then run `/handbook-audit` |
 | [`common/.nvmrc`](common/.nvmrc) | `.nvmrc` | Node repos | Nothing |
 | [`common/.npmrc`](common/.npmrc) | `.npmrc` | Repos that install Cobalt | Nothing. Never add a token |
 | [`common/.gitignore`](common/.gitignore) | `.gitignore` | Node repos | Add repo-specific entries |
@@ -79,6 +80,7 @@ Copying files is not enough. Each of these is a setting somewhere else.
 | `.prettierrc.json`, `dependabot.yml`, `_redirects` | **Proposed.** Not taken from a repo, and not yet deployed anywhere |
 | `netlify/_headers` | The long-cache rule for fingerprinted files is in use in one repo. The security headers are **Proposed** and have not been deployed anywhere |
 | `db/supabase-auth-stub.sql` | Generalised from one repo's CI stand-in. Run here against Postgres 16: a migration with a foreign key to `auth.users` and an `auth.uid()` policy fails without it and applies with it; the policy then shows each user only their own rows. Safe to apply twice |
+| The handbook skills and `audit.mjs` | New. The script has 69 tests at 100% coverage on Node 22 and 24, and was run against the eight other repos; its results matched the adoption table apart from two cells that were then corrected. Installing with the `skills` tool was checked from a local copy of this repo, not from GitHub. The skills' written steps have not yet been followed end to end by an agent in a real repo |
 | `e2e/quality.spec.ts` | **Proposed.** New. Run here with Playwright 1.63 and axe 4.14 against a good page (7 tests pass) and a deliberately bad page (20 distinct failures reported). Typechecks under strict mode. Not yet run in a repo |
 | `CLAUDE.template.md`, issue forms, PR template | Merged from the four existing rulebooks |
 

@@ -47,12 +47,75 @@ These are in the template. They are the same in every repo.
 11. **Review UI changes against the [Front-end checklist](frontend-checklist.md).** Fix Critical and High findings the PR introduced; file the rest.
 12. **Say what you did not do.** Skipped steps, failing tests and unverified claims are reported, not hidden.
 
+## How an agent meets the handbook
+
+Three layers. Each one works without the others, so a gap in one does not leave an agent with nothing.
+
+```mermaid
+flowchart LR
+    session(["An agent starts work in a repo"]) --> rulebook["<b>1 The repo's CLAUDE.md</b><br/>loaded automatically, every session<br/><i>carries the rules themselves</i>"]
+    rulebook --> skills["<b>2 Handbook skills</b><br/>in the repo's .claude/skills/<br/><i>run on request</i>"]
+    skills --> ci["<b>3 CI</b><br/>the same conformance script<br/><i>fails the PR on drift</i>"]
+```
+
+| Layer | What it is | How it is triggered | What it guarantees |
+| --- | --- | --- | --- |
+| 1. Rulebook | The repo's own `CLAUDE.md`, made from the kit template. It states the rules in full, so it works even when the agent cannot reach this handbook | Nothing to do. Claude Code loads it at the start of every session | Day-to-day work follows the standard: issue first, test first, the gates, the commit format |
+| 2. Skills | Two skills that live in this handbook and are copied into each repo: `handbook-audit` and `handbook-new-project` | Ask in plain words ("audit this repo against the handbook", "start a new web app here"), or type `/handbook-audit` or `/handbook-new-project` | An audit or a new project is one request, done the same way each time |
+| 3. CI | [`audit.mjs`](../skills/handbook-audit/scripts/audit.mjs), the script the audit skill runs, as a step in `ci.yml` | Every pull request | A repo cannot drift from the contract without a red check |
+
+### Auditing a repo
+
+Say **"audit this repo against the handbook"**, or type `/handbook-audit`.
+
+| Request | What the agent does |
+| --- | --- |
+| `/handbook-audit` | Runs the conformance script, reads the repo's listed deviations, compares it with its blueprint, and reports gaps in priority order. Changes nothing |
+| `/handbook-audit full` | The same, plus a read of the code (testability, data, security, UI), the Front-End Checklist, and a run of the gates |
+| `/handbook-audit fix` | Audits, then closes the gaps the repo's own way: an issue, then a pull request, copying from the kit |
+
+The script on its own, with no agent:
+
+```bash
+node .claude/skills/handbook-audit/scripts/audit.mjs . --all
+```
+
+It needs only Node. It checks about thirty rules a machine can verify (required files, script names, the Node pin, hooks, CI, lint and test configuration, the deploy pipeline, framework versions), prints the handbook page for each one it finds broken, and exits non-zero when a required rule is not met. Proposed rules are listed and never fail the run. It reports facts; the skill adds the judgement, such as telling a gap from a deviation the repo has chosen and written down.
+
+### Starting a new project
+
+In an empty repository, say **"start a new project from the handbook"**, or type `/handbook-new-project`, with what you are building. The agent picks the blueprint (asking one question if the request does not settle it), opens the first issue, scaffolds, copies the kit, fills in `CLAUDE.md`, proves the gates fail when they should, and runs the audit until nothing required is failing. It finishes with a pull request and a checklist of the settings only the owner can make.
+
+An empty repository has no skills yet. Either attach this handbook's repository to the session and say "follow `skills/handbook-new-project/SKILL.md` in the handbook", or install the skills first (below).
+
+### Getting the skills into a repo
+
+Cloud sessions load skills only from the repository itself (`.claude/skills/`), not from a user's home folder. So the skills are copied into each repo and committed, the same way vendor skills already are:
+
+```bash
+npx skills add qiheme/qiheme.github.io --agent claude-code --skill '*' --copy
+```
+
+That writes `.claude/skills/handbook-audit/` and `.claude/skills/handbook-new-project/` and records them in `skills-lock.json`. `npx skills update` refreshes them when the handbook changes. Copying the two folders by hand does the same.
+
+Two other routes, for sessions where a repo has no skills yet:
+
+| Route | Reaches | Set up |
+| --- | --- | --- |
+| A pointer in the user-level `CLAUDE.md` | Every session, any repo, including cloud sessions (the environment's setup script writes it) | One paragraph naming this handbook and the two skills. Not done yet: it is a change to the `setup-scripts` repo |
+| Skills on the claude.ai account | Every cloud session | Upload the two skill folders once in the account's settings |
+
+### Running the check in CI
+
+The kit's [`ci.yml`](../kit/workflows/ci.yml) runs the script when the skill is present. This is the part that keeps a repo conforming after the day it was set up. **Proposed:** it becomes a gate once a repo has closed its existing gaps or listed them as deviations; until then it would fail every pull request.
+
 ## Skills
 
 A skill is a folder with a `SKILL.md` that an agent loads when the task matches. Use one when a procedure has steps that are easy to get wrong.
 
 | Skill | Every repo? | What it holds |
 | --- | --- | --- |
+| `handbook-audit`, `handbook-new-project` | Yes | Audit a repo against this handbook; start a new one from a blueprint. They live in this repository under [`skills/`](../skills/handbook-audit/SKILL.md). See above |
 | `verify` | Yes, for anything that runs | How to build, start and drive this app to prove a change works: ports, commands, how to stop it, what the sandbox cannot do. Template: [`kit/common/claude-skill-verify/SKILL.template.md`](../kit/common/claude-skill-verify/SKILL.template.md) |
 | Front-End Checklist skills, or its MCP server | Anything with an interface | How to review code and pages against the checklist. See [Front-end checklist](frontend-checklist.md#agent-review) |
 | Vendor skills (for example Supabase's) | Where relevant | Pinned in a lock file. **The repo's own conventions win** where they differ, and `CLAUDE.md` says which |

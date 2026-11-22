@@ -130,6 +130,26 @@ jobs:
           include-hidden-files: true
           retention-days: 7
 
+  # Keeps the repo in step with the Engineering Handbook after the day it was
+  # set up: required files, script names, Node pin, hooks, CI and test config.
+  # Runs only where the handbook-audit skill has been installed. Needs no
+  # install step and no secrets. Standard: https://qiheme.github.io/#/standards/agents
+  conformance:
+    name: Handbook conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Check the repo against the handbook
+        if: hashFiles('.claude/skills/handbook-audit/scripts/audit.mjs') != ''
+        run: node .claude/skills/handbook-audit/scripts/audit.mjs . --all
+
   # DATABASE REPOS ONLY. Delete this job if the repo has no migrations.
   #
   # Applies the real migrations to a throwaway Postgres (same major version as

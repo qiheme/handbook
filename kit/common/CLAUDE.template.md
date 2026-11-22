@@ -101,6 +101,7 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 - **Docs parity.** A PR that changes behaviour, structure, setup or conventions updates `README.md` (and `docs/architecture.md`) in the same PR.
 - **No new dependency without discussion.** Open an issue first.
 - Before opening the PR, run the `verify` skill (`.claude/skills/verify`).
+- To check this repo against the standard: `/handbook-audit`, or `node .claude/skills/handbook-audit/scripts/audit.mjs . --all`.
 
 ## 6. Deviations from the standard
 

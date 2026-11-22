@@ -29,6 +29,7 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 | D15 | Front-end quality bar | **Adopt the Front-End Checklist** (frontendchecklist.io). Critical rules block a merge; High rules are required for new work and before launch | Keep the five-line accessibility baseline and nothing else | A maintained, prioritised list that agents can read and audit against. The cost is an audit of each existing site | Every repo with an interface |
 | D16 | Automate the checkable rules | **`quality.spec.ts` in every Playwright suite**, which adds `@axe-core/playwright` as a dev dependency | Rely on agent review alone | A check that runs on every PR does not depend on anyone remembering. One new dependency | Every repo with pages |
 | D17 | Security headers | **A `_headers` file in every Netlify site**, plus a Content-Security-Policy per app | Set headers in `netlify.toml`; or leave Netlify's defaults | A file in `public/` travels with the prebuilt upload, so previews and production get the same headers | Every deployed repo |
+| D18 | Conformance check in CI | **Run `audit.mjs` on every pull request** in each repo, as a required check once that repo's existing gaps are closed or listed as deviations | Run it only on request, through the audit skill | It is what keeps a repo conforming after setup. Turned on too early it fails every pull request | Every repo |
 
 ## Open
 

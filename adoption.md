@@ -4,6 +4,8 @@ Where each existing repo stands against the standard, and the order to close the
 
 Surveyed on 2026-11-21 from each repo's default branch. This page holds stack-level facts only.
 
+To check one repo now, run the conformance script in it (`/handbook-audit`, or see [How an agent meets the handbook](standards/agents.md#how-an-agent-meets-the-handbook)). The script was run against every repo below on 2026-11-22 and this page agrees with it.
+
 Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not · — not applicable.
 
 ## At a glance
@@ -16,7 +18,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | `cloud129-site` | private | [Static site](blueprints/static-site.md) | 🟡 | No coverage gate, no linter, no hooks |
 | `cobalt` | public | [Library](blueprints/library.md) | 🟡 | No linter, no hooks |
 | `portfolio` | public | [Static site](blueprints/static-site.md) | 🔴 | No tests, no CI; copied tokens; Vercel |
-| `setup-scripts` | private | [CLI and scripts](blueprints/cli-and-scripts.md) (shell) | 🟢 | No `CLAUDE.md` |
+| `setup-scripts` | private | [CLI and scripts](blueprints/cli-and-scripts.md) (shell) | 🟡 | No `CLAUDE.md`, issue forms or PR template |
 | `stock-cerebro-client` | public | none (2022 Create React App) | 🔴 | Unmaintained stack. Recommend archiving |
 | `qiheme.github.io` | public | Docs (this handbook) | 🟡 | Default branch is `master` |
 
@@ -24,7 +26,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 
 | Standard | wish-list | easy-finances | Travel-OS | cloud129-site | cobalt | portfolio |
 | --- | --- | --- | --- | --- | --- | --- |
-| TypeScript strict | 🟢 | 🔴 JavaScript | 🟢 | 🟢 | 🟢 | 🟢 |
+| TypeScript strict | 🟢 | 🔴 JavaScript | 🟢 | 🟡 TypeScript, on Astro's `base` preset, which is not strict | 🟢 | 🟢 |
 | Node 24, `.nvmrc` = `24` | 🟡 `22` | 🟡 `24.14.1` exact | 🟢 | 🔴 no `.nvmrc`; CI says 22 | 🟡 `22.22.2` exact | 🟡 `22` |
 | CI reads `.nvmrc` | 🟢 | 🔴 hard-coded | 🔴 hard-coded | 🔴 hard-coded | 🟢 | — no CI |
 | Framework on baseline | 🟢 React 19, Vite 8 | 🟡 React 18, Vite 5 | 🟡 React 18, Vite 5 | 🟡 Astro 5 | 🟡 Vite 6, Storybook 8 | 🟡 Astro 5 |
@@ -50,7 +52,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | Default branch `main` | 🟢 | 🟢 | 🟢 | 🔴 `master` | 🟢 | 🔴 `master` |
 | Conventional commits with scope | 🟢 | 🟡 not required | 🟡 older `type(#N):` form | 🟡 not required | 🟢 | 🟡 not required |
 
-`setup-scripts` meets the shell blueprint: `shellcheck`, `bats`, one `test.sh`, CI on macOS, pure decision functions. It lacks a `CLAUDE.md`.
+`setup-scripts` meets the shell blueprint: `shellcheck`, `bats`, one `test.sh`, CI on macOS, pure decision functions. It lacks the files every repo needs: a `CLAUDE.md`, agent pointer files, issue forms and a PR template.
 
 ## What is consistent already
 
@@ -80,7 +82,8 @@ Small, mechanical, low risk. One PR per repo.
 | 5 | Issue forms and PR template from the kit | all but wish-list | XS |
 | 6 | Rename the CI secret to `COBALT_PACKAGES_TOKEN`; remove the auth line from the committed `.npmrc` | Travel-OS, cloud129-site | XS |
 | 7 | Rename `master` to `main` | cloud129-site, portfolio, this repo | XS, but update workflow branch names and the CMS config in the same PR |
-| 8 | Update the cloud environment's setup script to install one Node version | setup-scripts | XS |
+| 8 | Update the cloud environment's setup script to install one Node version, and to point every session at this handbook | setup-scripts | XS |
+| 8a | Install the handbook skills and run `/handbook-audit` to get the repo's exact list | all | XS |
 
 ### Wave 2: close the quality gaps
 

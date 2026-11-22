@@ -41,10 +41,10 @@
   }
 
   /**
-   * Kit files and other non-page files are meant to be read as source, not
-   * rendered. Rewrite relative Markdown links to them so they open on GitHub.
-   * Links between pages (*.md outside kit/) are left alone for Docsify to turn
-   * into routes.
+   * Kit files, skills and other non-page files are meant to be read as source,
+   * not rendered. Rewrite relative Markdown links to them so they open on
+   * GitHub. Links between pages (*.md outside kit/ and skills/) are left alone
+   * for Docsify to turn into routes.
    */
   function sourceLinks(hook, vm) {
     hook.beforeEach(function (markdown) {
@@ -53,7 +53,7 @@
         if (/^([a-z][a-z0-9+.-]*:|\/\/|#|\?)/i.test(href)) return match
         var target = new URL(href, page)
         var path = target.pathname.slice(1)
-        var isPage = /\.md$/.test(path) && !/^kit\/(?!README\.md$)/.test(path)
+        var isPage = /\.md$/.test(path) && !/^(kit\/(?!README\.md$)|skills\/)/.test(path)
         return isPage ? match : '](' + BLOB + path + target.hash + ')'
       })
     })

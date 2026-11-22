@@ -33,6 +33,19 @@ jobs:
           args: --offline --no-progress --root-dir ${{ github.workspace }} --exclude-path kit/common './**/*.md'
           fail: true
 
+      # The conformance script other repos run. No dependencies: Node's own
+      # test runner, with its coverage thresholds as the gate.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Test the conformance script (100% coverage gate)
+        run: >-
+          node --test --experimental-test-coverage
+          --test-coverage-exclude='**/*.test.mjs'
+          --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100
+          'skills/**/*.test.mjs'
+
       # The kit's workflows are inert here (GitHub only runs the ones in
       # .github/workflows), so nothing else would notice a mistake in them.
       - name: Lint the kit's workflows
