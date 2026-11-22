@@ -23,7 +23,7 @@ Start from the template: [`kit/common/CLAUDE.template.md`](../kit/common/CLAUDE.
 3. **Project layout**: a tree with one line per folder.
 4. **The rules**: issue first, test first, 100% coverage, commit format, docs parity. The template carries these so the repo is self-contained even when the agent cannot reach this handbook.
 5. **Architecture rules** specific to this repo, each with its reason. Mark the ones that must never break.
-6. **Deviations from the standard**: what differs and why.
+6. **Deviations from the standard**: what differs and why, as a table. The conformance check reads it (see below).
 7. **Environment gotchas**: things that cost someone an hour once.
 
 Write rules as instructions with reasons. "Never import `*.server.ts` from client code: it ships the database driver to the browser" beats "be careful with imports".
@@ -80,7 +80,25 @@ The script on its own, with no agent:
 node .claude/skills/handbook-audit/scripts/audit.mjs . --all
 ```
 
-It needs only Node. It checks about thirty rules a machine can verify (required files, script names, the Node pin, hooks, CI, lint and test configuration, the deploy pipeline, framework versions), prints the handbook page for each one it finds broken, and exits non-zero when a required rule is not met. Proposed rules are listed and never fail the run. It reports facts; the skill adds the judgement, such as telling a gap from a deviation the repo has chosen and written down.
+It needs only Node. It checks about thirty rules a machine can verify (required files, script names, the Node pin, hooks, CI, lint and test configuration, the deploy pipeline, framework versions) and prints the handbook page for each one it finds broken.
+
+| It prints | When | Fails the run? |
+| --- | --- | --- |
+| `FAIL` | A rule this handbook marks Adopted or In use is not met | Yes |
+| `TODO` | A rule this handbook marks Proposed is not met | No. A proposal is not binding until it is decided |
+| `DEV` | A rule is not met, and the repo's `CLAUDE.md` lists it as a deviation with a reason | No |
+
+**A repo that differs on purpose says so, and the check accepts it.** Add a row to the Deviations table in the repo's `CLAUDE.md`, with the rule id in backticks and the reason:
+
+```markdown
+| Rule | Standard | This repo | Reason | Tracking issue |
+| --- | --- | --- | --- | --- |
+| `netlify-pipeline` | Netlify, built on Actions | Not deployed yet | The first deploy is its own piece of work | #19 |
+```
+
+The list is checked too: a row with no reason, an id the script does not know, or a deviation that is no longer true each fail the run. So the table cannot hide a gap by accident, and it cannot go stale.
+
+The script reports facts. The skill adds the judgement the script cannot make.
 
 ### Starting a new project
 
@@ -107,7 +125,7 @@ Two other routes, for sessions where a repo has no skills yet:
 
 ### Running the check in CI
 
-The kit's [`ci.yml`](../kit/workflows/ci.yml) runs the script when the skill is present. This is the part that keeps a repo conforming after the day it was set up. **Proposed:** it becomes a gate once a repo has closed its existing gaps or listed them as deviations; until then it would fail every pull request.
+The kit's [`ci.yml`](../kit/workflows/ci.yml) runs the script when the skill is present. This is the part that keeps a repo conforming after the day it was set up. **Proposed:** it becomes a required check once a repo has closed its gaps or listed them as deviations; until then it would fail every pull request.
 
 ## Skills
 

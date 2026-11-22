@@ -79,7 +79,8 @@ More: [CI/CD](ci-cd.md).
 | Method | Test first: red, green, refactor | Adopted | Every repo with a rulebook |
 | Commits | Conventional commits: `type(scope): description (#issue)` | Adopted | Two repos use this exact shape |
 | Default branch | `main` | Adopted in six repos, three still on `master` | One name means one set of workflow files |
-| Agent rulebook | `CLAUDE.md` in every repo. Other agent files point to it | Adopted in four repos | See [Agents](agents.md) |
+| Agent rulebook | `CLAUDE.md` in every repo | Adopted in four repos | See [Agents](agents.md) |
+| Other agent files | `AGENTS.md` and Copilot's file are one-line pointers to `CLAUDE.md`, not copies | Proposed | Three repos keep copies today, and none has `AGENTS.md`. A pointer cannot go stale |
 
 More: [Workflow](workflow.md).
 
@@ -105,7 +106,7 @@ These are the versions the newest reference repo runs today. They are a floor fo
 
 Checked against the npm registry on 2026-11-21.
 
-**Version rule.** Start a new project on the baseline. An existing repo may trail the baseline by one major version. Two majors behind is a Task issue in that repo.
+**Version rule (Proposed).** Start a new project on the baseline. An existing repo may trail the baseline by one major version. Two majors behind is a Task issue in that repo.
 
 ## What we do not use
 

@@ -8,11 +8,21 @@
  *
  *   node audit.mjs [path] [--blueprint <name>] [--json] [--all]
  *
- * Exit code: 0 when every required rule is met, 1 when one is not, 2 on a bad
- * argument. Proposed rules are reported and never fail the run.
+ * Exit code: 0 when every required rule is met or listed as a deviation, 1
+ * when one is not, 2 on a bad argument.
  *
- * It reports facts only. It does not read a repo's listed deviations, judge
- * architecture, or run anything: that is the audit skill's job (../SKILL.md).
+ * A rule is only as binding as its label in the handbook. Rules the handbook
+ * marks Adopted or In use are required. Rules it marks Proposed are reported
+ * as TODO and never fail the run: installing this check must not force a
+ * change the owner has not signed off.
+ *
+ * A repo that differs on purpose says so in its own CLAUDE.md: a row in the
+ * "Deviations" table whose first cell is the rule id in backticks and whose
+ * "Reason" cell is filled in. That rule is then reported as an accepted
+ * deviation and does not fail the run.
+ *
+ * It reports facts only. It does not judge architecture or run anything: that
+ * is the audit skill's job (../SKILL.md).
  *
  * No dependencies. Every decision is a pure function over a small "repo" port
  * (exists, read, list), so the tests run against repositories held in memory.
@@ -59,6 +69,7 @@ const WITH_PAGES = ['static-site', 'web-app', 'full-stack-app']
 export function memoryRepo(files) {
   const paths = Object.keys(files)
   return {
+    files,
     exists: (p) => p in files || paths.some((f) => f.startsWith(`${p}/`)),
     read: (p) => (p in files ? files[p] : null),
     list: (dir) => {
@@ -137,6 +148,56 @@ export function detectBlueprint(repo) {
   return 'cli'
 }
 
+/** Names a rulebook may use on its Blueprint line, and the blueprint each means. */
+const DECLARED = {
+  'static-site': 'static-site',
+  'web-app': 'web-app',
+  'full-stack-app': 'full-stack-app',
+  library: 'library',
+  cli: 'cli',
+  'cli-and-scripts': 'cli',
+  shell: 'shell',
+}
+
+/** The blueprint a repo names in its CLAUDE.md: `**Blueprint:** [Web app](…)`. */
+export function declaredBlueprint(repo) {
+  const match = (repo.read('CLAUDE.md') ?? '').match(/\*\*Blueprint:\*\*\s*\[([^\]]+)\]/)
+  if (!match) return null
+  return DECLARED[match[1].trim().toLowerCase().replace(/\s+/g, '-')] ?? null
+}
+
+const cellsOf = (row) =>
+  row
+    .trim()
+    .replace(/^\||\|$/g, '')
+    .split('|')
+    .map((cell) => cell.trim())
+
+/**
+ * The deviations a repo lists in its CLAUDE.md. Reads the table under the
+ * heading that contains "Deviations": each row whose first cell is a rule id
+ * in backticks, with the text of its "Reason" column.
+ */
+export function readDeviations(repo) {
+  const lines = (repo.read('CLAUDE.md') ?? '').split('\n')
+  const start = lines.findIndex((line) => /^#{1,6}\s.*deviations/i.test(line))
+  if (start === -1) return []
+  const rest = lines.slice(start + 1)
+  const end = rest.findIndex((line) => /^#{1,6}\s/.test(line))
+  const rows = rest
+    .slice(0, end === -1 ? rest.length : end)
+    .filter((line) => line.trim().startsWith('|'))
+  if (rows.length === 0) return []
+  const reasonColumn = cellsOf(rows[0]).findIndex((cell) => /^reason$/i.test(cell))
+  return rows
+    .map(cellsOf)
+    .map((cells) => ({
+      id: cells[0].match(/^`([a-z0-9-]+)`$/)?.[1],
+      reason: cells[reasonColumn] ?? '',
+    }))
+    .filter((row) => row.id)
+}
+
 // --- the checks --------------------------------------------------------------
 
 const pass = (detail = '') => ({ status: 'pass', detail })
@@ -153,6 +214,7 @@ const CHECKS = [
   },
   {
     id: 'agent-pointers',
+    level: 'proposed',
     title: 'Other agent files point to CLAUDE.md instead of copying it',
     page: 'standards/agents.md',
     run: ({ repo }) => {
@@ -176,6 +238,7 @@ const CHECKS = [
   },
   {
     id: 'node-pin',
+    level: 'proposed',
     title: `.nvmrc pins Node ${NODE_MAJOR} by major version`,
     page: 'standards/stack.md',
     node: true,
@@ -189,6 +252,7 @@ const CHECKS = [
   },
   {
     id: 'engines',
+    level: 'proposed',
     title: `package.json engines.node is >=${NODE_MAJOR}`,
     page: 'standards/stack.md',
     node: true,
@@ -382,6 +446,7 @@ const CHECKS = [
   },
   {
     id: 'no-vercel',
+    level: 'proposed',
     title: 'Not deployed to Vercel',
     page: 'standards/ci-cd.md',
     blueprints: WITH_PAGES,
@@ -404,6 +469,7 @@ const CHECKS = [
   },
   {
     id: 'versions',
+    level: 'proposed',
     title: 'Frameworks are within one major version of the baseline',
     page: 'standards/stack.md',
     node: true,
@@ -529,19 +595,42 @@ function applies(check, { blueprint, pkg }) {
  * @param options.blueprint  skip detection and use this blueprint
  */
 export function audit(repo, options = {}) {
-  const blueprint = options.blueprint ?? detectBlueprint(repo)
+  const declared = declaredBlueprint(repo)
+  const blueprint = options.blueprint ?? declared ?? detectBlueprint(repo)
   const pkg = readPackage(repo)
   const context = { repo, blueprint, pkg, deps: dependenciesOf(pkg) }
+  const deviations = readDeviations(repo)
+  const reasonFor = (id) => deviations.find((d) => d.id === id)?.reason
 
   const checks = CHECKS.map((check) => {
     const outcome = applies(check, context) ? check.run(context) : na
+    const reason = reasonFor(check.id)
+    const accepted = outcome.status === 'fail' && reason ? { status: 'deviation', reason } : {}
     return {
       id: check.id,
       level: check.level ?? 'required',
       title: check.title,
       page: check.page,
       ...outcome,
+      ...accepted,
     }
+  })
+
+  // The list itself is checked, so it cannot hide a gap by accident.
+  const problems = deviations.flatMap(({ id, reason }) => {
+    const check = checks.find((c) => c.id === id)
+    if (!check) return [`unknown rule \`${id}\``]
+    if (!reason) return [`\`${id}\` has no reason`]
+    return check.status === 'deviation'
+      ? []
+      : [`\`${id}\` is listed but the rule is met; remove the row`]
+  })
+  checks.push({
+    id: 'deviations',
+    level: 'required',
+    title: 'Every listed deviation names a real rule, gives a reason, and is still true',
+    page: 'standards/agents.md',
+    ...(problems.length ? fail(`in CLAUDE.md: ${problems.join('; ')}`) : pass()),
   })
 
   const count = (level, status) =>
@@ -550,11 +639,12 @@ export function audit(repo, options = {}) {
     pass: checks.filter((c) => c.status === 'pass').length,
     fail: count('required', 'fail'),
     proposed: count('proposed', 'fail'),
+    deviation: checks.filter((c) => c.status === 'deviation').length,
     na: checks.filter((c) => c.status === 'na').length,
   }
   return {
     blueprint,
-    blueprintSource: options.blueprint ? 'given' : 'detected',
+    blueprintSource: options.blueprint ? 'given' : declared ? 'declared' : 'detected',
     ok: summary.fail === 0,
     summary,
     checks,
@@ -569,8 +659,12 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
 export function format(result, name, options = {}) {
   const row = (label, check) =>
     `${label.padEnd(5)} ${check.id.padEnd(18)} ${check.detail}\n      ${check.page}`
-  const failed = result.checks.filter((c) => c.level === 'required' && c.status === 'fail')
-  const todo = result.checks.filter((c) => c.level === 'proposed' && c.status === 'fail')
+  const plain = (label, check) => `${label.padEnd(5)} ${check.id.padEnd(18)} ${check.title}`
+  const where = (status, level) =>
+    result.checks.filter((c) => c.status === status && (!level || c.level === level))
+  const failed = where('fail', 'required')
+  const todo = where('fail', 'proposed')
+  const accepted = where('deviation')
   const lines = [
     `Handbook audit: ${name}`,
     `Blueprint: ${result.blueprint} (${result.blueprintSource})`,
@@ -579,26 +673,25 @@ export function format(result, name, options = {}) {
 
   lines.push(...failed.map((check) => row('FAIL', check)))
   lines.push(...todo.map((check) => row('TODO', check)))
+  lines.push(...accepted.map((check) => `${row('DEV', check)}\n      accepted: ${check.reason}`))
   if (options.all) {
-    lines.push(
-      ...result.checks
-        .filter((c) => c.status === 'pass')
-        .map((check) => `PASS  ${check.id.padEnd(18)} ${check.title}`),
-    )
-    lines.push(
-      ...result.checks
-        .filter((c) => c.status === 'na')
-        .map((check) => `N/A   ${check.id.padEnd(18)} ${check.title}`),
-    )
+    lines.push(...where('pass').map((check) => plain('PASS', check)))
+    lines.push(...where('na').map((check) => plain('N/A', check)))
   }
-  if (failed.length + todo.length > 0 || options.all) lines.push('')
+  if (lines.length > 3) lines.push('')
 
   const { summary } = result
-  lines.push(
-    failed.length + todo.length === 0
-      ? `Meets every rule that was checked (${summary.pass} passed, ${summary.na} not applicable).`
-      : `${plural(summary.fail, 'required rule')} not met, ${plural(summary.proposed, 'proposed rule')} not met, ${summary.pass} passed, ${summary.na} not applicable.`,
-  )
+  const deviations = plural(summary.deviation, 'accepted deviation')
+  const tail = `${summary.pass} passed, ${summary.na} not applicable`
+  if (failed.length + todo.length > 0) {
+    lines.push(
+      `${plural(summary.fail, 'required rule')} not met, ${plural(summary.proposed, 'proposed rule')} not met, ${deviations}, ${tail}.`,
+    )
+  } else if (summary.deviation > 0) {
+    lines.push(`Meets every rule that was checked, with ${deviations} (${tail}).`)
+  } else {
+    lines.push(`Meets every rule that was checked (${tail}).`)
+  }
   return lines.join('\n')
 }
 

@@ -8,7 +8,17 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
-import { audit, detectBlueprint, format, main, majorOf, memoryRepo, parseArgs } from './audit.mjs'
+import {
+  audit,
+  declaredBlueprint,
+  detectBlueprint,
+  format,
+  main,
+  majorOf,
+  memoryRepo,
+  parseArgs,
+  readDeviations,
+} from './audit.mjs'
 
 const json = (value) => JSON.stringify(value, null, 2)
 
@@ -90,6 +100,7 @@ function conformingWebApp(overrides = {}) {
   return memoryRepo(files)
 }
 
+const filesOf = (repo) => repo.files
 const statusOf = (result, id) => result.checks.find((c) => c.id === id)?.status
 const withPackage = (change) => {
   const repo = conformingWebApp()
@@ -383,7 +394,7 @@ describe('audit: what counts and what does not', () => {
   })
 
   it('a failed required rule fails the audit', () => {
-    const result = audit(conformingWebApp({ '.nvmrc': '22\n' }))
+    const result = audit(conformingWebApp({ 'package-lock.json': null }))
     assert.equal(result.ok, false)
     assert.equal(result.summary.fail, 1)
   })
@@ -441,15 +452,247 @@ describe('audit: what counts and what does not', () => {
   })
 })
 
+describe('audit: a rule is only as binding as its label in the handbook', () => {
+  // Adopted and In use rules are required. Rules the handbook marks Proposed
+  // are reported and never fail the audit, so installing the audit cannot
+  // force a change the owner has not signed off.
+  const PROPOSED = [
+    'agent-pointers',
+    'node-pin',
+    'engines',
+    'no-vercel',
+    'versions',
+    'quality-spec',
+    'security-headers',
+    'prettier',
+    'dependabot',
+  ]
+
+  it('exactly the proposed rules are marked proposed', () => {
+    const result = audit(conformingWebApp())
+    const proposed = result.checks.filter((c) => c.level === 'proposed').map((c) => c.id)
+    assert.deepEqual(proposed.sort(), [...PROPOSED].sort())
+  })
+
+  it('a repo on another Node version, pinned exactly, still passes', () => {
+    const repo = withPackage((pkg) => (pkg.engines.node = '22.12.0'))
+    const result = audit(memoryRepo({ ...filesOf(repo), '.nvmrc': '22.12.0\n' }))
+    assert.equal(result.ok, true)
+    assert.equal(result.summary.proposed, 2)
+  })
+
+  it('a repo still on Vercel is told, not failed, for the host decision', () => {
+    const result = audit(conformingWebApp({ 'vercel.json': '{}' }))
+    assert.equal(statusOf(result, 'no-vercel'), 'fail')
+    assert.equal(result.ok, true)
+  })
+})
+
+describe('deviations listed in CLAUDE.md', () => {
+  const rulebook = (rows, { blueprint, heading = '## 6. Deviations from the standard' } = {}) =>
+    [
+      '# CLAUDE.md',
+      '',
+      blueprint
+        ? `**Blueprint:** [${blueprint}](https://qiheme.github.io/#/blueprints/README)`
+        : '',
+      '',
+      heading,
+      '',
+      'Where this repo differs, and why.',
+      '',
+      '| Rule | Standard | This repo | Reason | Tracking issue |',
+      '| --- | --- | --- | --- | --- |',
+      ...rows,
+      '',
+      '## 7. Environment gotchas',
+      '',
+      '| Rule | Note |',
+      '| --- | --- |',
+      '| `lockfile` | a table in another section is not a deviation |',
+      '',
+    ].join('\n')
+
+  const NO_PIPELINE = { 'netlify.toml': null, '.github/workflows/release.yml': null }
+
+  it('reads the rule id and the reason from each row of the Deviations table', () => {
+    const repo = memoryRepo({
+      'CLAUDE.md': rulebook([
+        '| `netlify-pipeline` | Netlify | Not deployed yet | First deploy is tracked | #19 |',
+        '| | Tailwind | Plain CSS | A deviation the script does not check | |',
+        '| `cobalt` | Cobalt | None | | |',
+      ]),
+    })
+    assert.deepEqual(readDeviations(repo), [
+      { id: 'netlify-pipeline', reason: 'First deploy is tracked' },
+      { id: 'cobalt', reason: '' },
+    ])
+  })
+
+  it('finds nothing when there is no rulebook, no section, or no table', () => {
+    assert.deepEqual(readDeviations(memoryRepo({})), [])
+    assert.deepEqual(
+      readDeviations(memoryRepo({ 'CLAUDE.md': '# Rules\n\nNo deviations here.\n' })),
+      [],
+    )
+    assert.deepEqual(readDeviations(memoryRepo({ 'CLAUDE.md': '## Deviations\n\nNone.\n' })), [])
+  })
+
+  it('a table with no Reason column gives every row an empty reason', () => {
+    const text = '## Deviations\n\n| Rule | Why |\n| --- | --- |\n| `cobalt` | because |\n'
+    assert.deepEqual(readDeviations(memoryRepo({ 'CLAUDE.md': text })), [
+      { id: 'cobalt', reason: '' },
+    ])
+  })
+
+  it('a failed rule that is listed with a reason is an accepted deviation, and the audit passes', () => {
+    const result = audit(
+      conformingWebApp({
+        ...NO_PIPELINE,
+        'CLAUDE.md': rulebook([
+          '| `netlify-pipeline` | Netlify | Not deployed yet | First deploy is tracked | #19 |',
+        ]),
+      }),
+    )
+    const check = result.checks.find((c) => c.id === 'netlify-pipeline')
+    assert.equal(check.status, 'deviation')
+    assert.equal(check.reason, 'First deploy is tracked')
+    assert.ok(check.detail.includes('release.yml'))
+    assert.equal(result.ok, true)
+    assert.equal(result.summary.deviation, 1)
+    assert.equal(result.summary.fail, 0)
+    assert.equal(statusOf(result, 'deviations'), 'pass')
+  })
+
+  it('a proposed rule can be listed too', () => {
+    const result = audit(
+      conformingWebApp({
+        '.prettierrc.json': null,
+        'CLAUDE.md': rulebook([
+          '| `prettier` | Prettier | None | The formatter decision is still open | |',
+        ]),
+      }),
+    )
+    assert.equal(statusOf(result, 'prettier'), 'deviation')
+    assert.equal(result.summary.proposed, 0)
+  })
+
+  it('a listed rule with no reason is not accepted', () => {
+    const result = audit(
+      conformingWebApp({
+        ...NO_PIPELINE,
+        'CLAUDE.md': rulebook(['| `netlify-pipeline` | Netlify | None |  | |']),
+      }),
+    )
+    assert.equal(statusOf(result, 'netlify-pipeline'), 'fail')
+    const check = result.checks.find((c) => c.id === 'deviations')
+    assert.equal(check.status, 'fail')
+    assert.ok(check.detail.includes('`netlify-pipeline` has no reason'))
+    assert.equal(result.ok, false)
+  })
+
+  it('a rule id the script does not know fails, so a typo cannot hide a gap', () => {
+    const result = audit(
+      conformingWebApp({
+        'CLAUDE.md': rulebook(['| `netlfy-pipeline` | Netlify | None | Typo | |']),
+      }),
+    )
+    const check = result.checks.find((c) => c.id === 'deviations')
+    assert.equal(check.status, 'fail')
+    assert.ok(check.detail.includes('unknown rule `netlfy-pipeline`'))
+  })
+
+  it('a deviation that is no longer true must be removed', () => {
+    const result = audit(
+      conformingWebApp({
+        'CLAUDE.md': rulebook(['| `cobalt` | Cobalt | None | We had a reason once | |']),
+      }),
+    )
+    const check = result.checks.find((c) => c.id === 'deviations')
+    assert.equal(check.status, 'fail')
+    assert.ok(check.detail.includes('`cobalt` is listed but the rule is met'))
+  })
+
+  it('the check that validates the list cannot itself be listed', () => {
+    const result = audit(
+      conformingWebApp({ 'CLAUDE.md': rulebook(['| `deviations` | x | y | No thanks | |']) }),
+    )
+    assert.ok(
+      result.checks.find((c) => c.id === 'deviations').detail.includes('unknown rule `deviations`'),
+    )
+  })
+
+  it('the report shows the deviation and its reason, and counts it', () => {
+    const result = audit(
+      conformingWebApp({
+        ...NO_PIPELINE,
+        'CLAUDE.md': rulebook([
+          '| `netlify-pipeline` | Netlify | Not deployed yet | First deploy is tracked | #19 |',
+        ]),
+      }),
+    )
+    const text = format(result, 'app')
+    assert.match(text, /DEV\s+netlify-pipeline/)
+    assert.match(text, /accepted: First deploy is tracked/)
+    assert.match(text, /Meets every rule that was checked, with 1 accepted deviation/)
+
+    const mixed = format(
+      audit(
+        conformingWebApp({
+          ...NO_PIPELINE,
+          'package-lock.json': null,
+          'CLAUDE.md': rulebook(['| `netlify-pipeline` | Netlify | None | Tracked | |']),
+        }),
+      ),
+      'app',
+    )
+    assert.match(mixed, /1 required rule not met, 0 proposed rules not met, 1 accepted deviation/)
+    assert.ok(mixed.indexOf('FAIL') < mixed.indexOf('DEV'))
+  })
+})
+
+describe('the blueprint a repo declares in CLAUDE.md', () => {
+  const declare = (name) =>
+    memoryRepo({ 'CLAUDE.md': `# x\n\n**Blueprint:** [${name}](https://qiheme.github.io)\n` })
+
+  it('is read from the Blueprint line', () => {
+    assert.equal(declaredBlueprint(declare('Static site')), 'static-site')
+    assert.equal(declaredBlueprint(declare('Web app')), 'web-app')
+    assert.equal(declaredBlueprint(declare('Full-stack app')), 'full-stack-app')
+    assert.equal(declaredBlueprint(declare('Library')), 'library')
+    assert.equal(declaredBlueprint(declare('CLI and scripts')), 'cli')
+  })
+
+  it('is ignored when it is missing, still a template placeholder, or not a blueprint the script knows', () => {
+    assert.equal(declaredBlueprint(memoryRepo({})), null)
+    assert.equal(declaredBlueprint(memoryRepo({ 'CLAUDE.md': '# x\n' })), null)
+    assert.equal(declaredBlueprint(declare('<Web app | Static site | Library>')), null)
+    assert.equal(declaredBlueprint(declare('Functions')), null)
+  })
+
+  it('wins over detection, and loses to the command line', () => {
+    const files = {
+      ...filesOf(conformingWebApp()),
+      'CLAUDE.md': '**Blueprint:** [Static site](https://x)\n',
+    }
+    const declared = audit(memoryRepo(files))
+    assert.equal(declared.blueprint, 'static-site')
+    assert.equal(declared.blueprintSource, 'declared')
+    const given = audit(memoryRepo(files), { blueprint: 'library' })
+    assert.equal(given.blueprint, 'library')
+    assert.equal(given.blueprintSource, 'given')
+  })
+})
+
 describe('format', () => {
   it('lists failures first, each with the page that states the rule', () => {
     const text = format(
-      audit(conformingWebApp({ '.nvmrc': '22\n', '.prettierrc.json': null })),
+      audit(conformingWebApp({ 'package-lock.json': null, '.prettierrc.json': null })),
       'my-app',
     )
     assert.match(text, /Handbook audit: my-app/)
     assert.match(text, /Blueprint: web-app \(detected\)/)
-    assert.match(text, /FAIL\s+node-pin/)
+    assert.match(text, /FAIL\s+lockfile/)
     assert.match(text, /standards\/stack\.md/)
     assert.match(text, /TODO\s+prettier/)
     assert.ok(text.indexOf('FAIL') < text.indexOf('TODO'))

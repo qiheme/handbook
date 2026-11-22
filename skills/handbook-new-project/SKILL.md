@@ -86,7 +86,7 @@ npm run build
 node .claude/skills/handbook-audit/scripts/audit.mjs . --all
 ```
 
-Fix every `FAIL`. For each `TODO` (a proposed rule), either meet it or leave it and say so. A `FAIL` that is deliberate becomes a row in the Deviations table, with the reason.
+Fix every `FAIL`. For each `TODO` (a proposed rule), either meet it or leave it and say so. A `FAIL` that is deliberate becomes a row in the Deviations table of `CLAUDE.md`: the rule id in backticks in the Rule column, and the reason. The script then reports it as `DEV` and passes.
 
 The project is set up when this prints no `FAIL`.
 

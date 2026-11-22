@@ -78,6 +78,7 @@ The readers are a new developer and an agent. Both read every word.
 - Placeholders are written `<LIKE THIS>`.
 - Workflows in `kit/workflows/` must pass `actionlint`. CI checks it.
 - A rule the conformance script checks changes in three places together: the standards page, the script and its test.
+- **A check is only as binding as the rule's label.** Adopted and In use rules are `required` in the script. Proposed rules are `proposed`, which never fails a run. When a decision moves a rule from Proposed to Adopted, change its level in the same PR. A test lists exactly which checks are proposed.
 - Skills live in `skills/<name>/SKILL.md`, not `.claude/skills/`, so they are not active in this repo. Other repos install them.
 
 ## Checking your work

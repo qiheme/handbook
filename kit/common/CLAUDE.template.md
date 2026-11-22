@@ -105,11 +105,12 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 
 ## 6. Deviations from the standard
 
-<Where this repo differs from https://qiheme.github.io and why. "None" is a fine answer.>
+<Where this repo differs from https://qiheme.github.io and why. "None" is a fine answer: leave the table with no rows.>
 
-| Standard | This repo | Reason | Tracking issue |
-| --- | --- | --- | --- |
-| | | | |
+The conformance check reads this table. A row whose **Rule** cell holds a rule id in backticks (the id the audit prints, for example `` `netlify-pipeline` ``) and whose **Reason** cell is filled in turns that failure into an accepted deviation, so CI passes. Leave Rule empty for a difference the audit does not check. Remove a row when it stops being true; the check fails on a stale one.
+
+| Rule | Standard | This repo | Reason | Tracking issue |
+| --- | --- | --- | --- | --- |
 
 ## 7. Environment gotchas
 

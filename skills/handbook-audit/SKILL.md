@@ -32,15 +32,27 @@ Read pages as Markdown, never from memory. Try in this order and use the first t
 node "${CLAUDE_SKILL_DIR}/scripts/audit.mjs" . --all
 ```
 
-It needs only Node and installs nothing. It checks what a machine can check: required files, script names, the Node pin, hooks, CI, lint and test configuration, the deploy pipeline, framework versions. It prints `FAIL` for a required rule that is not met and `TODO` for a proposed one, each with the handbook page that states the rule. Add `--json` for the full result. If it guesses the blueprint wrong, pass `--blueprint <name>`.
+It needs only Node and installs nothing. It checks what a machine can check: required files, script names, the Node pin, hooks, CI, lint and test configuration, the deploy pipeline, framework versions. Each line names the handbook page that states the rule.
+
+| Label | Meaning | Fails the run? |
+| --- | --- | --- |
+| `FAIL` | A rule the handbook marks Adopted or In use is not met | Yes |
+| `TODO` | A rule the handbook marks Proposed is not met | No |
+| `DEV` | A rule is not met, and the repo lists it as a deviation with a reason | No |
+
+Add `--json` for the full result. The blueprint comes from the `**Blueprint:**` line in the repo's `CLAUDE.md` if there is one, otherwise from its dependencies; pass `--blueprint <name>` to override.
 
 The script reports facts. The next steps are the judgement it cannot make.
 
 ## Step 2: separate gaps from deviations
 
-Read this repo's `CLAUDE.md`. If it has a "Deviations from the standard" section, a failed check that is listed there with a reason is an **accepted deviation**, not a gap. Report it as such. A failed check that is not listed is a **gap**.
+The script already reads the "Deviations" table in this repo's `CLAUDE.md`: a row with the rule id in backticks and a reason shows as `DEV`. Report those as **accepted deviations**, with the repo's reason. Every `FAIL` is a **gap**.
+
+Then read the Deviations section yourself. It may describe differences in prose, or in rows with no rule id, that the script cannot match. If a `FAIL` is clearly covered by one of those, say so and report it as "deviation, not yet in the form the check reads", with the row that would fix it.
 
 If the repo has no `CLAUDE.md`, every failure is a gap, and the missing rulebook is the first one.
+
+Do not treat a `TODO` as a gap. Those rules are proposals in the handbook's `decisions.md`; list them separately, as "proposed, not yet decided".
 
 ## Step 3: read the blueprint page
 
@@ -92,12 +104,13 @@ Only when asked. Follow this repo's own workflow for every change: an issue firs
 1. Open one issue per gap, or one for a group of small mechanical gaps. Use the Task form if the repo has it.
 2. Start with the mechanical gaps. Copy files from the handbook's `kit/` (read `kit/README.md` for what goes where) rather than writing them from memory. Fill in every placeholder.
 3. Re-run the script after each change. The gap is closed when its line is gone.
-4. Where the repo should stay different, do not "fix" it: add a row to the Deviations table in its `CLAUDE.md` with the reason.
+4. Where the repo should stay different, do not "fix" it. That is the owner's decision: ask, then add a row to the Deviations table in its `CLAUDE.md` with the rule id in backticks and the owner's reason. Never write a reason on the owner's behalf to make a check pass.
 5. Stop and ask before anything that needs the owner: renaming the default branch, changing hosts, adding secrets or a dependency, repository settings.
 6. When the pull request merges, the repo's row in the handbook's `adoption.md` is out of date. Say so; updating it is a separate pull request to the handbook.
 
 ## What this skill does not do
 
-- It does not decide that a deviation is acceptable. The repo's owner does, by listing it.
+- It does not decide that a deviation is acceptable. The repo's owner does, by listing it with a reason.
+- It does not make a proposed rule binding. `TODO` lines never fail the run.
 - It does not audit product behaviour, only how the project is built.
 - It does not replace CI. The same script can run there as a gate: see `standards/agents.md` in the handbook.
