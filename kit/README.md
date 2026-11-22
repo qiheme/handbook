@@ -19,7 +19,7 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`common/package.scripts.json`](common/package.scripts.json) | merged into `package.json` | Node repos | Adjust `dev`, `build`, `preview`, `typecheck` for the framework |
 | [`common/eslint.config.js`](common/eslint.config.js) | `eslint.config.js` | Node repos | Add the TanStack plugins if used |
 | [`common/.prettierrc.json`](common/.prettierrc.json) | `.prettierrc.json` | Node repos (Proposed) | Nothing |
-| [`common/vitest.config.ts`](common/vitest.config.ts) | `vitest.config.ts` | Node repos | Set the environment. Give every exclusion a reason. Static sites: narrow coverage `include` to `src/lib/**`. Tools under `scripts/<tool>/` are already discovered and covered, except their `bin/` entry points |
+| [`common/vitest.config.ts`](common/vitest.config.ts) | `vitest.config.ts` | Node repos | Set the environment. Give every exclusion a reason. Static sites: narrow coverage `include` to `src/lib/**`. Tools under `scripts/<tool>/` and Edge Function handlers under `supabase/functions/` are already discovered and covered, except their thin entry points |
 | [`common/playwright.config.ts`](common/playwright.config.ts) | `playwright.config.ts` | Anything with pages | Static sites: set `testDir` to `tests/e2e` |
 | [`e2e/quality.spec.ts`](e2e/quality.spec.ts) | `e2e/quality.spec.ts` (`tests/e2e/` in a static site) | Anything with pages (Proposed) | Install `@axe-core/playwright`. List every route in `PAGES`. Set `INDEXABLE` to `false` for an app behind a login |
 | [`common/.husky/pre-commit`](common/.husky/pre-commit), [`pre-push`](common/.husky/pre-push) | `.husky/` | Node repos | Run `npm install` once so `prepare` installs the hooks |
