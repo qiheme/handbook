@@ -24,7 +24,6 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 | D10 | TypeScript for the one JavaScript app | **Migrate**, file by file, pure modules first | Leave it as JavaScript | It is the largest codebase and the only one without types. Large effort; no user-visible change | easy-finances |
 | D11 | Dependency updates | **Dependabot**, weekly, minor and patch grouped | Renovate; or by hand | Vitest is on four majors across the repos. Built into GitHub, no new vendor | Every Node repo |
 | D12 | Protect `main` | **Require the CI check; no direct pushes** | No protection | The gate that cannot be skipped should not be skippable | Every repo |
-| D13 | `stock-cerebro-client` | **Archive it** | Rebuild it on the Web app blueprint | Untouched since 2022, on an unmaintained toolchain | That repo |
 | D14 | This handbook is public | **Keep it public**, with stack-level facts only | Make the repo private, or move the handbook to a private repo | Agents and new developers can read it with no access setup. The cost is care about what goes in | This repo |
 | D15 | Front-end quality bar | **Adopt the Front-End Checklist** (frontendchecklist.io). Critical rules block a merge; High rules are required for new work and before launch | Keep the five-line accessibility baseline and nothing else | A maintained, prioritised list that agents can read and audit against. The cost is an audit of each existing site | Every repo with an interface |
 | D16 | Automate the checkable rules | **`quality.spec.ts` in every Playwright suite**, which adds `@axe-core/playwright` as a dev dependency | Rely on agent review alone | A check that runs on every PR does not depend on anyone remembering. One new dependency | Every repo with pages |
@@ -47,6 +46,10 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 | O8 | Performance budget in CI | Lighthouse CI or a bundle-size check, or measure by hand at launch | The checklist rates Core Web Vitals High. Nothing measures them automatically today |
 
 ## Already settled
+
+**Decided by the owner:**
+
+- **D13, `stock-cerebro-client`:** its features (watchlist, quotes, market news) move into `easy-finances`, rebuilt on that repo's stack, and the repo is archived once they ship. Tracked in that repo's epic for the move. Its 13 audit findings are not filed one by one, because the code is being retired, not fixed.
 
 For the record, these came out of the survey with no real contest: TypeScript, npm, React and Vite, Astro for content, Supabase, Cobalt, Vitest at 100% coverage, Playwright, ESLint flat config, husky, GitHub Actions, issue first, test first, conventional commits, `CLAUDE.md` as the rulebook. Reasons are on [The stack](standards/stack.md).
 

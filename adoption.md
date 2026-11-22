@@ -19,7 +19,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | `cobalt` | public | [Library](blueprints/library.md) | 🟡 | No linter, no hooks |
 | `portfolio` | public | [Static site](blueprints/static-site.md) | 🔴 | No tests, no CI; copied tokens; Vercel |
 | `setup-scripts` | private | [CLI and scripts](blueprints/cli-and-scripts.md) (shell) | 🟡 | No `CLAUDE.md`, issue forms or PR template |
-| `stock-cerebro-client` | public | none (2022 Create React App) | 🔴 | Unmaintained stack. Recommend archiving |
+| `stock-cerebro-client` | public | none (2022 Create React App) | 🔴 | Being retired: its features move into `easy-finances`, then it is archived (D13) |
 | `qiheme.github.io` | public | Docs (this handbook) | 🟡 | Default branch is `master` |
 
 ## Detail
@@ -122,7 +122,7 @@ Small, mechanical, low risk. One PR per repo.
 | Rename existing migration files to a new scheme | Risk to applied history for no gain. The existing runner is tested |
 | Replace React Router in a working app | Routing rewrites are expensive and change nothing for users |
 | Rewrite plain CSS on tokens as Tailwind | It already uses the tokens. Convert a file when it is next rewritten |
-| Modernise `stock-cerebro-client` | Untouched since 2022 on an unmaintained toolchain. Archive it. If the idea returns, start fresh from the Web app blueprint |
+| Modernise `stock-cerebro-client` | Untouched since 2022 on an unmaintained toolchain. Its features are being rebuilt inside `easy-finances` instead (D13), and the repo archived afterwards |
 
 ## Tracking
 
