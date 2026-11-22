@@ -126,4 +126,4 @@ Small, mechanical, low risk. One PR per repo.
 
 ## Tracking
 
-Each row above becomes a Task issue in its repo when it is picked up. When a repo closes a gap, update its cell on this page in the same PR that updates its `CLAUDE.md`.
+Every gap is a GitHub issue in its repo. An audit files one Task issue per required rule that is not met, all sub-issues of one tracking issue titled "Handbook audit: bring `<repo>` up to the Engineering Handbook standard". That tracking issue is the live list for a repo; this page is the overview. When a repo closes a gap, its issue closes with the pull request, and this page is updated in the handbook.

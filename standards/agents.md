@@ -70,14 +70,25 @@ Say **"audit this repo against the handbook"**, or type `/handbook-audit`.
 
 | Request | What the agent does |
 | --- | --- |
-| `/handbook-audit` | Runs the conformance script, reads the repo's listed deviations, compares it with its blueprint, and reports gaps in priority order. Changes nothing |
+| `/handbook-audit` | Runs the conformance script, reads the repo's listed deviations, compares it with its blueprint, reports the gaps in priority order, and **logs each one as a GitHub issue**. Changes no files |
 | `/handbook-audit full` | The same, plus a read of the code (testability, data, security, UI), the Front-End Checklist, and a run of the gates |
 | `/handbook-audit fix` | Audits, then closes the gaps the repo's own way: an issue, then a pull request, copying from the kit |
+
+**Every finding becomes an issue.** Work starts with an issue, so an audit does not end with a list in a chat. For each required rule that is not met, the skill files one Task issue in the repo, written in the standard form (What, Why now, Done when, Parent issue, Effort estimate), all attached as sub-issues to one tracking issue. The script writes the text, so the issues read the same in every repo.
+
+| Line in the report | Becomes |
+| --- | --- |
+| `FAIL` | One issue per rule, a sub-issue of the tracking issue |
+| `TODO` | Listed in the tracking issue. Not filed: a proposal is not work until it is decided |
+| `DEV` | Listed in the tracking issue with the repo's reason |
+
+Running the audit again does not create duplicates. A finding's title ends with its rule id, so the skill finds the issue it filed before. It reopens one that has come back, and closes one whose rule is now met, with the evidence. A security weakness in a public repository is the one thing it does not file in the open.
 
 The script on its own, with no agent:
 
 ```bash
-node .claude/skills/handbook-audit/scripts/audit.mjs . --all
+node .claude/skills/handbook-audit/scripts/audit.mjs . --all       # the report
+node .claude/skills/handbook-audit/scripts/audit.mjs . --issues    # the issue drafts, as JSON
 ```
 
 It needs only Node. It checks about thirty rules a machine can verify (required files, script names, the Node pin, hooks, CI, lint and test configuration, the deploy pipeline, framework versions) and prints the handbook page for each one it finds broken.

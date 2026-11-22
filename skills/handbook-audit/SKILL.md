@@ -6,15 +6,16 @@ argument-hint: "[full | fix]"
 
 # Audit this repository against the Engineering Handbook
 
-The handbook is the standard for how these projects are built: <https://qiheme.github.io>. This skill checks one repository against it. It reads and reports. It changes nothing unless the request says to fix.
+The handbook is the standard for how these projects are built: <https://qiheme.github.io>. This skill checks one repository against it, reports, and **logs every finding as a GitHub issue** so nothing is tracked only in a chat. It changes no files unless the request says to fix.
 
 Modes, from `$ARGUMENTS`:
 
 | Request | Do |
 | --- | --- |
-| nothing, or "quick" | Steps 1 to 3, then report |
-| `full` | Steps 1 to 5, then report |
-| `fix`, "adopt", "bring it up to standard" | Steps 1 to 3, report, then step 7 |
+| nothing, or "quick" | Steps 1 to 3, report (6), log the findings (7) |
+| `full` | Steps 1 to 5, report (6), log the findings (7) |
+| `fix`, "adopt", "bring it up to standard" | Steps 1 to 3, report (6), log the findings (7), then step 8 |
+| "dry run", "don't file issues" | As above, but in step 7 show the drafts instead of filing them |
 
 ## Reading the handbook
 
@@ -95,13 +96,52 @@ Lead with the verdict in one line. Then:
 
 Label what you verified and what you inferred.
 
-**A security weakness is reported in this conversation and as an issue in this repository. It is never written into the handbook, which is public.**
+## Step 7: log every finding as an issue
 
-## Step 7 (fix): close the gaps
+Work here starts with an issue, so a finding that is not an issue does not exist. Do this on every audit, without being asked.
 
-Only when asked. Follow this repo's own workflow for every change: an issue first, test first, the repo's commit format, a pull request.
+**Get the drafts.** The script writes them, so every issue has the same shape:
 
-1. Open one issue per gap, or one for a group of small mechanical gaps. Use the Task form if the repo has it.
+```bash
+node "${CLAUDE_SKILL_DIR}/scripts/audit.mjs" . --issues
+```
+
+It prints JSON: a `parent` issue and one entry in `findings` for each `FAIL`. Each is in the Task form (What, Why now, Done when, Parent issue, Effort estimate). Titles start `[Task]: Handbook audit:` and a finding's title ends with its rule id in brackets, which is how a later audit finds it again. If there is no `FAIL`, there is nothing to file: say so.
+
+**Look before you file.** List this repository's issues, open and closed, whose title starts with `[Task]: Handbook audit:`. Also search for an existing issue that already covers a finding under another title (search the rule's key words). Never file a duplicate.
+
+Then, for the parent and each finding:
+
+| Situation | Do |
+| --- | --- |
+| No parent issue is open | Create it from `parent`. Set the Issue Type to Task if the repo has issue types |
+| A parent is open | Reuse it. Replace its body with the new `parent` body so its table is current |
+| No issue exists for the rule | Create it from the draft, as a **sub-issue of the parent**. Replace `{{parent}}` in the body with the parent's number |
+| An open issue already exists for the rule | Leave it. Do not create another |
+| An issue under another title already covers it | Do not create one. Attach that issue to the parent as a sub-issue |
+| A closed issue exists and the rule fails again | Reopen it and comment with today's finding |
+| An open issue exists but the rule now passes, or is now a listed deviation | Comment with the evidence (the script's line for that rule) and close it as completed |
+
+Follow anything this repo's `CLAUDE.md` adds about issues: a project board to add them to, fields to set, a roadmap issue to attach the parent to.
+
+**What does not become an issue:**
+
+- `TODO` lines. They are proposals, listed in the parent issue and decided in the handbook's `decisions.md`.
+- `DEV` lines. The owner has already decided; they are listed in the parent issue.
+
+**Findings from reading the code** (step 4) are logged too, one issue each, in the repo's Task or Bug form, as sub-issues of the same parent. Give the file and line as evidence.
+
+**A security weakness** is the exception to "file it where everyone can see". In a private repository, file it as an issue. In a public repository, do not: report it in this conversation and tell the owner to open a private security advisory. It is never written into the handbook, which is public.
+
+**If you cannot create issues here** (no access, no tool), print each draft in full and say plainly that nothing was filed.
+
+Finish by listing what you did: the parent's number, each issue created, reused, reopened or closed, and anything you could not file.
+
+## Step 8 (fix): close the gaps
+
+Only when asked. Follow this repo's own workflow for every change: an issue first, test first, the repo's commit format, a pull request. The issues from step 7 are the issues to work from; each pull request says `Closes #<n>` for the findings it fixes.
+
+1. Small mechanical findings can share one pull request. Each still closes its own issue.
 2. Start with the mechanical gaps. Copy files from the handbook's `kit/` (read `kit/README.md` for what goes where) rather than writing them from memory. Fill in every placeholder.
 3. Re-run the script after each change. The gap is closed when its line is gone.
 4. Where the repo should stay different, do not "fix" it. That is the owner's decision: ask, then add a row to the Deviations table in its `CLAUDE.md` with the rule id in backticks and the owner's reason. Never write a reason on the owner's behalf to make a check pass.
@@ -113,4 +153,5 @@ Only when asked. Follow this repo's own workflow for every change: an issue firs
 - It does not decide that a deviation is acceptable. The repo's owner does, by listing it with a reason.
 - It does not make a proposed rule binding. `TODO` lines never fail the run.
 - It does not audit product behaviour, only how the project is built.
+- It does not leave findings in the chat. Every `FAIL` ends as an issue, or the skill says why it could not file one.
 - It does not replace CI. The same script can run there as a gate: see `standards/agents.md` in the handbook.

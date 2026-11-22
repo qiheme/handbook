@@ -6,7 +6,7 @@
  * machine can verify: the repo contract (files, script names, Node pin, hooks,
  * CI), the lint and test configuration, and the deploy pipeline.
  *
- *   node audit.mjs [path] [--blueprint <name>] [--json] [--all]
+ *   node audit.mjs [path] [--blueprint <name>] [--json] [--all] [--issues]
  *
  * Exit code: 0 when every required rule is met or listed as a deviation, 1
  * when one is not, 2 on a bad argument.
@@ -20,6 +20,10 @@
  * "Deviations" table whose first cell is the rule id in backticks and whose
  * "Reason" cell is filled in. That rule is then reported as an accepted
  * deviation and does not fail the run.
+ *
+ * With --issues it prints, as JSON, one GitHub issue draft per required rule
+ * that is not met plus a parent issue to hang them on, each written in the
+ * Task form. It creates nothing: the audit skill files them.
  *
  * It reports facts only. It does not judge architecture or run anything: that
  * is the audit skill's job (../SKILL.md).
@@ -651,6 +655,286 @@ export function audit(repo, options = {}) {
   }
 }
 
+// --- from findings to issues -------------------------------------------------
+
+/** Where the handbook's pages are read on GitHub. Survives a branch rename. */
+export const HANDBOOK = 'https://github.com/qiheme/qiheme.github.io/blob/HEAD/'
+
+const SIZES = {
+  XS: 'XS - under 2 hours',
+  S: 'S - half day',
+  M: 'M - one weekend',
+  L: 'L - multi-weekend',
+  XL: 'XL - needs scoping (split into sub-issues)',
+}
+/** Rough hours behind each size, used only to size the parent issue. */
+const HOURS = { XS: 1, S: 4, M: 16, L: 40 }
+
+/**
+ * For each rule: what to do about it, why it matters, and a rough size.
+ * This is the text an issue is written from, so it is the same every time.
+ */
+export const GUIDANCE = {
+  rulebook: {
+    fix: "Add `CLAUDE.md` from the handbook's `kit/common/CLAUDE.template.md`. Replace every placeholder and list any deviations.",
+    why: 'Agents load the rulebook at the start of every session. Without it they work from memory, which is how the repos drifted apart.',
+    size: 'S',
+  },
+  'agent-pointers': {
+    fix: 'Add `AGENTS.md` from `kit/common/AGENTS.template.md`, and replace `.github/copilot-instructions.md` (if present) with the one-line pointer from the kit.',
+    why: 'A second copy of the rules goes stale. A pointer to `CLAUDE.md` cannot.',
+    size: 'XS',
+  },
+  readme: {
+    fix: 'Write `README.md` with the sections listed in `standards/repo-contract.md`.',
+    why: 'It is the first thing a person or an agent reads, and the only place setup steps live.',
+    size: 'S',
+  },
+  'node-pin': {
+    fix: `Set \`.nvmrc\` to \`${NODE_MAJOR}\`, the major version only.`,
+    why: 'One Node version across the repos means one CI setup and one cloud setup.',
+    size: 'XS',
+  },
+  engines: {
+    fix: `Set \`engines.node\` to \`>=${NODE_MAJOR}\` in \`package.json\`.`,
+    why: 'It stops an install on a Node version the repo is not tested on.',
+    size: 'XS',
+  },
+  lockfile: {
+    fix: 'Use npm: commit `package-lock.json` and remove any other lockfile.',
+    why: 'CI runs `npm ci`, which needs the lockfile. One package manager means one lockfile format.',
+    size: 'XS',
+  },
+  esm: {
+    fix: 'Add `"type": "module"` to `package.json` and convert any CommonJS files.',
+    why: 'Every active repo uses ES modules, and the kit configs assume it.',
+    size: 'S',
+  },
+  'npmrc-no-token': {
+    fix: 'Remove the `_authToken` line from the committed `.npmrc`, keeping only the `@q-labs` registry line. The token goes in the user-level `~/.npmrc`; CI uses the `COBALT_PACKAGES_TOKEN` secret.',
+    why: 'A token line in a committed file is one edit away from a leaked token.',
+    size: 'XS',
+  },
+  'env-ignored': {
+    fix: 'Add `.env`, `.env.*` and `!.env.example` to `.gitignore`.',
+    why: 'Nothing else stops a file of secrets from being committed.',
+    size: 'XS',
+  },
+  scripts: {
+    fix: 'Add the missing npm scripts under the contract names in `standards/repo-contract.md`. `kit/common/package.scripts.json` has them.',
+    why: 'CI, the hooks and agents all call these names. A repo without them needs special handling everywhere.',
+    size: 'S',
+  },
+  'test-script': {
+    fix: 'Make `test` a single run (`vitest run`) and put coverage in `test:coverage`.',
+    why: '`npm test` is the fast loop. `test:coverage` is the gate the hooks and CI call.',
+    size: 'XS',
+  },
+  'typescript-strict': {
+    fix: 'Set `"strict": true` in `tsconfig.json` (or extend a strict preset) and fix what it reports. In a JavaScript repo this is the TypeScript migration: file by file, pure modules first.',
+    why: 'Types catch what tests miss, and strict mode is where most of that value is.',
+    size: 'L',
+  },
+  'eslint-flat': {
+    fix: 'Add `eslint.config.js` from `kit/common/eslint.config.js`, remove any `.eslintrc*` file, and fix what it reports.',
+    why: 'One lint configuration across the repos, in the only format current ESLint reads.',
+    size: 'S',
+  },
+  'coverage-100': {
+    fix: 'Pin the Vitest coverage thresholds at 100 for lines, functions, branches and statements (see `kit/common/vitest.config.ts`), then write the tests the gate asks for.',
+    why: 'The coverage floor is how an agent knows a change is finished. Below 100 it erodes.',
+    size: 'M',
+  },
+  hooks: {
+    fix: 'Add the husky hooks from `kit/common/.husky/`: lint-staged on commit; typecheck and test:coverage on push.',
+    why: 'They catch a failure before CI does, and push-time gates let the red commit of a test-first cycle through.',
+    size: 'XS',
+  },
+  ci: {
+    fix: 'Bring `.github/workflows/ci.yml` in line with `kit/workflows/ci.yml`: Node from `.nvmrc`, then lint, typecheck, test:coverage and build.',
+    why: 'CI is the gate that cannot be skipped. Each missing step is a class of mistake that reaches the default branch.',
+    size: 'S',
+  },
+  'ci-secret-name': {
+    fix: 'Create the `COBALT_PACKAGES_TOKEN` Actions secret (the owner does this) and use it in `ci.yml` in place of the current name.',
+    why: 'One secret name means the kit workflows work in every repo unchanged.',
+    size: 'XS',
+  },
+  'netlify-pipeline': {
+    fix: 'Add `netlify.toml`, `deploy-preview.yml` and `release.yml` from the kit. The owner adds the Netlify secrets.',
+    why: 'One host and one pipeline: tests gate every deploy, every pull request gets a preview, and rollback is one click.',
+    size: 'M',
+  },
+  'no-vercel': {
+    fix: 'Move the site to Netlify with the kit pipeline. Server code on Vercel Functions or Vercel Cron moves first (`blueprints/functions.md`).',
+    why: 'Two hosts means two pipelines to maintain. This is decision D1 in the handbook.',
+    size: 'L',
+  },
+  cobalt: {
+    fix: 'Install `@q-labs/cobalt` and build the interface on its components and tokens (`standards/ui.md`).',
+    why: 'One design system across the products, instead of a palette per repo.',
+    size: 'L',
+  },
+  versions: {
+    fix: 'Upgrade the frameworks named above to within one major version of the baseline in `standards/stack.md`.',
+    why: 'Two majors behind, an upgrade stops being routine and the repos stop sharing configuration.',
+    size: 'M',
+  },
+  'pr-template': {
+    fix: 'Add `.github/pull_request_template.md` from `kit/common/.github/`.',
+    why: 'Every pull request then asks for the linked issue and for evidence the change works at runtime.',
+    size: 'XS',
+  },
+  'issue-forms': {
+    fix: 'Add the Feature, Bug and Task forms from `kit/common/.github/ISSUE_TEMPLATE/`, and enable Issue Types in the repository settings.',
+    why: 'Work starts with an issue. The forms make each one complete enough to act on.',
+    size: 'XS',
+  },
+  'verify-skill': {
+    fix: "Add `.claude/skills/verify/SKILL.md` from `kit/common/claude-skill-verify/SKILL.template.md`, with this repo's real build, serve and drive commands.",
+    why: 'It tells an agent how to prove a change works in the running app, not only in tests.',
+    size: 'S',
+  },
+  'shell-tests': {
+    fix: 'Add a `test.sh` that runs shellcheck, the syntax checks and the bats tests.',
+    why: 'One entry point means CI and a person run exactly the same checks.',
+    size: 'S',
+  },
+  'shell-ci': {
+    fix: 'Add a workflow in `.github/workflows/` that runs `test.sh`.',
+    why: 'Without CI the tests only run when someone remembers to.',
+    size: 'XS',
+  },
+  'quality-spec': {
+    fix: 'Add `kit/e2e/quality.spec.ts` to the end-to-end suite, list every route in it, and fix what it reports.',
+    why: 'It automates the Front-End Checklist rules a machine can check, on every pull request.',
+    size: 'S',
+  },
+  'security-headers': {
+    fix: "Add `public/_headers` from `kit/netlify/_headers` and write the app's Content-Security-Policy.",
+    why: 'The Front-End Checklist rates these headers High, and the host does not set them all by default.',
+    size: 'S',
+  },
+  prettier: {
+    fix: 'Add `.prettierrc.json` from the kit and format the repo in one commit.',
+    why: 'A formatter ends style differences between repos and shrinks every later diff.',
+    size: 'S',
+  },
+  dependabot: {
+    fix: 'Add `.github/dependabot.yml` from `kit/common/.github/`.',
+    why: 'Nothing else keeps the repos on the same framework versions.',
+    size: 'XS',
+  },
+}
+
+/** The size of a piece of work made of these sizes. Two small tasks are not one small task. */
+export function totalSize(sizes) {
+  const hours = sizes.reduce((sum, size) => sum + HOURS[size], 0)
+  if (hours <= 1) return 'XS'
+  if (hours <= 8) return 'S'
+  if (hours <= 24) return 'M'
+  if (hours <= 60) return 'L'
+  return 'XL'
+}
+
+/**
+ * Issue drafts for an audit result: one per required rule that is not met,
+ * and a parent to attach them to. Each is written in the Task form.
+ *
+ * Titles end with the rule id and never change, so a later audit can find the
+ * issue it already filed. `{{parent}}` in a finding's body stands for the
+ * parent issue's number, which only exists once the parent has been created.
+ *
+ * @param options.name   the repository's name
+ * @param options.today  the audit date, YYYY-MM-DD
+ */
+export function issueDrafts(result, { name, today }) {
+  const failed = result.checks.filter((c) => c.level === 'required' && c.status === 'fail')
+  if (failed.length === 0) return { parent: null, findings: [] }
+  const proposed = result.checks.filter((c) => c.level === 'proposed' && c.status === 'fail')
+  const accepted = result.checks.filter((c) => c.status === 'deviation')
+  const run = 'node .claude/skills/handbook-audit/scripts/audit.mjs .'
+
+  const findings = failed.map((check) => {
+    const { fix, why, size } = GUIDANCE[check.id]
+    return {
+      rule: check.id,
+      size,
+      title: `[Task]: Handbook audit: ${check.title} (${check.id})`,
+      body: [
+        '### What',
+        '',
+        fix,
+        '',
+        `**Found:** ${check.detail}`,
+        '',
+        '### Why now',
+        '',
+        `${why} The rule is in the Engineering Handbook: [\`${check.page}\`](${HANDBOOK}${check.page}).`,
+        '',
+        '### Done when',
+        '',
+        `- [ ] The audit no longer reports \`${check.id}\` (\`${run}\`), or the repo lists it as a deviation in \`CLAUDE.md\` with a reason`,
+        "- [ ] The repo's lint, typecheck, coverage and build gates pass",
+        '- [ ] Docs are updated if behaviour or structure changed',
+        '',
+        '### Parent issue',
+        '',
+        '#{{parent}}',
+        '',
+        '### Effort estimate',
+        '',
+        SIZES[size],
+        '',
+        '---',
+        `Audit rule: \`${check.id}\` · filed by the handbook-audit skill`,
+      ].join('\n'),
+    }
+  })
+
+  const parent = {
+    title: `[Task]: Handbook audit: bring ${name} up to the Engineering Handbook standard`,
+    body: [
+      '### What',
+      '',
+      `Close the gaps between this repository and the [Engineering Handbook](${HANDBOOK}README.md). Audited on ${today} (blueprint: ${result.blueprint}): ${plural(failed.length, 'required rule')} not met. Each one is a sub-issue of this issue.`,
+      '',
+      '| Rule | Found | Size |',
+      '| --- | --- | --- |',
+      ...findings.map((f, i) => `| \`${f.rule}\` | ${failed[i].detail} | ${f.size} |`),
+      '',
+      '### Why now',
+      '',
+      'Every repo on the same frameworks and infrastructure means a person or an agent can work in any of them without relearning it, and a fix to the shared kit reaches all of them.',
+      '',
+      '### Done when',
+      '',
+      '- [ ] Every sub-issue is closed, or its rule is listed as a deviation in `CLAUDE.md` with a reason',
+      `- [ ] \`${run}\` prints no \`FAIL\``,
+      '- [ ] The conformance job runs in CI on every pull request',
+      "- [ ] The repo's row in the handbook's `adoption.md` is updated",
+      '',
+      '### Proposed rules not yet met',
+      '',
+      proposed.length
+        ? `Not filed as issues: these are proposals in the handbook's \`decisions.md\`, not yet binding. ${proposed.map((c) => `\`${c.id}\``).join(', ')}.`
+        : 'None.',
+      '',
+      '### Accepted deviations',
+      '',
+      ...(accepted.length ? accepted.map((c) => `- \`${c.id}\`: ${c.reason}`) : ['None.']),
+      '',
+      '### Effort estimate',
+      '',
+      SIZES[totalSize(findings.map((f) => f.size))],
+      '',
+      '---',
+      'Filed by the handbook-audit skill',
+    ].join('\n'),
+  }
+  return { parent, findings }
+}
+
 // --- output ------------------------------------------------------------------
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
@@ -697,20 +981,29 @@ export function format(result, name, options = {}) {
 
 // --- command line ------------------------------------------------------------
 
-const USAGE = `Usage: node audit.mjs [path] [--blueprint <name>] [--json] [--all]
+const USAGE = `Usage: node audit.mjs [path] [--blueprint <name>] [--json] [--all] [--issues]
 
   path         the repository to check (default: the current directory)
   --blueprint  one of: ${BLUEPRINTS.filter((b) => b !== 'unknown').join(', ')} (default: detected)
   --json       print the full result as JSON
   --all        also list the rules that passed or did not apply
+  --issues     print, as JSON, an issue draft for each required rule not met
 
 Exit code: 0 when every required rule is met, 1 when one is not.`
 
 export function parseArgs(argv) {
-  const args = { path: '.', json: false, all: false, blueprint: undefined, help: false }
+  const args = {
+    path: '.',
+    json: false,
+    issues: false,
+    all: false,
+    blueprint: undefined,
+    help: false,
+  }
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i]
     if (arg === '--json') args.json = true
+    else if (arg === '--issues') args.issues = true
     else if (arg === '--all') args.all = true
     else if (arg === '--help' || arg === '-h') args.help = true
     else if (arg === '--blueprint') args.blueprint = argv[(i += 1)]
@@ -723,6 +1016,7 @@ export function parseArgs(argv) {
  * @param io.openRepo  path -> repo port
  * @param io.print     line -> void
  * @param io.name      path -> the name to show in the report
+ * @param io.today     () -> today's date, YYYY-MM-DD (used only by --issues)
  */
 export function main(argv, io) {
   const args = parseArgs(argv)
@@ -735,11 +1029,12 @@ export function main(argv, io) {
     return 2
   }
   const result = audit(io.openRepo(args.path), { blueprint: args.blueprint })
-  io.print(
-    args.json
-      ? JSON.stringify(result, null, 2)
-      : format(result, io.name(args.path), { all: args.all }),
-  )
+  const name = io.name(args.path)
+  if (args.issues) {
+    io.print(JSON.stringify(issueDrafts(result, { name, today: io.today() }), null, 2))
+  } else {
+    io.print(args.json ? JSON.stringify(result, null, 2) : format(result, name, { all: args.all }))
+  }
   return result.ok ? 0 : 1
 }
 
@@ -749,6 +1044,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     openRepo: (target) => diskRepo(path.resolve(target)),
     print: (line) => console.log(line),
     name: (target) => path.basename(path.resolve(target)),
+    today: () => new Date().toISOString().slice(0, 10),
   })
 }
 /* node:coverage enable */

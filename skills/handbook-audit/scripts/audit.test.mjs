@@ -13,10 +13,13 @@ import {
   declaredBlueprint,
   detectBlueprint,
   format,
+  GUIDANCE,
+  issueDrafts,
   main,
   majorOf,
   memoryRepo,
   parseArgs,
+  totalSize,
   readDeviations,
 } from './audit.mjs'
 
@@ -684,6 +687,145 @@ describe('the blueprint a repo declares in CLAUDE.md', () => {
   })
 })
 
+describe('issueDrafts: every finding becomes a tracked issue', () => {
+  const TODAY = '2026-11-22'
+  // two required rules not met, one proposed rule not met, one accepted deviation
+  const repo = () =>
+    conformingWebApp({
+      'package-lock.json': null,
+      '.husky/pre-push': 'npm test\n',
+      '.prettierrc.json': null,
+      'netlify.toml': null,
+      'CLAUDE.md':
+        '# CLAUDE.md\n\n## Deviations\n\n| Rule | Standard | This repo | Reason |\n| --- | --- | --- | --- |\n| `netlify-pipeline` | Netlify | Not deployed | First deploy is tracked |\n',
+    })
+  const drafts = () => issueDrafts(audit(repo()), { name: 'my-app', today: TODAY })
+
+  it('every rule has guidance: what to do, why it matters, and a size', () => {
+    const ids = audit(conformingWebApp())
+      .checks.map((c) => c.id)
+      .filter((id) => id !== 'deviations')
+    assert.deepEqual(Object.keys(GUIDANCE).sort(), [...ids].sort())
+    for (const [id, guide] of Object.entries(GUIDANCE)) {
+      assert.ok(guide.fix.length > 20, `${id} fix`)
+      assert.ok(guide.why.length > 20, `${id} why`)
+      assert.match(guide.size, /^(XS|S|M|L)$/, `${id} size`)
+    }
+  })
+
+  it('drafts one issue per required rule that is not met, and none for the rest', () => {
+    assert.deepEqual(
+      drafts().findings.map((f) => f.rule),
+      ['lockfile', 'hooks'],
+    )
+  })
+
+  it('gives each issue a stable title that ends with the rule id, so a second audit can find it', () => {
+    const [first] = drafts().findings
+    assert.equal(
+      first.title,
+      '[Task]: Handbook audit: npm, with a committed package-lock.json (lockfile)',
+    )
+    assert.equal(drafts().findings[0].title, first.title)
+  })
+
+  it('writes each issue in the Task form: what, why now, done when, parent, effort', () => {
+    const [issue] = drafts().findings
+    const headings = issue.body.match(/^### .+$/gm)
+    assert.deepEqual(headings, [
+      '### What',
+      '### Why now',
+      '### Done when',
+      '### Parent issue',
+      '### Effort estimate',
+    ])
+    assert.ok(issue.body.includes(GUIDANCE.lockfile.fix))
+    assert.ok(issue.body.includes('**Found:** package-lock.json is missing'))
+    assert.ok(issue.body.includes(GUIDANCE.lockfile.why))
+    assert.ok(issue.body.includes('standards/stack.md'))
+    assert.ok(issue.body.includes('- [ ] The audit no longer reports `lockfile`'))
+    assert.ok(issue.body.includes('{{parent}}'))
+    assert.ok(issue.body.includes('XS - under 2 hours'))
+    assert.ok(issue.body.includes('Audit rule: `lockfile`'))
+  })
+
+  it('drafts a parent issue that lists every finding, the proposals and the deviations', () => {
+    const { parent } = drafts()
+    assert.equal(
+      parent.title,
+      '[Task]: Handbook audit: bring my-app up to the Engineering Handbook standard',
+    )
+    for (const heading of ['### What', '### Why now', '### Done when', '### Effort estimate']) {
+      assert.ok(parent.body.includes(heading), heading)
+    }
+    assert.ok(parent.body.includes('Audited on 2026-11-22'))
+    assert.ok(parent.body.includes('blueprint: web-app'))
+    assert.ok(parent.body.includes('2 required rules'))
+    assert.ok(parent.body.includes('| `lockfile` |'))
+    assert.ok(parent.body.includes('| `hooks` |'))
+    assert.ok(parent.body.includes('`prettier`'), 'the proposed rule is listed, not filed')
+    assert.ok(parent.body.includes('`netlify-pipeline`: First deploy is tracked'))
+    assert.ok(!parent.body.includes('| `prettier` |'))
+  })
+
+  it('sizes the parent from its findings', () => {
+    assert.match(drafts().parent.body, /### Effort estimate\n\nS - half day/)
+    const big = issueDrafts(
+      audit(
+        memoryRepo({
+          'package.json': '{"dependencies":{"react":"^16.0.0","react-scripts":"3.4.3"}}',
+        }),
+      ),
+      {
+        name: 'old',
+        today: TODAY,
+      },
+    )
+    assert.match(big.parent.body, /### Effort estimate\n\nXL - needs scoping/)
+  })
+
+  it('says None when there are no proposals or deviations to list', () => {
+    const { parent } = issueDrafts(audit(conformingWebApp({ 'package-lock.json': null })), {
+      name: 'x',
+      today: TODAY,
+    })
+    assert.match(parent.body, /### Proposed rules not yet met\n\nNone\./)
+    assert.match(parent.body, /### Accepted deviations\n\nNone\./)
+  })
+
+  it('adds sizes up: two small tasks are not one small task', () => {
+    assert.equal(totalSize(['XS']), 'XS')
+    assert.equal(totalSize(['XS', 'XS']), 'S')
+    assert.equal(totalSize(['S', 'S']), 'S')
+    assert.equal(totalSize(['M', 'S']), 'M')
+    assert.equal(totalSize(['L', 'S']), 'L')
+    assert.equal(totalSize(['L', 'L']), 'XL')
+  })
+
+  it('drafts nothing when no required rule is unmet', () => {
+    const clean = issueDrafts(audit(conformingWebApp({ '.prettierrc.json': null })), {
+      name: 'x',
+      today: TODAY,
+    })
+    assert.equal(clean.parent, null)
+    assert.deepEqual(clean.findings, [])
+  })
+
+  it('--issues prints the drafts as JSON, with the date supplied from outside', () => {
+    const out = []
+    const code = main(['--issues'], {
+      openRepo: () => repo(),
+      print: (line) => out.push(line),
+      name: () => 'my-app',
+      today: () => TODAY,
+    })
+    const printed = JSON.parse(out.join('\n'))
+    assert.equal(code, 1)
+    assert.equal(printed.findings.length, 2)
+    assert.ok(printed.parent.body.includes('Audited on 2026-11-22'))
+  })
+})
+
 describe('format', () => {
   it('lists failures first, each with the page that states the rule', () => {
     const text = format(
@@ -712,6 +854,7 @@ describe('parseArgs and main', () => {
     assert.deepEqual(parseArgs(['../app', '--json', '--blueprint', 'library', '--all']), {
       path: '../app',
       json: true,
+      issues: false,
       all: true,
       blueprint: 'library',
       help: false,
@@ -719,11 +862,13 @@ describe('parseArgs and main', () => {
     assert.deepEqual(parseArgs([]), {
       path: '.',
       json: false,
+      issues: false,
       all: false,
       blueprint: undefined,
       help: false,
     })
     assert.equal(parseArgs(['--help']).help, true)
+    assert.equal(parseArgs(['--issues']).issues, true)
   })
 
   const run = (argv, repo) => {
