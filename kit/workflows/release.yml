@@ -140,22 +140,29 @@ jobs:
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      # Versions get a GitHub Release; builds (+<n>) do not. Notes start at the
-      # previous version, so they cover every build in between.
-      - name: Create the GitHub Release for a new version
-        if: steps.tag.outputs.tag != '' && !contains(steps.tag.outputs.tag, '+')
+      # Versions get a GitHub Release; builds (+<n>) do not. Every tagged run
+      # makes sure its base version has one, so a release that failed after its
+      # tag was pushed is created by the next build. Notes start at the version
+      # before, so they cover every build in between.
+      - name: Ensure the version's GitHub Release exists
+        if: steps.tag.outputs.tag != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "GitHub Release $TAG already exists."
+          BASE="${TAG%%+*}"
+          if [ -z "$(git tag -l "$BASE")" ]; then
+            echo "No $BASE tag in this repo, so no release to create."
             exit 0
           fi
-          PREV="$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -vxF "$TAG" | sort -V | tail -n 1 || true)"
-          gh release create "$TAG" --title "$TAG" --generate-notes --verify-tag \
+          if gh release view "$BASE" >/dev/null 2>&1; then
+            echo "GitHub Release $BASE already exists."
+            exit 0
+          fi
+          PREV="$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | awk -v b="$BASE" '$0 == b { print p; exit } { p = $0 }')"
+          gh release create "$BASE" --title "$BASE" --generate-notes --verify-tag \
             ${PREV:+--notes-start-tag "$PREV"} \
-            || gh release view "$TAG" >/dev/null
+            || gh release view "$BASE" >/dev/null
 
   deploy:
     name: Deploy to production
