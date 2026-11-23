@@ -1,14 +1,86 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Quincy's Portfolio</title>
-    </head>
-    <body>
-        <h1>
-            Hello World!!!!!
-        </h1>
-        <p>
-            This is Quincy's portfolio.
-        </p>
-    </body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Engineering Handbook</title>
+    <meta
+      name="description"
+      content="One standard for how Cloud 12Nine and Q-Labs projects are built: the stack, the workflow, the pipelines, and a kit of files to copy."
+    />
+    <link rel="canonical" href="https://qiheme.github.io/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Engineering Handbook" />
+    <meta
+      property="og:description"
+      content="One standard for how Cloud 12Nine and Q-Labs projects are built."
+    />
+    <meta property="og:url" content="https://qiheme.github.io/" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Cpath d='M9 9h14v3H9zm0 5.5h14v3H9zm0 5.5h9v3H9z' fill='%23fff'/%3E%3C/svg%3E"
+    />
+
+    <!--
+      This page is only a viewer. The handbook is the Markdown files in this
+      repository; Docsify fetches and renders them in the browser. There is no
+      build step. Agents should read the .md files directly (see llms.txt).
+
+      It follows the Front-End Checklist (standards/frontend-checklist.md):
+      no inline script or style, scripts deferred, third-party files pinned to
+      an exact version with an integrity hash, and a policy that lists the only
+      hosts the page may load from. When a version changes, its hash changes:
+        openssl dgst -sha384 -binary <file> | openssl base64 -A
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; base-uri 'self'; form-action 'none'"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/docsify@5.1.0/dist/themes/core.min.css"
+      integrity="sha384-EHVG4GyaSD3YEuLBkKV9+uYAxVxDbhmNuPVXRdvHjrC0+eLbs8F7fFiR2aeuXY5S"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="viewer.css" />
+
+    <script defer src="viewer.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/docsify@5.1.0/dist/docsify.min.js"
+      integrity="sha384-hx+mDRaRp2tw2tlDV9AVMMkU5zRLpaEIGGYt3k1ZiWSxGxIzCyP3FceVHUAMb1bI"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/docsify@5.1.0/dist/plugins/search.min.js"
+      integrity="sha384-mkjQDRnwrfyRbChj7+qlTfCEvrsSsxs6VVslNDhuufsMKuF4STph3BezVwzTknga"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <!-- Docsify replaces everything inside #app once it has loaded. -->
+    <div id="app">
+      <main>
+        <h1>Engineering Handbook</h1>
+        <p id="status">Loading the handbook…</p>
+      </main>
+    </div>
+
+    <noscript>
+      <p>
+        This viewer needs JavaScript. The handbook itself is plain Markdown:
+        <a href="https://github.com/qiheme/qiheme.github.io#readme">read it on GitHub</a>.
+      </p>
+    </noscript>
+  </body>
 </html>

@@ -1,0 +1,3 @@
+# Single-page apps only: put this file at public/_redirects. Every path that is
+# not a real file serves the app, which then routes in the browser.
+/*  /index.html  200

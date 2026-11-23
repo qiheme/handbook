@@ -1,0 +1,138 @@
+/*
+ * Cobalt look for the viewer.
+ *
+ * The values below are a SNAPSHOT of @q-labs/cobalt 0.3.0's tokens, kept
+ * under Cobalt's own token names. Apps must import the package instead
+ * (see standards/ui.md); this repo has no build step, so it cannot.
+ * Dark is the default, as in Cobalt. Light follows the reader's system.
+ */
+:root {
+  --bg-base: #040508;
+  --bg-surface: #080a0f;
+  --bg-raised: #111318;
+  --text-primary: #eef0f5;
+  --text-secondary: #8b95a8;
+  --text-accent: #60a5fa;
+  --accent-default: #2563eb;
+  --accent-hover: #3b82f6;
+  --viewer-accent: var(--accent-hover);
+  --border-default: rgba(255, 255, 255, 0.09);
+  --font-display: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+  --font-body: 'DM Sans', 'Helvetica Neue', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-base: #f7f8fa;
+    --bg-surface: #ffffff;
+    --bg-raised: #f1f5f9;
+    --text-primary: #0d0f14;
+    --text-secondary: #3d4a5c;
+    --text-accent: #1d4ed8;
+    --border-default: rgba(0, 0, 0, 0.08);
+    --viewer-accent: var(--accent-default);
+    color-scheme: light;
+  }
+}
+
+/* Map the tokens onto Docsify's theme variables. */
+:root {
+  --color-bg: var(--bg-base);
+  --color-text: var(--text-primary);
+  /* Docsify colours the active sidebar link with its theme colour. On the dark
+     background, Cobalt's default accent is below the 4.5:1 contrast minimum for
+     text, so the lighter hover accent is used there. */
+  --theme-color: var(--viewer-accent);
+  --font-family: var(--font-body);
+  --font-family-mono: var(--font-mono);
+  --font-weight: 400;
+  --border-color: var(--border-default);
+  --border-radius: 6px;
+  --heading-color: var(--text-primary);
+  --strong-color: var(--text-primary);
+  --link-color: var(--text-accent);
+  --sidebar-background: var(--bg-surface);
+  /* Wide enough for the comparison tables. */
+  --content-max-width: 96ch;
+}
+
+.markdown-section :is(h1, h2, h3, h4),
+.app-name-link {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.markdown-section .table-scroll {
+  overflow-x: auto;
+  margin-block: 1rem;
+}
+
+/* The wrapper scrolls, not the table: a table that scrolls by itself has
+   nothing the keyboard can focus, and display:block drops its table semantics. */
+.markdown-section .table-scroll > table {
+  display: table;
+  overflow: visible;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  margin-block: 0;
+  font-size: 0.925em;
+}
+
+.markdown-section .table-scroll :is(th, td) {
+  max-width: 44ch;
+}
+
+#app > main {
+  max-width: 60ch;
+  margin: 4rem auto;
+  padding-inline: 1.5rem;
+}
+
+.markdown-section :is(th, td) {
+  vertical-align: top;
+}
+
+.markdown-section th {
+  background: var(--bg-raised);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.markdown-section :not(pre) > code {
+  background: var(--bg-raised);
+}
+
+.markdown-section pre {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+}
+
+/* Diagrams: centred on a quiet panel, scrollable when wide. */
+.markdown-section .mermaid {
+  margin-block: 1.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+}
+
+.markdown-section .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mermaid's dark theme draws edge labels at 4.43:1, just under the 4.5:1
+   minimum. Its own rules are scoped by id, hence !important. */
+.markdown-section .mermaid :is(.edgeLabel, .labelBkg) {
+  background-color: var(--bg-raised) !important;
+}
+
+.markdown-section .mermaid .edgeLabel p {
+  background-color: var(--bg-raised) !important;
+  color: var(--text-primary) !important;
+}

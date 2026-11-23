@@ -1,0 +1,75 @@
+/*
+ * Kit file. Copy to src/styles/app.css and import it once from the app entry.
+ * Standard: https://qiheme.github.io/#/standards/ui
+ */
+@import 'tailwindcss';
+/*
+ * Cobalt's tokens and every component's styles. This is the import path that
+ * works: per-component CSS imports are tree-shaken out of Vite 8 builds, which
+ * leaves Badge, Card, ... unstyled (see Q-Labs/cobalt#16). The fonts come from
+ * CobaltProvider, which imports the token file that @imports them.
+ */
+@import '@q-labs/cobalt/styles.css';
+
+/*
+ * Cobalt's semantic tokens, exposed as Tailwind colors so utilities such as
+ * `bg-surface` and `text-fg-muted` follow the active theme (dark by default,
+ * light via data-theme). `inline` makes each utility reference the Cobalt
+ * variable directly, so a theme switch needs no rebuild.
+ *
+ * Names avoid Tailwind's own: `text-base` is a font size, so Cobalt's
+ * `--bg-base` is `canvas`, and its text colours are `fg-*`.
+ */
+@theme inline {
+  --color-canvas: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-raised: var(--bg-raised);
+  --color-overlay: var(--bg-overlay);
+  --color-sunken: var(--bg-sunken);
+
+  --color-fg: var(--text-primary);
+  --color-fg-muted: var(--text-secondary);
+  --color-fg-subtle: var(--text-tertiary);
+  --color-fg-disabled: var(--text-disabled);
+  --color-fg-inverse: var(--text-inverse);
+  --color-fg-accent: var(--text-accent);
+  --color-fg-danger: var(--text-danger);
+
+  --color-line: var(--border-default);
+  --color-line-subtle: var(--border-subtle);
+  --color-line-strong: var(--border-strong);
+  --color-line-accent: var(--border-accent);
+
+  --color-accent: var(--accent-default);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-pressed: var(--accent-pressed);
+  --color-accent-subtle: var(--accent-subtle);
+
+  --color-danger: var(--danger-default);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-subtle: var(--danger-subtle);
+
+  --color-success: var(--status-active);
+  --color-warning: var(--status-warning);
+  --color-info: var(--status-info);
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+}
+
+@utility font-body {
+  font-family: var(--font-body);
+}
+
+html {
+  color-scheme: dark light;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}

@@ -1,0 +1,58 @@
+name: Feature
+description: A new standard, blueprint, kit file or skill
+title: "[Feature]: "
+type: Feature
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for something new in the handbook: a rule, a blueprint, a kit file, a skill.
+        For corrections and upkeep use **Task**. For something wrong use **Bug**.
+
+  - type: textarea
+    id: what-and-why
+    attributes:
+      label: What and why
+      description: One paragraph. What does this enable, and why now?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: Checklist of what "done" looks like, from a user's perspective.
+      value: |
+        - [ ] The rule is stated with its reason and labelled Adopted, In use, Proposed or Open
+        - [ ] A Proposed rule has a row in decisions.md
+        - [ ] Kit files and the conformance script change in the same PR as the rule
+        - [ ] adoption.md is updated for the repos it affects
+    validations:
+      required: true
+
+  - type: input
+    id: parent
+    attributes:
+      label: Parent issue
+      description: If this is part of a larger effort, link the parent here and attach this as a sub-issue.
+      placeholder: e.g. #1
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Effort estimate
+      options:
+        - XS - under 2 hours
+        - S - half day
+        - M - one weekend
+        - L - multi-weekend
+        - XL - needs scoping (split into sub-issues)
+      default: 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: open-questions
+    attributes:
+      label: Open questions
+      description: Anything blocking a clean start? Decisions to make first.
