@@ -4,7 +4,7 @@
     2. Delete sections that do not apply (marked "if ...").
     3. Delete this comment.
   Keep it short enough to read in full. Link to docs/architecture.md for the why.
-  Source: https://qiheme.github.io/#/standards/agents
+  Source: https://qiheme.github.io/handbook/#/standards/agents
 -->
 
 # CLAUDE.md — <REPO NAME>
@@ -15,7 +15,7 @@ Rules for Claude Code, other agents and humans working in this repository.
 
 **Stack:** <e.g. React 19 · Vite · TypeScript · Cobalt + Tailwind v4 · Supabase · Vitest · Playwright>. Node ≥ 24.
 
-**Blueprint:** [<Web app | Static site | Full-stack app | Library | Functions | CLI>](https://qiheme.github.io/#/blueprints/README) from the [Engineering Handbook](https://qiheme.github.io). This file is self-contained; the handbook has the reasons. Where the two disagree, this file wins and the difference is listed under [Deviations](#6-deviations-from-the-standard).
+**Blueprint:** [<Web app | Static site | Full-stack app | Library | Functions | CLI>](https://qiheme.github.io/handbook/#/blueprints/README) from the [Engineering Handbook](https://qiheme.github.io/handbook/). This file is self-contained; the handbook has the reasons. Where the two disagree, this file wins and the difference is listed under [Deviations](#6-deviations-from-the-standard).
 
 ## Commands
 
@@ -105,7 +105,7 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 
 ## 6. Deviations from the standard
 
-<Where this repo differs from https://qiheme.github.io and why. "None" is a fine answer: leave the table with no rows.>
+<Where this repo differs from https://qiheme.github.io/handbook/ and why. "None" is a fine answer: leave the table with no rows.>
 
 The conformance check reads this table. A row whose **Rule** cell holds a rule id in backticks (the id the audit prints, for example `` `netlify-pipeline` ``) and whose **Reason** cell is filled in turns that failure into an accepted deviation, so CI passes. Leave Rule empty for a difference the audit does not check. Remove a row when it stops being true; the check fails on a stale one.
 

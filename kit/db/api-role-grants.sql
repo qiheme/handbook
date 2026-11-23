@@ -1,5 +1,5 @@
 -- Kit file. Copy to scripts/ci/api-role-grants.sql in a server-only
--- (Drizzle) repo. Standard: https://qiheme.github.io/#/standards/data
+-- (Drizzle) repo. Standard: https://qiheme.github.io/handbook/#/standards/data
 --
 -- One row for every (Supabase Data API role, table in public) pair where the
 -- role holds ANY privilege on the table, including on just some of its columns

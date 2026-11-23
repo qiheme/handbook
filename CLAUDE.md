@@ -2,7 +2,7 @@
 
 Rules for Claude Code, other agents and humans working in this repository.
 
-**What this is:** the standard for how Cloud 12Nine and Q-Labs projects are built. Markdown pages (the source of truth), a kit of files other repos copy, and a no-build website that displays the pages at <https://qiheme.github.io>.
+**What this is:** the standard for how Cloud 12Nine and Q-Labs projects are built. Markdown pages (the source of truth), a kit of files other repos copy, and a no-build website that displays the pages at <https://qiheme.github.io/handbook/>.
 
 **There is no build, no `package.json`, and no dependency.** Do not add one without an issue that says why. The conformance script uses only Node's standard library and built-in test runner for the same reason.
 
@@ -100,7 +100,7 @@ Before opening a PR:
 | --- | --- | --- |
 | Default branch `main` | `master` | Not renamed yet. See [`adoption.md`](adoption.md) |
 | Node toolchain, Vitest, ESLint, hooks | None, except Node's built-in test runner for the conformance script | No dependencies to install or keep current. The script must also run in any repo with nothing but Node |
-| Netlify hosting | GitHub Pages | A `username.github.io` repo is served by Pages directly |
+| Netlify hosting | GitHub Pages, at `qiheme.github.io/handbook/` | Documentation of public repos goes on GitHub Pages ([CI/CD](standards/ci-cd.md#what-uses-github-pages)). No build, so nothing to deploy |
 | Cobalt via the npm package | A few token values copied into `viewer.css` | No build step to import the package. Marked as a snapshot in the file |
 | Front-End Checklist: search-engine rules | No `robots.txt` or sitemap | Reference material, not a site meant to rank. Whether it should be indexed at all is the owner's call |
 | Front-End Checklist: page weight | A page with a diagram loads a 3.5 MB library | Loaded only on those pages. No smaller pinned build to swap in yet |

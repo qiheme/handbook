@@ -1,6 +1,6 @@
 # No [build] command here on purpose: the site is built on GitHub Actions
 # (.github/workflows/ci.yml and release.yml) and deployed prebuilt with the
-# Netlify CLI. Standard: https://qiheme.github.io/#/standards/ci-cd
+# Netlify CLI. Standard: https://qiheme.github.io/handbook/#/standards/ci-cd
 #
 # This file alone can't stop Netlify from building. That also requires builds
 # to be stopped in the Netlify project (or the project left unlinked from Git),

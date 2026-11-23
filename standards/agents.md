@@ -122,7 +122,7 @@ An empty repository has no skills yet. Either attach this handbook's repository 
 Cloud sessions load skills only from the repository itself (`.claude/skills/`), not from a user's home folder. So the skills are copied into each repo and committed, the same way vendor skills already are:
 
 ```bash
-npx skills add qiheme/qiheme.github.io --agent claude-code --skill '*' --copy
+npx skills add qiheme/handbook --agent claude-code --skill '*' --copy
 ```
 
 That writes `.claude/skills/handbook-audit/` and `.claude/skills/handbook-new-project/` and records them in `skills-lock.json`. `npx skills update` refreshes them when the handbook changes. Copying the two folders by hand does the same.
@@ -167,7 +167,7 @@ A cloud session is Claude Code running on a fresh Linux machine instead of your 
 | A blocked host | A settings change for the owner. Not something to work around |
 | Production migrations, logins to third-party sites | Not from a cloud session |
 
-The environment's setup script and its documentation live in the `setup-scripts` repo. To let cloud sessions read this handbook, add `qiheme.github.io` to the environment's allowed domains.
+The environment's setup script and its documentation live in the `setup-scripts` repo. To let cloud sessions read this handbook, add `qiheme.github.io` to the environment's allowed domains (the handbook is served at `qiheme.github.io/handbook/`). Reading it from GitHub (`raw.githubusercontent.com`) needs nothing extra.
 
 Each repo's README has a short **Cloud sessions** table: what works as-is, and what extra this repo needs.
 

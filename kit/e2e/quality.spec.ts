@@ -1,6 +1,6 @@
 /**
  * Front-End Checklist, the part a machine can check.
- * Standard: https://qiheme.github.io/#/standards/frontend-checklist
+ * Standard: https://qiheme.github.io/handbook/#/standards/frontend-checklist
  *
  * Copy to e2e/quality.spec.ts (tests/e2e/ in a static site) and list every
  * route a visitor can land on in PAGES. Each test names the checklist rules it

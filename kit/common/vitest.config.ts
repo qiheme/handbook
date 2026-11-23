@@ -1,6 +1,6 @@
 /**
  * Vitest configuration.
- * Standard: https://qiheme.github.io/#/standards/testing
+ * Standard: https://qiheme.github.io/handbook/#/standards/testing
  *
  * Coverage is a hard floor, not an aspiration: every metric is pinned at 100%
  * and `npm run test:coverage` (pre-push hook and CI) fails below it. Plain

@@ -6,50 +6,50 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 
 ## Start
 
-- [README](https://qiheme.github.io/README.md): what this is, the chooser for what you are building, the standard on one page
-- [CLAUDE.md](https://qiheme.github.io/CLAUDE.md): how to use and how to change this handbook
+- [README](https://qiheme.github.io/handbook/README.md): what this is, the chooser for what you are building, the standard on one page
+- [CLAUDE.md](https://qiheme.github.io/handbook/CLAUDE.md): how to use and how to change this handbook
 
 ## Standards
 
-- [The stack](https://qiheme.github.io/standards/stack.md): one choice per layer, its status and the reason; version baseline; what we do not use
-- [Repo contract](https://qiheme.github.io/standards/repo-contract.md): required files, npm script names, README sections, repository settings, folder names
-- [Workflow](https://qiheme.github.io/standards/workflow.md): issue first, branch names, red-green-refactor, commit format, pull requests, review, merge
-- [Testing](https://qiheme.github.io/standards/testing.md): Vitest, the 100% coverage gate, dependency injection, allowed exclusions, database tests, Playwright
-- [CI/CD](https://qiheme.github.io/standards/ci-cd.md): gates, Netlify hosting built on GitHub Actions, split previews, releases, the migrations job, secret names
-- [Data](https://qiheme.github.io/standards/data.md): Supabase, browser-direct versus server-only access, table rules, migrations, connection strings, auth
-- [Security](https://qiheme.github.io/standards/security.md): where each secret goes, endpoint rules, fetching user-supplied URLs, model providers
-- [UI and Cobalt](https://qiheme.github.io/standards/ui.md): the Cobalt design system, tokens, Tailwind mapping, atomic design, accessibility baseline
-- [Front-end checklist](https://qiheme.github.io/standards/frontend-checklist.md): frontendchecklist.io as the quality bar; which priorities are required, what is automated, how agents review, known gaps
-- [Agents](https://qiheme.github.io/standards/agents.md): CLAUDE.md as the rulebook, what every agent must do, skills, cloud sessions, AI features in apps
+- [The stack](https://qiheme.github.io/handbook/standards/stack.md): one choice per layer, its status and the reason; version baseline; what we do not use
+- [Repo contract](https://qiheme.github.io/handbook/standards/repo-contract.md): required files, npm script names, README sections, repository settings, folder names
+- [Workflow](https://qiheme.github.io/handbook/standards/workflow.md): issue first, branch names, red-green-refactor, commit format, pull requests, review, merge
+- [Testing](https://qiheme.github.io/handbook/standards/testing.md): Vitest, the 100% coverage gate, dependency injection, allowed exclusions, database tests, Playwright
+- [CI/CD](https://qiheme.github.io/handbook/standards/ci-cd.md): gates, Netlify hosting built on GitHub Actions, split previews, releases, the migrations job, secret names
+- [Data](https://qiheme.github.io/handbook/standards/data.md): Supabase, browser-direct versus server-only access, table rules, migrations, connection strings, auth
+- [Security](https://qiheme.github.io/handbook/standards/security.md): where each secret goes, endpoint rules, fetching user-supplied URLs, model providers
+- [UI and Cobalt](https://qiheme.github.io/handbook/standards/ui.md): the Cobalt design system, tokens, Tailwind mapping, atomic design, accessibility baseline
+- [Front-end checklist](https://qiheme.github.io/handbook/standards/frontend-checklist.md): frontendchecklist.io as the quality bar; which priorities are required, what is automated, how agents review, known gaps
+- [Agents](https://qiheme.github.io/handbook/standards/agents.md): CLAUDE.md as the rulebook, what every agent must do, skills, cloud sessions, AI features in apps
 
 ## Blueprints
 
-- [Pick one](https://qiheme.github.io/blueprints/README.md): comparison table and decision tree; web app versus full-stack app
-- [Static site](https://qiheme.github.io/blueprints/static-site.md): Astro, content collections, Cobalt with no client JavaScript
-- [Web app](https://qiheme.github.io/blueprints/web-app.md): React, Vite, Supabase from the browser with row-level security
-- [Full-stack app](https://qiheme.github.io/blueprints/full-stack-app.md): TanStack Start, Drizzle, server-only data access
-- [Library](https://qiheme.github.io/blueprints/library.md): Vite library mode, CSS Modules, Storybook, Changesets, GitHub Packages
-- [Functions](https://qiheme.github.io/blueprints/functions.md): Supabase Edge Functions for APIs, webhooks, scheduled jobs and model calls
-- [CLI and scripts](https://qiheme.github.io/blueprints/cli-and-scripts.md): Node tools, shell scripts, Python scripts
-- [Not built yet](https://qiheme.github.io/blueprints/other.md): mobile, browser extension, documentation sites; the rule for anything new
+- [Pick one](https://qiheme.github.io/handbook/blueprints/README.md): comparison table and decision tree; web app versus full-stack app
+- [Static site](https://qiheme.github.io/handbook/blueprints/static-site.md): Astro, content collections, Cobalt with no client JavaScript
+- [Web app](https://qiheme.github.io/handbook/blueprints/web-app.md): React, Vite, Supabase from the browser with row-level security
+- [Full-stack app](https://qiheme.github.io/handbook/blueprints/full-stack-app.md): TanStack Start, Drizzle, server-only data access
+- [Library](https://qiheme.github.io/handbook/blueprints/library.md): Vite library mode, CSS Modules, Storybook, Changesets, GitHub Packages
+- [Functions](https://qiheme.github.io/handbook/blueprints/functions.md): Supabase Edge Functions for APIs, webhooks, scheduled jobs and model calls
+- [CLI and scripts](https://qiheme.github.io/handbook/blueprints/cli-and-scripts.md): Node tools, shell scripts, Python scripts
+- [Not built yet](https://qiheme.github.io/handbook/blueprints/other.md): mobile, browser extension, documentation sites; the rule for anything new
 
 ## Kit
 
-- [What to copy where](https://qiheme.github.io/kit/README.md): every kit file, its destination, who needs it, and how much of it has been run
-- [CLAUDE.md template](https://qiheme.github.io/kit/common/CLAUDE.template.md): the per-repo rulebook to fill in
-- [verify skill template](https://qiheme.github.io/kit/common/claude-skill-verify/SKILL.template.md): how to prove a change works at runtime
-- [ci.yml](https://qiheme.github.io/kit/workflows/ci.yml): lint, typecheck, coverage, build, end-to-end, migrations
-- [deploy-preview.yml](https://qiheme.github.io/kit/workflows/deploy-preview.yml): trusted per-PR preview deploy to Netlify
-- [release.yml](https://qiheme.github.io/kit/workflows/release.yml): tag on merge, migrate, deploy to production, rollback
-- [quality.spec.ts](https://qiheme.github.io/kit/e2e/quality.spec.ts): Playwright spec that automates the checkable Front-End Checklist rules
+- [What to copy where](https://qiheme.github.io/handbook/kit/README.md): every kit file, its destination, who needs it, and how much of it has been run
+- [CLAUDE.md template](https://qiheme.github.io/handbook/kit/common/CLAUDE.template.md): the per-repo rulebook to fill in
+- [verify skill template](https://qiheme.github.io/handbook/kit/common/claude-skill-verify/SKILL.template.md): how to prove a change works at runtime
+- [ci.yml](https://qiheme.github.io/handbook/kit/workflows/ci.yml): lint, typecheck, coverage, build, end-to-end, migrations
+- [deploy-preview.yml](https://qiheme.github.io/handbook/kit/workflows/deploy-preview.yml): trusted per-PR preview deploy to Netlify
+- [release.yml](https://qiheme.github.io/handbook/kit/workflows/release.yml): tag on merge, migrate, deploy to production, rollback
+- [quality.spec.ts](https://qiheme.github.io/handbook/kit/e2e/quality.spec.ts): Playwright spec that automates the checkable Front-End Checklist rules
 
 ## Skills
 
-- [handbook-audit](https://qiheme.github.io/skills/handbook-audit/SKILL.md): audit the current repository against this handbook; modes quick, full and fix
-- [audit.mjs](https://qiheme.github.io/skills/handbook-audit/scripts/audit.mjs): the conformance script the audit runs; Node only, JSON output, exit code for CI
-- [handbook-new-project](https://qiheme.github.io/skills/handbook-new-project/SKILL.md): start a new project from a blueprint, step by step
+- [handbook-audit](https://qiheme.github.io/handbook/skills/handbook-audit/SKILL.md): audit the current repository against this handbook; modes quick, full and fix
+- [audit.mjs](https://qiheme.github.io/handbook/skills/handbook-audit/scripts/audit.mjs): the conformance script the audit runs; Node only, JSON output, exit code for CI
+- [handbook-new-project](https://qiheme.github.io/handbook/skills/handbook-new-project/SKILL.md): start a new project from a blueprint, step by step
 
 ## Status
 
-- [Adoption](https://qiheme.github.io/adoption.md): where each existing repo stands and the suggested order of migration
-- [Decisions](https://qiheme.github.io/decisions.md): every proposed or open choice, with recommendation and runner-up
+- [Adoption](https://qiheme.github.io/handbook/adoption.md): where each existing repo stands and the suggested order of migration
+- [Decisions](https://qiheme.github.io/handbook/decisions.md): every proposed or open choice, with recommendation and runner-up

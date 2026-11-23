@@ -11,7 +11,7 @@ name: CI
 # here is never tagged or deployed. Keep the workflow name "CI": both of the
 # other workflows refer to it by name.
 #
-# Standard: https://qiheme.github.io/#/standards/ci-cd
+# Standard: https://qiheme.github.io/handbook/#/standards/ci-cd
 on:
   push:
     branches: [main]
@@ -133,7 +133,7 @@ jobs:
   # Keeps the repo in step with the Engineering Handbook after the day it was
   # set up: required files, script names, Node pin, hooks, CI and test config.
   # Runs only where the handbook-audit skill has been installed. Needs no
-  # install step and no secrets. Standard: https://qiheme.github.io/#/standards/agents
+  # install step and no secrets. Standard: https://qiheme.github.io/handbook/#/standards/agents
   conformance:
     name: Handbook conformance
     runs-on: ubuntu-latest

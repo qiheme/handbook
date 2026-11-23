@@ -6,7 +6,7 @@
  * before Docsify (all scripts are deferred, so they run in document order).
  */
 ;(function () {
-  var REPO = 'qiheme/qiheme.github.io'
+  var REPO = 'qiheme/handbook'
   // HEAD follows the default branch, so links survive a branch rename.
   var BLOB = 'https://github.com/' + REPO + '/blob/HEAD/'
 

@@ -17,7 +17,7 @@ name: Deploy Preview
 # Note: workflow_run only fires once this file exists on main, so previews
 # start working after the PR that adds the pipeline has merged.
 #
-# Standard: https://qiheme.github.io/#/standards/ci-cd
+# Standard: https://qiheme.github.io/handbook/#/standards/ci-cd
 on:
   workflow_run:
     workflows: [CI]

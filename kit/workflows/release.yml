@@ -25,7 +25,7 @@ name: Release & Deploy
 # --no-git-tag-version`); a merge without a bump still deploys, it just doesn't
 # cut a new tag.
 #
-# Standard: https://qiheme.github.io/#/standards/ci-cd
+# Standard: https://qiheme.github.io/handbook/#/standards/ci-cd
 on:
   workflow_run:
     workflows: [CI]

@@ -84,7 +84,7 @@ llms.txt      Index of every page, for agents.
 index.html    The website viewer. It renders these same Markdown files.
 ```
 
-The Markdown files are the source of truth. The website at <https://qiheme.github.io> only displays them.
+The Markdown files are the source of truth. The website at <https://qiheme.github.io/handbook/> only displays them.
 
 ## Starting a new project
 

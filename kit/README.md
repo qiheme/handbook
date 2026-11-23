@@ -12,7 +12,7 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`common/AGENTS.template.md`](common/AGENTS.template.md) | `AGENTS.md` | Every repo | Nothing |
 | [`common/.github/copilot-instructions.md`](common/.github/copilot-instructions.md) | `.github/copilot-instructions.md` | Every repo | Nothing |
 | [`common/claude-skill-verify/SKILL.template.md`](common/claude-skill-verify/SKILL.template.md) | `.claude/skills/verify/SKILL.md` | Anything that runs | Write the real commands and ports |
-| The handbook skills in [`../skills/`](../skills/handbook-audit/SKILL.md) | `.claude/skills/handbook-audit/`, `.claude/skills/handbook-new-project/` | Every repo | Install with `npx skills add qiheme/qiheme.github.io --agent claude-code --skill '*' --copy`, or copy the two folders. Then run `/handbook-audit` |
+| The handbook skills in [`../skills/`](../skills/handbook-audit/SKILL.md) | `.claude/skills/handbook-audit/`, `.claude/skills/handbook-new-project/` | Every repo | Install with `npx skills add qiheme/handbook --agent claude-code --skill '*' --copy`, or copy the two folders. Then run `/handbook-audit` |
 | [`common/.nvmrc`](common/.nvmrc) | `.nvmrc` | Node repos | Nothing |
 | [`common/.npmrc`](common/.npmrc) | `.npmrc` | Repos that install Cobalt | Nothing. Never add a token |
 | [`common/.gitignore`](common/.gitignore) | `.gitignore` | Node repos | Add repo-specific entries |
