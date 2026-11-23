@@ -64,7 +64,8 @@ More: [Testing](testing.md).
 | CI | **GitHub Actions**: lint, typecheck, coverage, build, end-to-end, migrations | Adopted | Every repo with CI |
 | Hosting | **Netlify**. Built on GitHub Actions and uploaded prebuilt. Netlify never builds | Adopted | Two repos have the full pipeline. Two repos still deploy to Vercel |
 | Previews | One preview per PR, deployed by a trusted workflow that never runs PR code | Adopted | Two repos |
-| App releases | Version bumped by hand in the PR. Merge tags `v<version>` and deploys | Adopted | Two repos |
+| App releases | Version bumped by hand in the PR. Merge tags `v<version>` | Adopted | Two repos |
+| Production deploys | **Every merge is tagged** (`v<version>+<n>` when not bumped) and production deploys only from the tag | Proposed (D21) | No repo yet. The two with a release workflow deploy the merged commit, tagged or not |
 | Library releases | **Changesets**, published to GitHub Packages | In use (one repo) | Cobalt is the only library |
 | Docs and Storybook | GitHub Pages | Adopted | Cobalt's Storybook, this handbook |
 | Dependency updates | **Dependabot**, weekly, grouped | Proposed | Vitest is on four different majors across the repos. Nothing keeps them moving together |

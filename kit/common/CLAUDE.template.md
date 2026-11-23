@@ -97,7 +97,7 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 
 - **Conventional commits**: `type(scope): description (#issue)`. Types: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `ci`.
 - The PR title is conventional too. The PR body follows `.github/pull_request_template.md`, including **evidence it works at runtime**: what you ran and what you saw. Green CI is not evidence.
-- <if a deployed app> **Bump the version** in a user-facing PR: `npm version <patch|minor|major> --no-git-tag-version`. The merge tags and deploys it.
+- <if a deployed app> **Bump the version** in a user-facing PR: `npm version <patch|minor|major> --no-git-tag-version`. Every merge is tagged (`v<version>`, or `v<version>+<n>` without a bump) and production deploys that tag.
 - **Docs parity.** A PR that changes behaviour, structure, setup or conventions updates `README.md` (and `docs/architecture.md`) in the same PR.
 - **No new dependency without discussion.** Open an issue first.
 - Before opening the PR, run the `verify` skill (`.claude/skills/verify`).

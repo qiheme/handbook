@@ -43,6 +43,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | Netlify, built on Actions | 🔴 not deployed | 🟢 reference | 🔴 Vercel | 🟢 reference | — Pages | 🔴 Vercel |
 | PR preview | 🔴 | 🟢 | 🟡 not in the repo; left to Vercel | 🟢 | — | 🟡 not in the repo; left to Vercel |
 | Release: tag on merge | 🔴 none yet | 🟢 | 🔴 none | 🟢 | 🟢 Changesets | 🔴 none |
+| Every merge tagged; deploy only from the tag (Proposed, D21. Cells inferred from the kit these repos match; not re-checked) | 🔴 none yet | 🔴 tags only bumps; deploys the commit | 🔴 none | 🔴 tags only bumps; deploys the commit | — | 🔴 none |
 | Migrations in CI and on release | 🟡 CI only | 🟢 both | 🔴 applied by hand | — | — | — |
 | [Front-End Checklist](standards/frontend-checklist.md): audited, `quality.spec.ts` in CI | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited |
 | `CLAUDE.md` | 🟢 | 🟢 | 🟢 | 🔴 | 🟢 | 🔴 |

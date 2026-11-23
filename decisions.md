@@ -31,6 +31,7 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 | D18 | Conformance check in CI | **Run `audit.mjs` on every pull request** in each repo, as a required check once that repo's existing gaps are closed or listed as deviations | Run it only on request, through the audit skill | It is what keeps a repo conforming after setup. Turned on too early it fails every pull request | Every repo |
 | D19 | Other agent files | **`AGENTS.md` and Copilot's file are one-line pointers to `CLAUDE.md`** | Keep a full copy of the rules in each file | Three repos keep copies and they have already drifted apart. Agents that read `AGENTS.md` find nothing today | Every repo |
 | D20 | Version rule | **A repo may trail the baseline by one major version; two behind is a Task** | No rule; upgrade when something breaks | Vitest is on four majors across the repos. Without a line, "later" has no meaning | Every Node repo |
+| D21 | Deploys | **Tag every merge, deploy only from the tag.** A bump gets `v<version>`; other merges get `v<version>+<n>` | Deploy every merge from its commit, tag only bumps (what two repos do today) | A tag names what is live, every deploy can be rolled back by name, and nothing untagged reaches production. One workflow, so no extra token | Every deployed repo |
 
 ## Open
 

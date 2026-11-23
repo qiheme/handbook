@@ -74,7 +74,7 @@ Copying files is not enough. Each of these is a setting somewhere else.
 
 | Files | State |
 | --- | --- |
-| `workflows/*.yml` | Generalised from two repos where they run in production. Checked with `actionlint`. The combined form here (one CI file feeding both preview and release, with a `main` default branch and the optional migrate step) has **not** run end to end in a repo yet. Expect to fix small things on first use, and send the fix back here |
+| `workflows/*.yml` | Generalised from two repos where they run in production. Checked with `actionlint`. The combined form here (one CI file feeding both preview and release, with a `main` default branch and the optional migrate step) has **not** run end to end in a repo yet. Expect to fix small things on first use, and send the fix back here. `release.yml` tagging every merge and deploying from the tag is **Proposed** (D21): it has not run in any repo. Its tagging script was run against a local Git remote |
 | `eslint.config.js`, `vitest.config.ts`, hooks, `app.css`, `db/*.sql` | Taken from a repo where they run. The lint and test configs were run against a scratch project. The three `no-eval` rules in the lint config are an addition, checked the same way |
 | `playwright.config.ts` | Generalised from one repo. The `executablePath` line for cloud sessions is new |
 | `.prettierrc.json`, `dependabot.yml`, `_redirects` | **Proposed.** Not taken from a repo, and not yet deployed anywhere |

@@ -13,7 +13,7 @@ flowchart LR
     pr --> ci{"CI green?<br/>Preview checked?"}
     ci -->|no| red
     ci -->|yes| merge["7 Squash merge"]
-    merge --> release["8 Tag + deploy"]
+    merge --> release["8 Tag, then deploy the tag"]
 ```
 
 ## 1. Every piece of work starts with an issue
@@ -108,7 +108,7 @@ Never, to get a green check: skip, disable or delete a test. Lower a coverage th
 
 ## 8. Release
 
-Merging to `main` deploys. If the PR bumped the version, the merge also creates the tag and the GitHub Release. Nothing is deployed by hand. See [CI/CD](ci-cd.md).
+Merging to `main` tags the merged commit, then deploys that tag. A bumped version gets `v<version>` and a GitHub Release; any other merge gets the next build tag, `v<version>+<n>`. Nothing is deployed by hand, and nothing untagged is deployed. Proposed (D21). See [CI/CD](ci-cd.md#releases).
 
 ## Planning
 

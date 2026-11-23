@@ -1,29 +1,38 @@
 name: Release & Deploy
 
-# Merge → CI → tag → (migrate) → deploy. Netlify never builds this repo, so
-# production deploys run from here with the Netlify CLI.
+# Merge → CI → tag → (migrate) → deploy the tag. Netlify never builds this
+# repo, so production deploys run from here with the Netlify CLI.
 #
-#   merge to main ──► CI ──► green?
-#                       ├─► release: tag v<package.json version> + GitHub Release
-#                       │   (only if that tag is new; notes generated from the
-#                       │   PRs merged since the previous tag)
-#                       └─► deploy:  migrate the database (database repos)
-#                                    → build → netlify deploy --prod
-#                           (every merge, so production always matches main)
+#   merge to main ──► CI ──► green, and still main's tip?
+#                       ├─► tag:    every merge gets a tag
+#                       │           version bumped → v1.5.0 + GitHub Release
+#                       │           no bump        → v1.5.0+1, v1.5.0+2, ...
+#                       └─► deploy: once the tag is on GitHub, check it out,
+#                                   check it is the commit CI tested,
+#                                   migrate (database repos) → build →
+#                                   netlify deploy --prod
 #
-#   Actions tab → "Release & Deploy" → Run workflow (tag: v1.2.0)
+#   Actions tab → "Release & Deploy" → Run workflow (tag: v1.4.0+3)
 #                  ──► deploy only, from that tag. This is the rollback path.
-#                      No migrations: rolling code back never rolls the schema
-#                      back. Leave the tag empty to redeploy main as-is.
+#                      The tag must be on main. No migrations: rolling code
+#                      back never rolls the schema back.
+#
+# Production only ever runs a tagged commit.
+#
+# `+<n>` is SemVer build metadata: the same version, a later build. The
+# version is still bumped by hand in a PR (`npm version <patch|minor|major>
+# --no-git-tag-version`) when a change is user-facing; nothing commits back to
+# main.
+#
+# Why one workflow and not a second one `on: push: tags`: a tag pushed with
+# GITHUB_TOKEN does not start other workflows, so that would need an app token
+# or PAT in every repo. It would also deploy any tag anyone pushed, tested or
+# not.
 #
 # Gated on CI via workflow_run rather than on the push itself, so a commit that
 # breaks the build is never tagged or deployed. workflow_run always runs main's
 # copy of this file; the `event == 'push'` check keeps CI runs from PRs
 # (including a fork branch that happens to be named "main") out.
-#
-# The version is bumped by hand in a PR (`npm version <patch|minor|major>
-# --no-git-tag-version`); a merge without a bump still deploys, it just doesn't
-# cut a new tag.
 #
 # Standard: https://qiheme.github.io/#/standards/ci-cd
 on:
@@ -34,17 +43,17 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing tag to (re)deploy to production, e.g. v1.2.0. Empty = current main.'
-        required: false
+        description: 'Tag to (re)deploy to production, e.g. v1.2.0 or v1.2.0+3. Must be on main.'
+        required: true
 
 permissions:
   contents: write
 
 # No workflow-level concurrency group on purpose: GitHub keeps only ONE pending
-# run per group and cancels the rest, so three quick merges would silently drop
-# the middle one's tag. Every merge's `release` job runs; it is idempotent and
-# tolerates racing another run for the same tag. Only `deploy` is serialized
-# (job-level group below), and it skips if main has moved on.
+# run per group and cancels the rest, so a burst of merges would silently drop
+# one. Every merge's run starts; a run whose commit is no longer main's tip
+# stops before tagging, and the newer run tags and deploys (its tag includes
+# the skipped merge's changes). Only `deploy` is serialized (job-level group).
 
 env:
   # Pinned on purpose. Bump it deliberately, in its own PR.
@@ -54,13 +63,16 @@ env:
   HUSKY: '0'
 
 jobs:
-  release:
-    name: Tag & release
+  tag:
+    name: Tag the build
     if: >-
       github.event_name == 'workflow_run' &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    outputs:
+      # Empty when main has moved on; the deploy job then skips.
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       # The commit CI tested. (On workflow_run, github.sha is main's tip when
       # CI finished, which may already be a newer merge.)
@@ -70,44 +82,91 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      # Idempotent, and each half checked on its own: a merge with no version
-      # bump finds both present and no-ops; a run that pushed the tag but died
-      # before the release retries just the release.
-      - name: Ensure tag and GitHub Release exist
+      # Runs can finish out of order. Tagging only main's tip keeps tag order
+      # the same as merge order. A failed lookup must stop the job, never read
+      # as "main moved on" (which would silently skip the deploy).
+      - name: Skip if main has moved on
+        id: fresh
         env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION="$(node -p "require('./package.json').version")"
-          TAG="v$VERSION"
+          MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
+          if [ -z "$MAIN_SHA" ]; then
+            echo "::error::Couldn't look up main's current commit."
+            exit 1
+          fi
+          if [ "$MAIN_SHA" != "$HEAD_SHA" ]; then
+            echo "::notice::main is now at ${MAIN_SHA::7}; not tagging ${HEAD_SHA::7} (the newer run tags and deploys)."
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          fi
 
-          if git tag -l "$TAG" | grep -q .; then
-            echo "$TAG already exists. No version bump in this merge, nothing to tag."
+      # Idempotent: a re-run finds this commit's tag and reuses it. If another
+      # run takes the same name first, the push fails and the next number is
+      # tried.
+      - name: Tag this commit
+        id: tag
+        if: steps.fresh.outputs.stale != 'true'
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          V_RE="${VERSION//./\\.}"
+
+          TAG="$(git tag --points-at HEAD | grep -E "^v${V_RE}(\+[0-9]+)?$" | head -n 1 || true)"
+          if [ -n "$TAG" ]; then
+            echo "This commit is already tagged $TAG."
           else
-            echo "Tagging $TAG at $(git rev-parse --short HEAD)"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git tag -a "$TAG" -m "Release $VERSION"
-            # A concurrent run for the same version may win the push; that's fine.
-            git push origin "$TAG" || git ls-remote --exit-code --tags origin "refs/tags/$TAG"
+            for attempt in 1 2 3; do
+              if [ -z "$(git tag -l "v$VERSION")" ]; then
+                TAG="v$VERSION"
+              else
+                LAST="$(git tag -l "v$VERSION+*" | sed -n "s/^v${V_RE}+\([0-9][0-9]*\)$/\1/p" | sort -n | tail -n 1)"
+                TAG="v$VERSION+$(( ${LAST:-0} + 1 ))"
+              fi
+              echo "Tagging $TAG at $(git rev-parse --short HEAD) (attempt $attempt)"
+              git tag -a "$TAG" -m "Build $TAG"
+              if git push origin "refs/tags/$TAG"; then
+                break
+              fi
+              git tag -d "$TAG"
+              git fetch --tags --force origin
+              TAG=""
+            done
+            if [ -z "$TAG" ]; then
+              echo "::error::Could not push a tag for $VERSION after 3 attempts."
+              exit 1
+            fi
           fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
+      # Versions get a GitHub Release; builds (+<n>) do not. Notes start at the
+      # previous version, so they cover every build in between.
+      - name: Create the GitHub Release for a new version
+        if: steps.tag.outputs.tag != '' && !contains(steps.tag.outputs.tag, '+')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "GitHub Release $TAG already exists."
-          else
-            gh release create "$TAG" --title "$TAG" --generate-notes --verify-tag \
-              || gh release view "$TAG" >/dev/null
+            exit 0
           fi
+          PREV="$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -vxF "$TAG" | sort -V | tail -n 1 || true)"
+          gh release create "$TAG" --title "$TAG" --generate-notes --verify-tag \
+            ${PREV:+--notes-start-tag "$PREV"} \
+            || gh release view "$TAG" >/dev/null
 
   deploy:
     name: Deploy to production
-    needs: release
-    # Runs after a successful release, or on its own for a manual redeploy.
-    # `release` is also skipped when CI failed or ran for a PR, so a skipped
-    # release only counts on a manual run.
+    needs: tag
+    # After a run of `tag` that produced a tag, or on its own for a manual
+    # redeploy. `tag` is also skipped when CI failed or ran for a PR, so a
+    # skipped tag job only counts on a manual run.
     if: >-
       !cancelled() && (
-        needs.release.result == 'success' ||
-        (needs.release.result == 'skipped' && github.event_name == 'workflow_dispatch')
+        (needs.tag.result == 'success' && needs.tag.outputs.tag != '') ||
+        (needs.tag.result == 'skipped' && github.event_name == 'workflow_dispatch')
       )
     runs-on: ubuntu-latest
     # Serialize production deploys; never cancel one mid-upload.
@@ -122,6 +181,7 @@ jobs:
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      TAG: ${{ needs.tag.outputs.tag || inputs.tag }}
     steps:
       - name: Check deploy secrets
         run: |
@@ -130,14 +190,43 @@ jobs:
             exit 1
           fi
 
+      # Checks out the tag from GitHub, never a SHA or a branch, so this fails
+      # unless the tag is really there. `refs/tags/` stops a branch with the
+      # same name being picked instead.
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag || github.event.workflow_run.head_sha || github.sha }}
+          ref: refs/tags/${{ needs.tag.outputs.tag || inputs.tag }}
           persist-credentials: false
 
-      # Runs can finish out of order: if a newer merge already landed on main,
-      # its own run deploys it. Don't let this older commit overwrite it.
-      # (Manual redeploys skip this check by design.)
+      # After a merge: the tag must point at the commit CI tested.
+      # On a manual run: the tag's commit must be on main, so CI ran on it.
+      # A hand-pushed tag on an unmerged branch is refused.
+      - name: Check the tag is a tested commit
+        env:
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHA="$(git rev-parse HEAD)"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_run" ]; then
+            if [ "$SHA" != "$TESTED_SHA" ]; then
+              echo "::error::$TAG points at ${SHA::7}, but CI tested ${TESTED_SHA::7}."
+              exit 1
+            fi
+          else
+            STATUS="$(gh api "repos/$GITHUB_REPOSITORY/compare/$SHA...main" --jq .status)"
+            case "$STATUS" in
+              ahead|identical) ;;
+              *)
+                echo "::error::$TAG (${SHA::7}) is not on main (compare status: ${STATUS:-lookup failed}). Only merged, tested commits are deployed."
+                exit 1
+                ;;
+            esac
+          fi
+          echo "Deploying $TAG (${SHA::7})."
+
+      # The tag job checked this before tagging, but a deploy can wait here for
+      # a reviewer's approval while newer merges land. Don't let an older tag
+      # overwrite a newer one. (Manual redeploys skip this check by design.)
       - name: Skip if main has moved on
         id: fresh
         if: github.event_name == 'workflow_run'
@@ -155,7 +244,7 @@ jobs:
             exit 1
           fi
           if [ "$MAIN_SHA" != "$HEAD_SHA" ]; then
-            echo "::notice::main is now at ${MAIN_SHA::7}; skipping deploy of ${HEAD_SHA::7} (the newer run deploys it)."
+            echo "::notice::main is now at ${MAIN_SHA::7}; skipping deploy of $TAG (the newer run deploys it)."
             echo "stale=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -209,17 +298,16 @@ jobs:
         env:
           REDEPLOY: ${{ github.event_name == 'workflow_dispatch' && ' (manual redeploy)' || '' }}
         run: |
-          VERSION="$(node -p "require('./package.json').version")"
           npx --yes "$NETLIFY_CLI" deploy \
             --prod \
             --no-build \
             --dir dist \
-            --message "v$VERSION @ $(git rev-parse --short HEAD)$REDEPLOY" \
+            --message "$TAG @ $(git rev-parse --short HEAD)$REDEPLOY" \
             --json > deploy.json
           URL="$(jq -r '.url' deploy.json)"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           {
-            echo "### 🚀 Deployed v$VERSION to production"
+            echo "### 🚀 Deployed $TAG to production"
             echo ""
             echo "- **Site:** $URL"
             echo "- **Commit:** \`$(git rev-parse --short HEAD)\`"
