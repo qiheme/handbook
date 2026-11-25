@@ -64,7 +64,7 @@ Something else (mobile, browser extension, docs)? See [Not built yet](blueprints
 | Front-end quality | The [Front-End Checklist](https://frontendchecklist.io): Critical and High rules required |
 | Git hooks | husky: lint staged files on commit, typecheck and coverage on push |
 | CI/CD | GitHub Actions builds. Netlify hosts. Netlify never builds |
-| Releases | Version bumped in the PR, tagged on merge. Libraries use Changesets |
+| Releases | Every merge tagged, production deployed from the tag. Version bumped in the PR. Libraries use Changesets |
 | Workflow | Issue first, test first (red, green, refactor), conventional commits |
 | Agents | `CLAUDE.md` is the rulebook in every repo |
 

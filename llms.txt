@@ -40,7 +40,7 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 - [verify skill template](https://qiheme.github.io/kit/common/claude-skill-verify/SKILL.template.md): how to prove a change works at runtime
 - [ci.yml](https://qiheme.github.io/kit/workflows/ci.yml): lint, typecheck, coverage, build, end-to-end, migrations
 - [deploy-preview.yml](https://qiheme.github.io/kit/workflows/deploy-preview.yml): trusted per-PR preview deploy to Netlify
-- [release.yml](https://qiheme.github.io/kit/workflows/release.yml): tag on merge, migrate, deploy to production, rollback
+- [release.yml](https://qiheme.github.io/kit/workflows/release.yml): tag every merge, then migrate and deploy that tag to production; rollback by tag
 - [quality.spec.ts](https://qiheme.github.io/kit/e2e/quality.spec.ts): Playwright spec that automates the checkable Front-End Checklist rules
 
 ## Skills
