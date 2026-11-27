@@ -46,7 +46,8 @@ The same command does the same thing in every repo. CI, hooks and agents rely on
 | `npm run test:e2e` | Playwright, against the built output | Anything with pages |
 | `npm run db:migrate` | Apply pending migrations | Repos with a database |
 | `npm run db:generate` | Generate a migration from the schema | Drizzle repos |
-| `npm run storybook` | Component explorer | Libraries |
+| `npm run storybook` | Component explorer | Libraries, web apps, full-stack apps |
+| `npm run build-storybook` | Build the explorer. CI runs it | Libraries, web apps, full-stack apps |
 
 A repo may add scripts. It may not give one of these names a different meaning.
 

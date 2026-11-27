@@ -20,6 +20,8 @@ This is the default for anything with a login. Choose [Full-stack app](full-stac
 | Server-side code | Supabase Edge Functions. See [Functions](functions.md) | In use (one repo) |
 | Validation | zod | Adopted |
 | Unit tests | Vitest + Testing Library, jsdom, 100% | Adopted |
+| Component explorer | Storybook 10 (`@storybook/react-vite`). A story file for every component | Decided by the owner (D26). No app has it yet |
+| Code documentation | JSDoc on every export in `src/`, enforced by `eslint-plugin-jsdoc` | Decided by the owner (D27). Not checked in any repo yet |
 | End-to-end | Playwright against the built app | In use (one repo) |
 | Host | Netlify, prebuilt, with a single-page-app redirect | In use (one repo). One app is still on Vercel |
 
@@ -31,8 +33,9 @@ cd my-app
 npm install @q-labs/cobalt @supabase/supabase-js @tanstack/react-router @tanstack/react-query zod
 npm install -D tailwindcss @tailwindcss/vite vitest @vitest/coverage-v8 jsdom \
   @testing-library/react @testing-library/user-event @testing-library/jest-dom \
-  @playwright/test eslint @eslint/js typescript-eslint eslint-plugin-react-hooks globals \
+  @playwright/test eslint @eslint/js typescript-eslint eslint-plugin-react-hooks eslint-plugin-jsdoc globals \
   husky lint-staged
+npm create storybook@latest
 ```
 
 Then copy the kit: [`kit/README.md`](../kit/README.md).
@@ -61,7 +64,10 @@ supabase/
   functions/        Edge Functions (see the Functions blueprint)
 e2e/                Playwright specs
 public/_redirects   /*  /index.html  200
+.storybook/         Storybook config. Import the app's stylesheet in preview.ts
 ```
+
+Each component sits in its own folder: `Name.tsx`, `Name.test.tsx`, `Name.stories.tsx` and `index.ts`.
 
 ## Where things go
 
@@ -77,6 +83,8 @@ flowchart TB
 | Rule | Why |
 | --- | --- |
 | **Views hold no business logic.** Rules live in pure functions in `lib/` | They are tested without rendering anything |
+| **Every component has stories**, one per variant and state | Every state can be reviewed without the app's data. CI fails when Storybook does not build |
+| **Every export has a JSDoc comment** | The contract is readable at the definition and on hover. The lint fails without it |
 | **Only organisms and pages touch app state.** Atoms, molecules and templates take props | Small pieces stay reusable and trivially testable |
 | **All Supabase calls go through `lib/db.ts`** (or one file per domain) | One place to mock, one place to read what the app asks the database |
 | **Every table has RLS on, with explicit policies** | The browser holds the publishable key. Policies are the security |
