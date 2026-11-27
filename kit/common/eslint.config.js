@@ -69,9 +69,17 @@ export default defineConfig([
             FunctionDeclaration: true,
             ArrowFunctionExpression: true,
             ClassDeclaration: true,
+            FunctionExpression: true,
             MethodDefinition: true,
           },
-          contexts: ['TSTypeAliasDeclaration', 'TSInterfaceDeclaration', 'TSEnumDeclaration'],
+          // Exported constants too: `export const Button = memo(...)` and
+          // `export const settings = { ... }` match no function node.
+          contexts: [
+            'ExportNamedDeclaration > VariableDeclaration',
+            'TSTypeAliasDeclaration',
+            'TSInterfaceDeclaration',
+            'TSEnumDeclaration',
+          ],
         },
       ],
     },
