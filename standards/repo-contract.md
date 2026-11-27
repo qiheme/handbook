@@ -84,7 +84,7 @@ Docs parity is a rule: a PR that changes behaviour, structure, setup or conventi
 | --- | --- |
 | `src/` | Application source |
 | `src/lib/` | Pure logic. No framework, no network, dependencies passed in as arguments |
-| `src/components/` | UI, by atomic level |
+| `src/components/` | UI. How it is grouped inside is the repo's choice, stated in its `CLAUDE.md` |
 | `e2e/` | Playwright specs (`tests/e2e/` in Astro sites) |
 | `supabase/migrations/`, `supabase/functions/` | Database changes and Edge Functions |
 | `scripts/` | Node tools that ship with the repo. `scripts/<tool>/bin/` is the only impure part |
