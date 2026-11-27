@@ -13,12 +13,15 @@ Copy, then read each file once. The comments say what to delete and what to fill
 | [`common/.github/copilot-instructions.md`](common/.github/copilot-instructions.md) | `.github/copilot-instructions.md` | Every repo | Nothing |
 | [`common/claude-skill-verify/SKILL.template.md`](common/claude-skill-verify/SKILL.template.md) | `.claude/skills/verify/SKILL.md` | Anything that runs | Write the real commands and ports |
 | The handbook skills in [`../skills/`](../skills/handbook-audit/SKILL.md) | `.claude/skills/handbook-audit/`, `.claude/skills/handbook-new-project/` | Every repo | Install with `npx skills add qiheme/handbook --agent claude-code --skill '*' --copy`, or copy the two folders. Then run `/handbook-audit` |
+| [`common/docs/architecture.template.md`](common/docs/architecture.template.md) | `docs/architecture.md` | Any deployed repo (Proposed) | Fill every section from the code and the live services. Keep the section order |
+| [`common/docs/architecture-target.template.md`](common/docs/architecture-target.template.md) | `docs/architecture/<issue>-<slug>.md` | An epic that changes data, server code, hosting, a service or a dependency (Proposed) | Write it before the epic's first story |
+| [`common/docs/decision.template.md`](common/docs/decision.template.md) | `docs/decisions/<NNNN>-<slug>.md` | The same (Proposed) | One decision per record. Add a row to `docs/decisions/README.md` |
 | [`common/.nvmrc`](common/.nvmrc) | `.nvmrc` | Node repos | Nothing |
 | [`common/.npmrc`](common/.npmrc) | `.npmrc` | Repos that install Cobalt | Nothing. Never add a token |
 | [`common/.gitignore`](common/.gitignore) | `.gitignore` | Node repos | Add repo-specific entries |
 | [`common/.env.example`](common/.env.example) | `.env.example` | Repos that read environment variables | List every variable the app reads |
-| [`common/package.scripts.json`](common/package.scripts.json) | merged into `package.json` | Node repos | Adjust `dev`, `build`, `preview`, `typecheck` for the framework |
-| [`common/eslint.config.js`](common/eslint.config.js) | `eslint.config.js` | Node repos | Add the TanStack plugins if used |
+| [`common/package.scripts.json`](common/package.scripts.json) | merged into `package.json` | Node repos | Adjust `dev`, `build`, `preview`, `typecheck` for the framework. Static sites: delete the two Storybook scripts |
+| [`common/eslint.config.js`](common/eslint.config.js) | `eslint.config.js` | Node repos | Add the TanStack plugins if used. Outside web projects, the JSDoc block may be deleted |
 | [`common/.prettierrc.json`](common/.prettierrc.json) | `.prettierrc.json` | Node repos (Proposed) | Nothing |
 | [`common/vitest.config.ts`](common/vitest.config.ts) | `vitest.config.ts` | Node repos | Set the environment. Give every exclusion a reason. Static sites: narrow coverage `include` to `src/lib/**`. Tools under `scripts/<tool>/` and Edge Function handlers under `supabase/functions/` are already discovered and covered, except their thin entry points |
 | [`common/playwright.config.ts`](common/playwright.config.ts) | `playwright.config.ts` | Anything with pages | Static sites: set `testDir` to `tests/e2e` |
@@ -74,8 +77,8 @@ Copying files is not enough. Each of these is a setting somewhere else.
 
 | Files | State |
 | --- | --- |
-| `workflows/*.yml` | Generalised from two repos where they run in production. Checked with `actionlint`. The combined form here (one CI file feeding both preview and release, with a `main` default branch and the optional migrate step) has **not** run end to end in a repo yet. Expect to fix small things on first use, and send the fix back here |
-| `eslint.config.js`, `vitest.config.ts`, hooks, `app.css`, `db/*.sql` | Taken from a repo where they run. The lint and test configs were run against a scratch project. The three `no-eval` rules in the lint config are an addition, checked the same way |
+| `workflows/*.yml` | Generalised from two repos where they run in production. Checked with `actionlint`. The combined form here (one CI file feeding both preview and release, with a `main` default branch and the optional migrate step) has **not** run end to end in a repo yet. Expect to fix small things on first use, and send the fix back here. `release.yml` tagging every merge and deploying from the tag is **Proposed** (D21): it has not run in any repo. Its tagging script was run against a local Git remote. The Storybook step in `ci.yml` (D26) is new and has not run in a repo |
+| `eslint.config.js`, `vitest.config.ts`, hooks, `app.css`, `db/*.sql` | Taken from a repo where they run. The lint and test configs were run against a scratch project. The three `no-eval` rules in the lint config are an addition, checked the same way. The JSDoc block (D27) is new and has not run in a repo: on 2026-11-27 it was run against a scratch project with ESLint 10 and `eslint-plugin-jsdoc` 65, where it failed undocumented exports (functions, arrow functions, function expressions, constants, `memo(...)` components, types and interfaces) and JSDoc types, passed documented and private code and test files, and `--fix` did not insert empty comments |
 | `playwright.config.ts` | Generalised from one repo. The `executablePath` line for cloud sessions is new |
 | `.prettierrc.json`, `dependabot.yml`, `_redirects` | **Proposed.** Not taken from a repo, and not yet deployed anywhere |
 | `netlify/_headers` | The long-cache rule for fingerprinted files is in use in one repo. The security headers are **Proposed** and have not been deployed anywhere |
@@ -83,6 +86,7 @@ Copying files is not enough. Each of these is a setting somewhere else.
 | The handbook skills and `audit.mjs` | New. The script has 95 tests at 100% line, branch and function coverage on Node 22 and 24, and was run against the eight other repos; its results matched the adoption table apart from two cells that were then corrected. Installing with the `skills` tool was checked from a local copy of this repo, not from GitHub. The skills' written steps have not yet been followed end to end by an agent in a real repo, and no repo lists deviations in the form the script reads yet |
 | `e2e/quality.spec.ts` | **Proposed.** New. Run here with Playwright 1.63 and axe 4.14 against a good page (7 tests pass) and a deliberately bad page (20 distinct failures reported). Typechecks under strict mode. Not yet run in a repo |
 | `CLAUDE.template.md`, issue forms, PR template | Merged from the four existing rulebooks |
+| `docs/*.template.md` | **Proposed.** Reduced from the three documents written for `Travel-OS`, which are in review there and not merged. Not yet filled in by a second repo |
 
 ## Changing the kit
 

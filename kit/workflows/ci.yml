@@ -77,6 +77,11 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
 
+      # React apps and libraries (D26): a broken Storybook fails the PR.
+      # Skipped where the repo has no build-storybook script, as in a static site.
+      - name: Storybook
+        run: npm run build-storybook --if-present
+
       # End-to-end tests run against the build above (playwright.config.ts
       # starts a preview server on it). Delete these steps, down to "Stage the
       # preview", if the repo has no Playwright suite yet.

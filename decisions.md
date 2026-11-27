@@ -31,6 +31,11 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 | D18 | Conformance check in CI | **Run `audit.mjs` on every pull request** in each repo, as a required check once that repo's existing gaps are closed or listed as deviations | Run it only on request, through the audit skill | It is what keeps a repo conforming after setup. Turned on too early it fails every pull request | Every repo |
 | D19 | Other agent files | **`AGENTS.md` and Copilot's file are one-line pointers to `CLAUDE.md`** | Keep a full copy of the rules in each file | Three repos keep copies and they have already drifted apart. Agents that read `AGENTS.md` find nothing today | Every repo |
 | D20 | Version rule | **A repo may trail the baseline by one major version; two behind is a Task** | No rule; upgrade when something breaks | Vitest is on four majors across the repos. Without a line, "later" has no meaning | Every Node repo |
+| D21 | Deploys | **Tag every merge, deploy only from the tag.** A bump gets `v<version>`; other merges get `v<version>+<n>` | Deploy every merge from its commit, tag only bumps (what two repos do today) | A tag names what is live, every deploy can be rolled back by name, and nothing untagged reaches production. One workflow, so no extra token | Every deployed repo |
+| D22 | Architecture documents | **Three pages in the repo**: `docs/architecture.md` as built, one target page per epic that changes data, server code, hosting, a service or a dependency, written before the first story | A wiki or a design tool outside the repo; or the README alone | In the repo they are reviewed in the pull request and change with the code. The first baseline written this way found a production build seven months behind `main`. Being tried in one repo | Every deployed repo, when it next starts an epic of that kind |
+| D23 | Where a decision is recorded | **One short record per decision** in `docs/decisions/`, with its runner-up and what would reopen it. A new runtime dependency always has one | Record decisions in issue comments and pull request bodies | A comment is found by whoever remembers it exists. A record is found by whoever opens the folder | Every repo with a `docs/` folder |
+| D24 | A table or a JSON column | **A table for anything added one at a time or that must not be lost; one user action is one row write; items in a JSON list carry ids; write the column you changed** | Leave it to each repo | One app stores a trip's details as six JSON documents written whole, which lets two devices overwrite each other. The rule is what its target architecture came to | Browser-direct apps, for new data |
+| D25 | What a write returns | **Every data-layer function returns a result, and the screen shows "saved" only after the server confirms** | Change the screen first and log a failed write | The same rule the handbook already has for server code. A swallowed error is indistinguishable from a save | Web apps |
 
 ## Open
 
@@ -44,11 +49,15 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 | O6 | Error monitoring in production | A hosted error tracker, or none | The checklist rates it High and no repo has it. A new vendor and a new dependency, so it starts with an issue |
 | O7 | Browsers in end-to-end tests | Chromium only, or add Firefox and WebKit | The checklist rates cross-browser testing High. More browsers means slower CI. Decide per project, starting with the public sites |
 | O8 | Performance budget in CI | Lighthouse CI or a bundle-size check, or measure by hand at launch | The checklist rates Core Web Vitals High. Nothing measures them automatically today |
+| O9 | How a web app and its Edge Functions share pure code | One folder both runtimes import, with explicit file extensions; or a copy step; or keep the logic only in `supabase/functions/_shared/` and have the app import from there | The first repo to move a function that shares logic with its app. `Travel-OS` has an issue for it |
+| O10 | What data a pull-request preview uses | The production project through row-level security (what the kit does today); demo mode on fixtures with no database client; or a second project migrated by CI | `Travel-OS` is trying demo mode. Decide here once it has run |
 
 ## Already settled
 
 **Decided by the owner:**
 
+- **D26, Storybook:** every React app and library runs Storybook 10, with a story file for every component, one story per variant and state. CI builds it. Static sites are exempt: Storybook's own frameworks do not render `.astro` components. Issue #10.
+- **D27, JSDoc:** every export in `src/` of a static site, web app or full-stack app has a JSDoc comment, enforced by `eslint-plugin-jsdoc` in the kit's lint config. Issue #10.
 - **D13, `stock-cerebro-client`:** its features (watchlist, quotes, market news) move into `easy-finances`, rebuilt on that repo's stack, and the repo is archived once they ship. Tracked in that repo's epic for the move. Its 13 audit findings are not filed one by one, because the code is being retired, not fixed.
 
 For the record, these came out of the survey with no real contest: TypeScript, npm, React and Vite, Astro for content, Supabase, Cobalt, Vitest at 100% coverage, Playwright, ESLint flat config, husky, GitHub Actions, issue first, test first, conventional commits, `CLAUDE.md` as the rulebook. Reasons are on [The stack](standards/stack.md).

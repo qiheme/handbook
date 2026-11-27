@@ -15,6 +15,7 @@ One standard for how Cloud 12Nine and Q-Labs projects are built: the stack, the 
 | Write tests the way we do | [Testing](standards/testing.md) |
 | Set up CI, previews, releases, hosting | [CI/CD](standards/ci-cd.md) |
 | Add a table, a migration, auth | [Data](standards/data.md) |
+| Write down what a system is, plan a change to it, record a decision | [Architecture](standards/architecture.md) |
 | Handle a key, token or secret | [Security](standards/security.md) |
 | Build UI | [UI and Cobalt](standards/ui.md) |
 | Know what "good" means for a page | [Front-end checklist](standards/frontend-checklist.md) |
@@ -64,7 +65,7 @@ Something else (mobile, browser extension, docs)? See [Not built yet](blueprints
 | Front-end quality | The [Front-End Checklist](https://frontendchecklist.io): Critical and High rules required |
 | Git hooks | husky: lint staged files on commit, typecheck and coverage on push |
 | CI/CD | GitHub Actions builds. Netlify hosts. Netlify never builds |
-| Releases | Version bumped in the PR, tagged on merge. Libraries use Changesets |
+| Releases | Every merge tagged, production deployed from the tag. Version bumped in the PR. Libraries use Changesets |
 | Workflow | Issue first, test first (red, green, refactor), conventional commits |
 | Agents | `CLAUDE.md` is the rulebook in every repo |
 

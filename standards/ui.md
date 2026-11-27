@@ -105,6 +105,8 @@ Atomic design, the same five levels in every app and in Cobalt itself.
 
 - A level imports from its own level or below, never above. Guard it with a test that reads the import graph.
 - New UI goes in the lowest level that fits.
+- **Every component has a story file** next to it (`Name.stories.tsx`), with one story per variant and state: default, empty, loading, error. Storybook must build in CI (D26). Static sites are exempt.
+- **Every exported component, hook and function has a JSDoc comment** saying what it does, and why when that is not obvious. `eslint-plugin-jsdoc` fails the lint when one is missing (D27).
 - Views hold no business logic. Logic lives in pure modules in `src/lib/` and is tested there.
 - Guard "Cobalt first" with a test that fails when a hand-rolled copy of a Cobalt component appears.
 

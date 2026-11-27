@@ -108,8 +108,8 @@ Apps behind a login use a dev-only bypass flag that the Playwright web server se
 | Blueprint | Unit | End-to-end | Notes |
 | --- | --- | --- | --- |
 | Static site | Pure helpers in `src/lib/`, and any browser script, loaded into jsdom | Every page loads, nav, forms, SEO files, no dead internal links | Keep logic out of `.astro` frontmatter so it can be tested |
-| Web app | Logic, components, Edge Function handlers | Core flows | |
-| Full-stack app | Logic, handlers, schema (PGlite) | Core flows, once there is UI | Also grep the client bundle for server-only code |
+| Web app | Logic, components, Edge Function handlers | Core flows | Storybook must build in CI |
+| Full-stack app | Logic, handlers, schema (PGlite) | Core flows, once there is UI | Also grep the client bundle for server-only code. Storybook must build in CI |
 | Library | Every component and variant | Storybook `play` functions | Storybook must build in CI |
 | Functions | Handlers, adapters, validation | A single smoke call after deploy | Entry `index.ts` excluded |
 | CLI | Argument parsing, commands, every decision | A dry run | `bin/` excluded |

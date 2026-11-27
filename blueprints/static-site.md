@@ -20,6 +20,8 @@ For sites that are mostly content: a studio site, a portfolio, a blog, a landing
 | Unit tests | Vitest on pure helpers in `src/lib/`, 100% coverage of that folder. Tests live in `tests/` | In use (one repo). The coverage gate is Proposed |
 | End-to-end | Playwright against `astro preview` of `dist/`, desktop and mobile | In use (one repo) |
 | Type check | `astro check` | In use (one repo) |
+| Code documentation | JSDoc on every export in `src/`, enforced by `eslint-plugin-jsdoc` | Decided by the owner (D27). Not checked in any repo yet |
+| Component explorer | None. Storybook's own frameworks do not render `.astro` components | Exempt from D26 |
 | Host | Netlify, prebuilt | In use (one repo). One site is still on Vercel |
 
 ## Create it

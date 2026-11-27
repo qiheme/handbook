@@ -83,6 +83,8 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 - **Logic is pure and takes its dependencies as arguments** (HTTP client, database client, clock). Production wiring supplies the real ones. Thin entry points only construct and delegate.
 - **Views hold no business logic.** Only organisms and pages touch app state; atoms, molecules and templates take props.
 - **Components follow atomic design.** A level imports from its own level or below, never above.
+- <if the repo has React components> **Every component has a story file**, one story per variant and state. `npm run build-storybook` must pass.
+- **Every export in `src/` has a JSDoc comment**: what it does, and why when that is not obvious. No types in the comment; TypeScript owns them.
 - **Cobalt first.** If `@q-labs/cobalt` has the component, import it. Colours, type, radius and shadow come from its tokens. No raw hex values.
 - <if the repo has a database> **Every table has row-level security on.** Schema changes are migration files in this PR; they only add things. Never change the schema through the dashboard or an MCP tool.
 - <if the repo has server code> **Every server endpoint authenticates inside the handler.** Failures are returned as `{ ok: false, error: { code, message } }`; only the code and message cross the wire.
@@ -97,7 +99,7 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 
 - **Conventional commits**: `type(scope): description (#issue)`. Types: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `ci`.
 - The PR title is conventional too. The PR body follows `.github/pull_request_template.md`, including **evidence it works at runtime**: what you ran and what you saw. Green CI is not evidence.
-- <if a deployed app> **Bump the version** in a user-facing PR: `npm version <patch|minor|major> --no-git-tag-version`. The merge tags and deploys it.
+- <if a deployed app> **Bump the version** in a user-facing PR: `npm version <patch|minor|major> --no-git-tag-version`. Every merge is tagged (`v<version>`, or `v<version>+<n>` without a bump) and production deploys that tag.
 - **Docs parity.** A PR that changes behaviour, structure, setup or conventions updates `README.md` (and `docs/architecture.md`) in the same PR.
 - **No new dependency without discussion.** Open an issue first.
 - Before opening the PR, run the `verify` skill (`.claude/skills/verify`).

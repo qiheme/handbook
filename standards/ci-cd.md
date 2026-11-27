@@ -21,14 +21,15 @@ flowchart TB
     merge --> ci2["<b>ci.yml</b> on main"]
 
     subgraph rel["release.yml: only after CI passes"]
-        tag["Tag v‹version› + GitHub Release<br/><i>only when the version is new</i>"]
+        tag["Tag every merge<br/><i>v‹version› when bumped, else v‹version›+‹n›</i>"]
+        check["Check out the tag<br/><i>must be the commit CI tested</i>"]
         migrate["Migrate the database<br/><i>repos with one</i>"]
         deploy["Build → netlify deploy --prod"]
-        tag --> migrate --> deploy
+        tag --> check --> migrate --> deploy
     end
 
     ci2 --> tag
-    manual(["Run workflow with a tag"]) -.->|"rollback: deploy only"| deploy
+    manual(["Run workflow with a tag on main"]) -.->|"rollback: deploy only"| check
 ```
 
 The three workflow files are in the kit: [`ci.yml`](../kit/workflows/ci.yml), [`deploy-preview.yml`](../kit/workflows/deploy-preview.yml), [`release.yml`](../kit/workflows/release.yml).
@@ -41,7 +42,7 @@ The three workflow files are in the kit: [`ci.yml`](../kit/workflows/ci.yml), [`
 | Quality | pre-push | `npm run typecheck && npm run test:coverage` | Needs green tests, so it cannot run on commit |
 | CI | every PR, every push to `main` | lint → typecheck → coverage → build → end-to-end, plus the migrations job | The gate that cannot be skipped |
 | Preview | every PR | The built site on its own URL | A person looks at it before merge |
-| Release | merge to `main`, after CI passes | Tag, migrate, deploy | A commit that fails CI is never tagged or deployed |
+| Release | merge to `main`, after CI passes | Tag, then deploy that tag (migrate first in database repos) | A commit that fails CI is never tagged. An untagged commit is never deployed |
 
 ## Hosting: Netlify, built on GitHub Actions
 
@@ -67,7 +68,7 @@ Server-rendered apps (TanStack Start) follow the same shape, but the artifact ho
 
 ### What uses GitHub Pages
 
-Only documentation of public repos: Cobalt's Storybook and this handbook. Not apps.
+Only documentation of public repos: Cobalt's Storybook and this handbook. Not apps. An app's Storybook is built in CI to prove it works, and is not published.
 
 ### Leaving Vercel
 
@@ -84,19 +85,35 @@ A PR's code runs `npm ci` and the build. A compromised dependency could read any
 | Does | Builds, tests, uploads `dist/` as an artifact | Downloads the artifact, checks it holds only build output, uploads it as a draft deploy |
 | Runs PR code? | Yes | Never. No checkout, no `npm` inside the artifact |
 
+**What data a preview uses is open** ([O10](../decisions.md#open)). The kit builds a pull request with the same public values as production, so a preview of a database app reads the production project through row-level security. Migrations run on release, so a preview of a pull request that adds a table cannot load the feature it exists to show. One repo is trying previews in demo mode instead: fixtures only, no database client in the build.
+
 A draft deploy to an alias (`pr-<number>--<site>.netlify.app`) cannot touch production. Fork PRs get no preview. `workflow_run` workflows only fire once the file exists on `main`, so previews start working after the pipeline's own PR merges.
 
 ## Releases
 
 ### Apps and sites
 
-1. **Bump the version in the PR**: `npm version <patch|minor|major> --no-git-tag-version`.
-   - patch: fixes and tweaks. minor: new features, new pages, schema changes. major: breaking changes.
-2. **Merge.** `release.yml` waits for CI on `main`, then tags `v<version>` and creates a GitHub Release, but only if that tag is new. Notes are generated from the merged PRs.
-3. **Deploy runs on every merge**, bump or not. Production always matches `main`.
-4. **Rollback:** Actions → Release & Deploy → Run workflow → enter an older tag. Code only. It never rolls the database back, which is safe because migrations only add things.
+**Every merge is tagged, and production deploys only from a tag.** Proposed ([D21](../decisions.md)): no repo runs it yet. The two repos with a release workflow tag only when the version was bumped and deploy the merged commit directly.
 
-An app that shows its own changelog to users also keeps a changelog entry per version, and CI checks that the version, the changelog and the tag agree.
+Why: a tag names exactly what is live, every deploy can be rolled back to by name, and a commit nobody tagged cannot reach production.
+
+1. **Bump the version in the PR** when the change is user-facing: `npm version <patch|minor|major> --no-git-tag-version`.
+   - patch: fixes and tweaks. minor: new features, new pages, schema changes. major: breaking changes.
+2. **Merge.** `release.yml` waits for CI on `main`, then tags the merged commit:
+
+   | The merge | Tag | GitHub Release |
+   | --- | --- | --- |
+   | Bumped the version to `1.5.0` | `v1.5.0` | Yes, notes generated from the PRs since the previous version |
+   | Did not bump it | `v1.5.0+1`, then `v1.5.0+2`, … | No. A build, not a new version |
+
+   `+<n>` is [SemVer](https://semver.org/) build metadata: the same version, built again with more merged work. Nothing commits back to `main`, so `package.json` keeps the version and the tag adds the build number.
+3. **Deploy runs once the tag exists.** The deploy job checks out `refs/tags/<tag>` from GitHub and stops unless the tag points at the commit CI tested. Then it migrates (database repos), builds and deploys. The Netlify deploy message and the job summary name the tag.
+4. **A burst of merges** gets one tag. A run whose commit is no longer `main`'s tip stops before tagging. The newest merge is tagged and deployed, and its tag contains the earlier merges.
+5. **Rollback:** Actions → Release & Deploy → Run workflow → enter an older tag. The tag must be on `main`'s history, so a tag pushed by hand on an unmerged branch is refused. Code only. It never rolls the database back, which is safe because migrations only add things.
+
+**Why the deploy is a job in the same workflow, not a second workflow that starts on a tag push.** A tag pushed with the built-in `GITHUB_TOKEN` does not start other workflows (GitHub docs: "Automatic token authentication"). A separate workflow would need an app token or personal access token in every repo. It would also deploy any matching tag anyone pushed, tested or not.
+
+An app that shows its own changelog to users also keeps a changelog entry per version, and CI checks that the version, the changelog and the tag agree. Build tags (`+<n>`) are not versions and need no entry. A check that compares the newest tag with the changelog must ignore them. Not verified against the repo that has this check.
 
 ### Libraries
 

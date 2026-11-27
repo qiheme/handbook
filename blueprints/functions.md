@@ -65,6 +65,10 @@ flowchart LR
 
 Deno imports such as `npm:zod@3` are mapped to the installed package with a Vitest alias, so one source file runs in both runtimes.
 
+### Code the app also uses
+
+**Open** ([O9](../decisions.md#open)). A function often needs pure logic the web app already has: row mappers, validation schemas, a rules table. This page does not yet say where that code lives or how both runtimes import it. Deno wants explicit file extensions and has its own rules for files outside `supabase/functions/`; Vite does not. The first repo to move a function that shares logic with its app settles it and writes the answer here.
+
 ## Rules for this blueprint
 
 | Rule | Why |

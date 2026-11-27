@@ -17,6 +17,7 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 - [Testing](https://qiheme.github.io/handbook/standards/testing.md): Vitest, the 100% coverage gate, dependency injection, allowed exclusions, database tests, Playwright
 - [CI/CD](https://qiheme.github.io/handbook/standards/ci-cd.md): gates, Netlify hosting built on GitHub Actions, split previews, releases, the migrations job, secret names
 - [Data](https://qiheme.github.io/handbook/standards/data.md): Supabase, browser-direct versus server-only access, table rules, migrations, connection strings, auth
+- [Architecture](https://qiheme.github.io/handbook/standards/architecture.md): the as-built page, a target page per epic and decision records; when each is required; how a target becomes issues (Proposed)
 - [Security](https://qiheme.github.io/handbook/standards/security.md): where each secret goes, endpoint rules, fetching user-supplied URLs, model providers
 - [UI and Cobalt](https://qiheme.github.io/handbook/standards/ui.md): the Cobalt design system, tokens, Tailwind mapping, atomic design, accessibility baseline
 - [Front-end checklist](https://qiheme.github.io/handbook/standards/frontend-checklist.md): frontendchecklist.io as the quality bar; which priorities are required, what is automated, how agents review, known gaps
@@ -26,7 +27,7 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 
 - [Pick one](https://qiheme.github.io/handbook/blueprints/README.md): comparison table and decision tree; web app versus full-stack app
 - [Static site](https://qiheme.github.io/handbook/blueprints/static-site.md): Astro, content collections, Cobalt with no client JavaScript
-- [Web app](https://qiheme.github.io/handbook/blueprints/web-app.md): React, Vite, Supabase from the browser with row-level security
+- [Web app](https://qiheme.github.io/handbook/blueprints/web-app.md): React, Vite, Supabase from the browser with row-level security, Storybook, JSDoc
 - [Full-stack app](https://qiheme.github.io/handbook/blueprints/full-stack-app.md): TanStack Start, Drizzle, server-only data access
 - [Library](https://qiheme.github.io/handbook/blueprints/library.md): Vite library mode, CSS Modules, Storybook, Changesets, GitHub Packages
 - [Functions](https://qiheme.github.io/handbook/blueprints/functions.md): Supabase Edge Functions for APIs, webhooks, scheduled jobs and model calls
@@ -37,10 +38,13 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 
 - [What to copy where](https://qiheme.github.io/handbook/kit/README.md): every kit file, its destination, who needs it, and how much of it has been run
 - [CLAUDE.md template](https://qiheme.github.io/handbook/kit/common/CLAUDE.template.md): the per-repo rulebook to fill in
+- [architecture template](https://qiheme.github.io/handbook/kit/common/docs/architecture.template.md): `docs/architecture.md`, the system as built
+- [architecture target template](https://qiheme.github.io/handbook/kit/common/docs/architecture-target.template.md): the plan for one epic
+- [decision record template](https://qiheme.github.io/handbook/kit/common/docs/decision.template.md): one architecture decision
 - [verify skill template](https://qiheme.github.io/handbook/kit/common/claude-skill-verify/SKILL.template.md): how to prove a change works at runtime
 - [ci.yml](https://qiheme.github.io/handbook/kit/workflows/ci.yml): lint, typecheck, coverage, build, end-to-end, migrations
 - [deploy-preview.yml](https://qiheme.github.io/handbook/kit/workflows/deploy-preview.yml): trusted per-PR preview deploy to Netlify
-- [release.yml](https://qiheme.github.io/handbook/kit/workflows/release.yml): tag on merge, migrate, deploy to production, rollback
+- [release.yml](https://qiheme.github.io/handbook/kit/workflows/release.yml): tag every merge, then migrate and deploy that tag to production; rollback by tag
 - [quality.spec.ts](https://qiheme.github.io/handbook/kit/e2e/quality.spec.ts): Playwright spec that automates the checkable Front-End Checklist rules
 
 ## Skills

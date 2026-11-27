@@ -7,6 +7,7 @@
   - [Testing](/standards/testing.md)
   - [CI/CD](/standards/ci-cd.md)
   - [Data](/standards/data.md)
+  - [Architecture](/standards/architecture.md)
   - [Security](/standards/security.md)
   - [UI and Cobalt](/standards/ui.md)
   - [Front-end checklist](/standards/frontend-checklist.md)

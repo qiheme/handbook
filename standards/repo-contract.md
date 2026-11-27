@@ -25,7 +25,9 @@ What every repo contains, and what every repo's commands are called. If these ar
 | `.github/ISSUE_TEMPLATE/` | Feature, Bug, Task forms | [`kit/common/.github/ISSUE_TEMPLATE/`](../kit/common/.github/ISSUE_TEMPLATE/feature.yml) |
 | `.github/dependabot.yml` | Weekly grouped updates (Proposed) | [`kit/common/.github/dependabot.yml`](../kit/common/.github/dependabot.yml) |
 | `.claude/skills/verify/SKILL.md` | How to prove a change works in the running app | [`kit/common/claude-skill-verify/SKILL.template.md`](../kit/common/claude-skill-verify/SKILL.template.md) |
-| `docs/architecture.md` | Diagrams and the reasons behind the design. Needed once the README can't hold it | Write it |
+| `docs/architecture.md` | The system as built: what runs where, the data model, the pipeline, the gaps. Needed once the README can't hold it. Sections: [Architecture](architecture.md#the-as-built-page) (Proposed) | [`kit/common/docs/architecture.template.md`](../kit/common/docs/architecture.template.md) |
+| `docs/architecture/<issue>-<slug>.md` | The target for one epic that changes data, server code, hosting, a service or a dependency (Proposed) | [`kit/common/docs/architecture-target.template.md`](../kit/common/docs/architecture-target.template.md) |
+| `docs/decisions/<NNNN>-<slug>.md` | One record per architecture decision (Proposed) | [`kit/common/docs/decision.template.md`](../kit/common/docs/decision.template.md) |
 
 Shell-only and Python-only repos keep the non-Node rows. See [CLI and scripts](../blueprints/cli-and-scripts.md).
 
@@ -46,7 +48,8 @@ The same command does the same thing in every repo. CI, hooks and agents rely on
 | `npm run test:e2e` | Playwright, against the built output | Anything with pages |
 | `npm run db:migrate` | Apply pending migrations | Repos with a database |
 | `npm run db:generate` | Generate a migration from the schema | Drizzle repos |
-| `npm run storybook` | Component explorer | Libraries |
+| `npm run storybook` | Component explorer | Libraries, web apps, full-stack apps |
+| `npm run build-storybook` | Build the explorer. CI runs it | Libraries, web apps, full-stack apps |
 
 A repo may add scripts. It may not give one of these names a different meaning.
 
@@ -88,5 +91,5 @@ Docs parity is a rule: a PR that changes behaviour, structure, setup or conventi
 | `e2e/` | Playwright specs (`tests/e2e/` in Astro sites) |
 | `supabase/migrations/`, `supabase/functions/` | Database changes and Edge Functions |
 | `scripts/` | Node tools that ship with the repo. `scripts/<tool>/bin/` is the only impure part |
-| `docs/` | Architecture and decisions |
+| `docs/` | Architecture and decisions. See [Architecture](architecture.md) |
 | `.github/`, `.husky/`, `.claude/` | Automation |

@@ -51,6 +51,23 @@ flowchart LR
 | A new function in `public` must `REVOKE EXECUTE … FROM PUBLIC` in its own migration | Postgres grants `EXECUTE` to everyone by default, and the API roles inherit it |
 | When a policy calls a helper function, grant `EXECUTE` to the roles the policy applies to, and keep the helper in a schema the API does not expose | Postgres checks `EXECUTE` against the role running the query |
 
+## A table or a JSON column
+
+**Proposed** ([D24](../decisions.md)). Being tried in `Travel-OS`.
+
+| Store it as | When |
+| --- | --- |
+| **A table, one row per thing** | Items are added one at a time, edited on their own, pointed at by something else, counted or queried, or must never be lost to an edit somewhere else. Money and evidence always qualify |
+| **A JSON column on the row it belongs to** | It is saved and read only with that row and has no life of its own: how one expense is split, a snapshot taken at a moment |
+
+| Rule | Why |
+| --- | --- |
+| In a browser-direct app, **one user action is one write to one row** | `supabase-js` cannot run a transaction across tables. Two writes can half-succeed, and the user sees a save that did not fully happen |
+| If one action must change two tables, it goes through **one database function** | The function is the transaction |
+| A list kept in a JSON column gives **every item a stable id**. Never address an item by its position | Positions change when anything is inserted or removed, and every later item looks new |
+| **Write the column you changed**, not the whole row | A row of several JSON documents written whole lets a change in one overwrite a change in another made on a second device |
+| A row the browser creates carries **an id made in the browser** | A retry after a lost reply hits the same key instead of creating a second row |
+
 ## Migrations
 
 A migration is a file that changes the database's structure. The rules are the same in both patterns.

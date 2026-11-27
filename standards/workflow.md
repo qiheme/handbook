@@ -13,7 +13,7 @@ flowchart LR
     pr --> ci{"CI green?<br/>Preview checked?"}
     ci -->|no| red
     ci -->|yes| merge["7 Squash merge"]
-    merge --> release["8 Tag + deploy"]
+    merge --> release["8 Tag, then deploy the tag"]
 ```
 
 ## 1. Every piece of work starts with an issue
@@ -22,6 +22,7 @@ flowchart LR
 - Use the form: **Feature** (users can see it), **Bug** (something is broken), **Task** (refactor, tooling, tests, infrastructure). Set the Issue Type.
 - Attach it to its parent issue as a sub-issue when there is one.
 - **Audit findings are issues.** When an audit of a repo finds a required rule not met, each finding is logged as a Task issue in that repo, as a sub-issue of one tracking issue. The audit skill does this itself. See [Agents](agents.md#auditing-a-repo).
+- **An epic that changes data, server code, hosting, an outside service or a dependency starts with its architecture.** The target page and its decision records come before the first story. Proposed: see [Architecture](architecture.md).
 - **Out-of-scope discoveries are filed, not fixed.** If you find something that should change but is not this task, open an issue and carry on. Reference it in a code comment if it matters right there: `// TODO: see #42`.
 
 ## 2. Branch from the issue
@@ -108,7 +109,7 @@ Never, to get a green check: skip, disable or delete a test. Lower a coverage th
 
 ## 8. Release
 
-Merging to `main` deploys. If the PR bumped the version, the merge also creates the tag and the GitHub Release. Nothing is deployed by hand. See [CI/CD](ci-cd.md).
+Merging to `main` tags the merged commit, then deploys that tag. A bumped version gets `v<version>` and a GitHub Release; any other merge gets the next build tag, `v<version>+<n>`. Nothing is deployed by hand, and nothing untagged is deployed. Proposed (D21). See [CI/CD](ci-cd.md#releases).
 
 ## Planning
 

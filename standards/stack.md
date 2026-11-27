@@ -29,6 +29,8 @@ Status labels: **Adopted** (two or more active repos already do this), **In use*
 | Styling | **Tailwind v4** for layout, with Cobalt's tokens mapped into the Tailwind theme. No raw hex values | In use (one repo). Proposed for content sites | One styling approach everywhere. One other app uses Tailwind without the tokens, and one uses the tokens without Tailwind. Existing plain-CSS-on-tokens sites are fine as they are |
 | Inside Cobalt itself | CSS Modules, tokens only | In use (one repo) | A library must not force Tailwind on its consumers |
 | Component structure | Atomic design: atoms, molecules, organisms, templates, pages. A level imports from its own level or below | Adopted | Three repos. One repo enforces it with a test |
+| Component explorer | **Storybook 10** in every React app and library. Every component has a story file, one story per variant and state. CI builds it | Decided by the owner (D26). No app has it yet. Cobalt runs it | Each state of a component (empty, loading, error) can be seen and reviewed without running the app or its data. Static sites are exempt: Storybook's own frameworks do not render `.astro` components |
+| Code documentation | **JSDoc** on every export in `src/` of a web project: what it does, and why when that is not obvious. No types in the comment; TypeScript owns them. Enforced by `eslint-plugin-jsdoc` | Decided by the owner (D27). Not checked in any repo yet | Editors show the comment on hover, and an agent reading one file learns the contract without opening the callers |
 | Formatting | **Prettier**: no semicolons, single quotes | Proposed | No active repo has a formatter, and the repos disagree on style. A formatter ends the argument and shrinks diffs |
 
 ## Backend and data
@@ -64,7 +66,8 @@ More: [Testing](testing.md).
 | CI | **GitHub Actions**: lint, typecheck, coverage, build, end-to-end, migrations | Adopted | Every repo with CI |
 | Hosting | **Netlify**. Built on GitHub Actions and uploaded prebuilt. Netlify never builds | Adopted | Two repos have the full pipeline. Two repos still deploy to Vercel |
 | Previews | One preview per PR, deployed by a trusted workflow that never runs PR code | Adopted | Two repos |
-| App releases | Version bumped by hand in the PR. Merge tags `v<version>` and deploys | Adopted | Two repos |
+| App releases | Version bumped by hand in the PR. Merge tags `v<version>` | Adopted | Two repos |
+| Production deploys | **Every merge is tagged** (`v<version>+<n>` when not bumped) and production deploys only from the tag | Proposed (D21) | No repo yet. The two with a release workflow deploy the merged commit, tagged or not |
 | Library releases | **Changesets**, published to GitHub Packages | In use (one repo) | Cobalt is the only library |
 | Docs and Storybook | GitHub Pages | Adopted | Cobalt's Storybook, this handbook |
 | Dependency updates | **Dependabot**, weekly, grouped | Proposed | Vitest is on four different majors across the repos. Nothing keeps them moving together |
@@ -100,11 +103,12 @@ These are the versions the newest reference repo runs today. They are a floor fo
 | Astro | 7 for new sites | Both existing sites run 5, which is two majors behind. Upgrading is a Task in each. Cobalt has not been tried on Astro 7 yet |
 | Playwright | Current | Never pin below the cloud image's browser |
 | husky / lint-staged | 9 / 16 | lint-staged 17 needs a newer Node patch than some machines have |
-| Storybook | 10 for new libraries | Cobalt runs 8, two majors behind. A Task there |
+| Storybook | 10, with `@storybook/react-vite` | Cobalt runs 8, two majors behind. A Task there |
+| eslint-plugin-jsdoc | 65 | Supports ESLint 10 |
 | Changesets | 3 for new libraries | Cobalt runs 2 |
 | Cobalt | 0.3 | |
 
-Checked against the npm registry on 2026-11-21.
+Checked against the npm registry on 2026-11-21. Storybook and `eslint-plugin-jsdoc` checked again on 2026-11-27.
 
 **Version rule (Proposed).** Start a new project on the baseline. An existing repo may trail the baseline by one major version. Two majors behind is a Task issue in that repo.
 
