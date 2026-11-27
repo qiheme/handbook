@@ -136,7 +136,7 @@ Places where the standard itself does not yet meet the checklist. Each is in [De
 
 ## This handbook follows it too
 
-The viewer at <https://qiheme.github.io> was put through the same process. Running `quality.spec.ts` against it found four real problems, all fixed:
+The viewer at <https://qiheme.github.io/handbook/> was put through the same process. Running `quality.spec.ts` against it found four real problems, all fixed:
 
 | Found | Fix |
 | --- | --- |

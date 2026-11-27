@@ -20,7 +20,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | `portfolio` | public | [Static site](blueprints/static-site.md) | 🔴 | No tests, no CI; copied tokens; Vercel |
 | `setup-scripts` | private | [CLI and scripts](blueprints/cli-and-scripts.md) (shell) | 🟡 | No `CLAUDE.md`, issue forms or PR template |
 | `stock-cerebro-client` | public | none (2022 Create React App) | 🔴 | Being retired: its features move into `easy-finances`, then it is archived (D13) |
-| `qiheme.github.io` | public | Docs (this handbook) | 🟡 | Default branch is `master` |
+| `handbook` | public | Docs (this handbook) | 🟡 | Default branch is `master` |
 
 ## Detail
 

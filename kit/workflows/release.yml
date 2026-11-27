@@ -34,7 +34,7 @@ name: Release & Deploy
 # copy of this file; the `event == 'push'` check keeps CI runs from PRs
 # (including a fork branch that happens to be named "main") out.
 #
-# Standard: https://qiheme.github.io/#/standards/ci-cd
+# Standard: https://qiheme.github.io/handbook/#/standards/ci-cd
 on:
   workflow_run:
     workflows: [CI]

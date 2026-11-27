@@ -7,7 +7,7 @@ description: Build/launch/drive recipe for runtime-verifying changes to <REPO NA
   TEMPLATE. Copy to .claude/skills/verify/SKILL.md, replace every <PLACEHOLDER>,
   and delete this comment. Write down the steps that actually worked, with the
   exact commands and ports. Update it whenever a step stops working.
-  Source: https://qiheme.github.io/#/standards/agents
+  Source: https://qiheme.github.io/handbook/#/standards/agents
 -->
 
 # Verifying <REPO NAME> at runtime

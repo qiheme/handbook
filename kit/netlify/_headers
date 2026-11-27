@@ -1,6 +1,6 @@
 # Security headers for every response. Put this file at public/_headers so the
 # build copies it into dist/ and the prebuilt upload carries it.
-# Standard: https://qiheme.github.io/#/standards/frontend-checklist
+# Standard: https://qiheme.github.io/handbook/#/standards/frontend-checklist
 #
 # These cover the Front-End Checklist's header rules: HSTS, X-Frame-Options,
 # X-Content-Type-Options, Referrer-Policy and Permissions-Policy.

@@ -31,7 +31,7 @@
  * No dependencies. Every decision is a pure function over a small "repo" port
  * (exists, read, list), so the tests run against repositories held in memory.
  *
- * Handbook: https://qiheme.github.io
+ * Handbook: https://qiheme.github.io/handbook/
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -658,7 +658,7 @@ export function audit(repo, options = {}) {
 // --- from findings to issues -------------------------------------------------
 
 /** Where the handbook's pages are read on GitHub. Survives a branch rename. */
-export const HANDBOOK = 'https://github.com/qiheme/qiheme.github.io/blob/HEAD/'
+export const HANDBOOK = 'https://github.com/qiheme/handbook/blob/HEAD/'
 
 const SIZES = {
   XS: 'XS - under 2 hours',

@@ -497,7 +497,7 @@ describe('deviations listed in CLAUDE.md', () => {
       '# CLAUDE.md',
       '',
       blueprint
-        ? `**Blueprint:** [${blueprint}](https://qiheme.github.io/#/blueprints/README)`
+        ? `**Blueprint:** [${blueprint}](https://qiheme.github.io/handbook/#/blueprints/README)`
         : '',
       '',
       heading,
@@ -656,7 +656,7 @@ describe('deviations listed in CLAUDE.md', () => {
 
 describe('the blueprint a repo declares in CLAUDE.md', () => {
   const declare = (name) =>
-    memoryRepo({ 'CLAUDE.md': `# x\n\n**Blueprint:** [${name}](https://qiheme.github.io)\n` })
+    memoryRepo({ 'CLAUDE.md': `# x\n\n**Blueprint:** [${name}](https://qiheme.github.io/handbook/)\n` })
 
   it('is read from the Blueprint line', () => {
     assert.equal(declaredBlueprint(declare('Static site')), 'static-site')

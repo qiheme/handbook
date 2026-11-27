@@ -1,6 +1,6 @@
 -- Kit file. Copy to scripts/ci/supabase-auth-stub.sql. The migrations job in
 -- ci.yml runs it after supabase-roles.sql.
--- Standard: https://qiheme.github.io/#/standards/data
+-- Standard: https://qiheme.github.io/handbook/#/standards/data
 --
 -- Stand-in for the parts of Supabase Auth that migrations refer to, so CI can
 -- apply them to a plain Postgres container: the auth schema, auth.users (for

@@ -1,12 +1,12 @@
 ---
 name: handbook-new-project
-description: Start a new project the standard way, from an Engineering Handbook blueprint (qiheme.github.io). Use when asked to start, scaffold, bootstrap or set up a new app, site, library, service or tool, or to set up an empty repository.
+description: Start a new project the standard way, from an Engineering Handbook blueprint (qiheme/handbook). Use when asked to start, scaffold, bootstrap or set up a new app, site, library, service or tool, or to set up an empty repository.
 argument-hint: "[blueprint] [what it is]"
 ---
 
 # Start a new project from the Engineering Handbook
 
-The handbook is the standard for how these projects are built: <https://qiheme.github.io>. This skill takes an empty (or nearly empty) repository to the point where it meets the standard and the first real feature can start.
+The handbook is the standard for how these projects are built: <https://qiheme.github.io/handbook/>. This skill takes an empty (or nearly empty) repository to the point where it meets the standard and the first real feature can start.
 
 Do the steps in order. Each one ends with something you can check.
 
@@ -14,9 +14,9 @@ Do the steps in order. Each one ends with something you can check.
 
 Read pages as Markdown, never from memory. Try in this order and use the first that works:
 
-1. A local clone, if one is attached to this session: `../qiheme.github.io/<path>`.
-2. `https://raw.githubusercontent.com/qiheme/qiheme.github.io/HEAD/<path>`
-3. `https://qiheme.github.io/<path>`
+1. A local clone, if one is attached to this session: `../handbook/<path>`.
+2. `https://raw.githubusercontent.com/qiheme/handbook/HEAD/<path>`
+3. `https://qiheme.github.io/handbook/<path>`
 
 If none is reachable, stop and say so. A project started from memory is how the repos drifted apart in the first place.
 

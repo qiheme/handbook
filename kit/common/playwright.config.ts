@@ -1,6 +1,6 @@
 /**
  * Playwright configuration.
- * Standard: https://qiheme.github.io/#/standards/testing
+ * Standard: https://qiheme.github.io/handbook/#/standards/testing
  *
  * End-to-end tests run against the BUILT app (`npm run build` first), served
  * by the preview server, so they exercise what actually ships. CI runs them

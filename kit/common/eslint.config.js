@@ -1,6 +1,6 @@
 /**
  * ESLint flat config. Run with `npm run lint` (zero warnings allowed).
- * Standard: https://qiheme.github.io/#/standards/stack
+ * Standard: https://qiheme.github.io/handbook/#/standards/stack
  *
  * Needs: eslint @eslint/js typescript-eslint eslint-plugin-react-hooks eslint-plugin-jsdoc globals
  */

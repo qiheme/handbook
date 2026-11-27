@@ -1,5 +1,5 @@
 {
-  "//": "Merge these keys into package.json. Script names are a contract: https://qiheme.github.io/#/standards/repo-contract",
+  "//": "Merge these keys into package.json. Script names are a contract: https://qiheme.github.io/handbook/#/standards/repo-contract",
   "type": "module",
   "engines": {
     "node": ">=24"

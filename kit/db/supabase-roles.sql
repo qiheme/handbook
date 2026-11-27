@@ -1,5 +1,5 @@
 -- Kit file. Copy to scripts/ci/supabase-roles.sql. The migrations job in
--- ci.yml runs it. Standard: https://qiheme.github.io/#/standards/data
+-- ci.yml runs it. Standard: https://qiheme.github.io/handbook/#/standards/data
 --
 -- Stand-in for what every Supabase project ships with, so migrations and tests
 -- can be exercised against a plain Postgres (the Vitest in-process engine and
