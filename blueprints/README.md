@@ -52,6 +52,8 @@ All of them follow the [repo contract](../standards/repo-contract.md), the [work
 | Tailwind | ✓ | ✓ | ✓ | no, CSS Modules | | |
 | Vitest, 100% | on `src/lib/` | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Playwright | ✓ | ✓ | ✓ | Storybook | | |
+| Storybook | | ✓ | ✓ | ✓ | | |
+| JSDoc on exports | ✓ | ✓ | ✓ | | | |
 | Preview per PR | ✓ | ✓ | ✓ | Storybook build | | |
 | Release | version tag | version tag | version tag | Changesets | with its app | version tag |
 

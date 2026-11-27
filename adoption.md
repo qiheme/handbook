@@ -46,6 +46,8 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | Every merge tagged; deploy only from the tag (Proposed, D21. Cells inferred from the kit these repos match; not re-checked) | 🔴 none yet | 🔴 tags only bumps; deploys the commit | 🔴 none | 🔴 tags only bumps; deploys the commit | — | 🔴 none |
 | Migrations in CI and on release | 🟡 CI only | 🟢 both | 🔴 applied by hand | — | — | — |
 | [Front-End Checklist](standards/frontend-checklist.md): audited, `quality.spec.ts` in CI | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited |
+| Storybook builds in CI, a story per component (D26) | not checked | not checked | not checked | — static site | 🟡 Storybook 8 | — static site |
+| JSDoc on every export, `eslint-plugin-jsdoc` in the lint (D27) | not checked | not checked | not checked | not checked | not checked | not checked |
 | `CLAUDE.md` | 🟢 | 🟢 | 🟢 | 🔴 | 🟢 | 🔴 |
 | Agent pointer files, not copies | 🟡 none | 🔴 a copy | 🔴 a copy | 🔴 none | 🔴 a copy | 🔴 none |
 | `verify` skill | 🟢 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |

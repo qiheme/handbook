@@ -20,6 +20,8 @@ Use this only when the [chooser page](README.md#web-app-or-full-stack-app) says 
 | Validation | zod, with `.validator()` on server functions | In use (one repo) |
 | Unit tests | Vitest, `node` environment, PGlite for the database, 100% | In use (one repo) |
 | End-to-end | Playwright, once there is UI to drive | Proposed |
+| Component explorer | Storybook 10 (`@storybook/react-vite`). A story file for every component | Decided by the owner (D26). No app has it yet |
+| Code documentation | JSDoc on every export in `src/`, enforced by `eslint-plugin-jsdoc` | Decided by the owner (D27). Not checked in any repo yet |
 | Host | Netlify | **Proposed, not proven.** Nothing on this blueprint has been deployed |
 
 ## Create it
@@ -30,7 +32,8 @@ cd my-app
 npm install @q-labs/cobalt @tanstack/react-query drizzle-orm pg zod
 npm install -D drizzle-kit @electric-sql/pglite @types/pg tailwindcss @tailwindcss/vite \
   vitest @vitest/coverage-v8 eslint @eslint/js typescript-eslint eslint-plugin-react-hooks \
-  @tanstack/eslint-plugin-query @tanstack/eslint-plugin-router globals husky lint-staged
+  @tanstack/eslint-plugin-query @tanstack/eslint-plugin-router eslint-plugin-jsdoc globals husky lint-staged
+npm create storybook@latest
 ```
 
 Then copy the kit: [`kit/README.md`](../kit/README.md). Keep `vitest.config.ts` separate from `vite.config.ts`: the Start and Nitro plugins drive full builds and must not run under the test runner.

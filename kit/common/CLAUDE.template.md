@@ -83,6 +83,8 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 - **Logic is pure and takes its dependencies as arguments** (HTTP client, database client, clock). Production wiring supplies the real ones. Thin entry points only construct and delegate.
 - **Views hold no business logic.** Only organisms and pages touch app state; atoms, molecules and templates take props.
 - **Components follow atomic design.** A level imports from its own level or below, never above.
+- <if the repo has React components> **Every component has a story file**, one story per variant and state. `npm run build-storybook` must pass.
+- **Every export in `src/` has a JSDoc comment**: what it does, and why when that is not obvious. No types in the comment; TypeScript owns them.
 - **Cobalt first.** If `@q-labs/cobalt` has the component, import it. Colours, type, radius and shadow come from its tokens. No raw hex values.
 - <if the repo has a database> **Every table has row-level security on.** Schema changes are migration files in this PR; they only add things. Never change the schema through the dashboard or an MCP tool.
 - <if the repo has server code> **Every server endpoint authenticates inside the handler.** Failures are returned as `{ ok: false, error: { code, message } }`; only the code and message cross the wire.

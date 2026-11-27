@@ -26,7 +26,7 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 
 - [Pick one](https://qiheme.github.io/blueprints/README.md): comparison table and decision tree; web app versus full-stack app
 - [Static site](https://qiheme.github.io/blueprints/static-site.md): Astro, content collections, Cobalt with no client JavaScript
-- [Web app](https://qiheme.github.io/blueprints/web-app.md): React, Vite, Supabase from the browser with row-level security
+- [Web app](https://qiheme.github.io/blueprints/web-app.md): React, Vite, Supabase from the browser with row-level security, Storybook, JSDoc
 - [Full-stack app](https://qiheme.github.io/blueprints/full-stack-app.md): TanStack Start, Drizzle, server-only data access
 - [Library](https://qiheme.github.io/blueprints/library.md): Vite library mode, CSS Modules, Storybook, Changesets, GitHub Packages
 - [Functions](https://qiheme.github.io/blueprints/functions.md): Supabase Edge Functions for APIs, webhooks, scheduled jobs and model calls

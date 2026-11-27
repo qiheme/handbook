@@ -68,7 +68,7 @@ Server-rendered apps (TanStack Start) follow the same shape, but the artifact ho
 
 ### What uses GitHub Pages
 
-Only documentation of public repos: Cobalt's Storybook and this handbook. Not apps.
+Only documentation of public repos: Cobalt's Storybook and this handbook. Not apps. An app's Storybook is built in CI to prove it works, and is not published.
 
 ### Leaving Vercel
 

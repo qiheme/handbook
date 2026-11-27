@@ -50,6 +50,8 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 
 **Decided by the owner:**
 
+- **D26, Storybook:** every React app and library runs Storybook 10, with a story file for every component, one story per variant and state. CI builds it. Static sites are exempt: Storybook's own frameworks do not render `.astro` components. Issue #10.
+- **D27, JSDoc:** every export in `src/` of a static site, web app or full-stack app has a JSDoc comment, enforced by `eslint-plugin-jsdoc` in the kit's lint config. Issue #10.
 - **D13, `stock-cerebro-client`:** its features (watchlist, quotes, market news) move into `easy-finances`, rebuilt on that repo's stack, and the repo is archived once they ship. Tracked in that repo's epic for the move. Its 13 audit findings are not filed one by one, because the code is being retired, not fixed.
 
 For the record, these came out of the survey with no real contest: TypeScript, npm, React and Vite, Astro for content, Supabase, Cobalt, Vitest at 100% coverage, Playwright, ESLint flat config, husky, GitHub Actions, issue first, test first, conventional commits, `CLAUDE.md` as the rulebook. Reasons are on [The stack](standards/stack.md).
