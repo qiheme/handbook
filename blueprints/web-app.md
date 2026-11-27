@@ -80,6 +80,7 @@ flowchart TB
 | **Only organisms and pages touch app state.** Atoms, molecules and templates take props | Small pieces stay reusable and trivially testable |
 | **All Supabase calls go through `lib/db.ts`** (or one file per domain) | One place to mock, one place to read what the app asks the database |
 | **Every table has RLS on, with explicit policies** | The browser holds the publishable key. Policies are the security |
+| **Every function in `lib/db.ts` returns a result**: `{ ok: true, data }` or `{ ok: false, error: { code, message } }`. The screen shows "saved" only after the server confirms, and a failed read is an error state, not an empty list. Proposed ([D25](../decisions.md)) | A swallowed error looks like a save. An empty list looks like "nothing here" |
 | **External APIs take an injected `fetch`** | Tests never touch the network |
 | **Anything needing a secret runs in an Edge Function** | The browser bundle is public |
 | **No global store** unless an issue justifies it | Query for server data, React state for the rest |

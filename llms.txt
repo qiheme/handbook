@@ -17,6 +17,7 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 - [Testing](https://qiheme.github.io/standards/testing.md): Vitest, the 100% coverage gate, dependency injection, allowed exclusions, database tests, Playwright
 - [CI/CD](https://qiheme.github.io/standards/ci-cd.md): gates, Netlify hosting built on GitHub Actions, split previews, releases, the migrations job, secret names
 - [Data](https://qiheme.github.io/standards/data.md): Supabase, browser-direct versus server-only access, table rules, migrations, connection strings, auth
+- [Architecture](https://qiheme.github.io/standards/architecture.md): the as-built page, a target page per epic and decision records; when each is required; how a target becomes issues (Proposed)
 - [Security](https://qiheme.github.io/standards/security.md): where each secret goes, endpoint rules, fetching user-supplied URLs, model providers
 - [UI and Cobalt](https://qiheme.github.io/standards/ui.md): the Cobalt design system, tokens, Tailwind mapping, atomic design, accessibility baseline
 - [Front-end checklist](https://qiheme.github.io/standards/frontend-checklist.md): frontendchecklist.io as the quality bar; which priorities are required, what is automated, how agents review, known gaps
@@ -37,6 +38,9 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 
 - [What to copy where](https://qiheme.github.io/kit/README.md): every kit file, its destination, who needs it, and how much of it has been run
 - [CLAUDE.md template](https://qiheme.github.io/kit/common/CLAUDE.template.md): the per-repo rulebook to fill in
+- [architecture template](https://qiheme.github.io/kit/common/docs/architecture.template.md): `docs/architecture.md`, the system as built
+- [architecture target template](https://qiheme.github.io/kit/common/docs/architecture-target.template.md): the plan for one epic
+- [decision record template](https://qiheme.github.io/kit/common/docs/decision.template.md): one architecture decision
 - [verify skill template](https://qiheme.github.io/kit/common/claude-skill-verify/SKILL.template.md): how to prove a change works at runtime
 - [ci.yml](https://qiheme.github.io/kit/workflows/ci.yml): lint, typecheck, coverage, build, end-to-end, migrations
 - [deploy-preview.yml](https://qiheme.github.io/kit/workflows/deploy-preview.yml): trusted per-PR preview deploy to Netlify

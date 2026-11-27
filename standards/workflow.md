@@ -22,6 +22,7 @@ flowchart LR
 - Use the form: **Feature** (users can see it), **Bug** (something is broken), **Task** (refactor, tooling, tests, infrastructure). Set the Issue Type.
 - Attach it to its parent issue as a sub-issue when there is one.
 - **Audit findings are issues.** When an audit of a repo finds a required rule not met, each finding is logged as a Task issue in that repo, as a sub-issue of one tracking issue. The audit skill does this itself. See [Agents](agents.md#auditing-a-repo).
+- **An epic that changes data, server code, hosting, an outside service or a dependency starts with its architecture.** The target page and its decision records come before the first story. Proposed: see [Architecture](architecture.md).
 - **Out-of-scope discoveries are filed, not fixed.** If you find something that should change but is not this task, open an issue and carry on. Reference it in a code comment if it matters right there: `// TODO: see #42`.
 
 ## 2. Branch from the issue

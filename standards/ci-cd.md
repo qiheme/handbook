@@ -85,6 +85,8 @@ A PR's code runs `npm ci` and the build. A compromised dependency could read any
 | Does | Builds, tests, uploads `dist/` as an artifact | Downloads the artifact, checks it holds only build output, uploads it as a draft deploy |
 | Runs PR code? | Yes | Never. No checkout, no `npm` inside the artifact |
 
+**What data a preview uses is open** ([O10](../decisions.md#open)). The kit builds a pull request with the same public values as production, so a preview of a database app reads the production project through row-level security. Migrations run on release, so a preview of a pull request that adds a table cannot load the feature it exists to show. One repo is trying previews in demo mode instead: fixtures only, no database client in the build.
+
 A draft deploy to an alias (`pr-<number>--<site>.netlify.app`) cannot touch production. Fork PRs get no preview. `workflow_run` workflows only fire once the file exists on `main`, so previews start working after the pipeline's own PR merges.
 
 ## Releases

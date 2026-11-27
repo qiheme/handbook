@@ -47,6 +47,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | Migrations in CI and on release | 🟡 CI only | 🟢 both | 🔴 applied by hand | — | — | — |
 | [Front-End Checklist](standards/frontend-checklist.md): audited, `quality.spec.ts` in CI | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited |
 | `CLAUDE.md` | 🟢 | 🟢 | 🟢 | 🔴 | 🟢 | 🔴 |
+| [Architecture](standards/architecture.md) documents (Proposed, D22. Checked on 2026-11-27 for the two repos marked; the rest not checked) | not checked | not checked | 🟡 in review, not merged | not checked | 🔴 no `docs/` folder | not checked |
 | Agent pointer files, not copies | 🟡 none | 🔴 a copy | 🔴 a copy | 🔴 none | 🔴 a copy | 🔴 none |
 | `verify` skill | 🟢 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |
 | Issue forms + PR template | 🟢 | 🟡 forms only | 🔴 | 🔴 | 🟡 PR template only | 🔴 |
