@@ -58,6 +58,9 @@ export default defineConfig({
         'src/test/**',
         // Entry point: mounts the app and nothing else.
         'src/main.tsx',
+        // Stories (D26): review fixtures for Storybook, not shipped logic. The
+        // components they render are covered by their own tests.
+        'src/**/*.stories.{ts,tsx}',
         // Type-only files: nothing executes.
         'src/**/*.d.ts',
         'src/**/types.ts',
