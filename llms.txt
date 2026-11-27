@@ -18,7 +18,7 @@ Each rule is labelled Adopted (two or more repos already do it), In use (one rep
 - [CI/CD](https://qiheme.github.io/standards/ci-cd.md): gates, Netlify hosting built on GitHub Actions, split previews, releases, the migrations job, secret names
 - [Data](https://qiheme.github.io/standards/data.md): Supabase, browser-direct versus server-only access, table rules, migrations, connection strings, auth
 - [Security](https://qiheme.github.io/standards/security.md): where each secret goes, endpoint rules, fetching user-supplied URLs, model providers
-- [UI and Cobalt](https://qiheme.github.io/standards/ui.md): the Cobalt design system, tokens, Tailwind mapping, component rules, accessibility baseline
+- [UI and Cobalt](https://qiheme.github.io/standards/ui.md): the Cobalt design system, tokens, Tailwind mapping, atomic design, accessibility baseline
 - [Front-end checklist](https://qiheme.github.io/standards/frontend-checklist.md): frontendchecklist.io as the quality bar; which priorities are required, what is automated, how agents review, known gaps
 - [Agents](https://qiheme.github.io/standards/agents.md): CLAUDE.md as the rulebook, what every agent must do, skills, cloud sessions, AI features in apps
 

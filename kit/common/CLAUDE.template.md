@@ -81,8 +81,8 @@ Coverage is a hard floor: **100% lines, branches, functions and statements.**
 <The rules specific to this repo, each with its reason. Keep the ones below that apply; add your own.>
 
 - **Logic is pure and takes its dependencies as arguments** (HTTP client, database client, clock). Production wiring supplies the real ones. Thin entry points only construct and delegate.
-- **Views hold no business logic.** Only route-level and feature components touch app state; everything else takes props.
-- **Components are grouped by <HOW THIS REPO GROUPS src/components/>.** <One line on what goes where.>
+- **Views hold no business logic.** Only organisms and pages touch app state; atoms, molecules and templates take props.
+- **Components follow atomic design.** A level imports from its own level or below, never above.
 - **Cobalt first.** If `@q-labs/cobalt` has the component, import it. Colours, type, radius and shadow come from its tokens. No raw hex values.
 - <if the repo has a database> **Every table has row-level security on.** Schema changes are migration files in this PR; they only add things. Never change the schema through the dashboard or an MCP tool.
 - <if the repo has server code> **Every server endpoint authenticates inside the handler.** Failures are returned as `{ ok: false, error: { code, message } }`; only the code and message cross the wire.

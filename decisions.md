@@ -50,7 +50,6 @@ To decide one: comment on the handbook's tracking issue or open a PR that change
 
 **Decided by the owner:**
 
-- **D26, component structure:** atomic design is no longer required in apps. Each repo groups its components as it chooses and says how in its `CLAUDE.md`; repos that use atomic design may keep it. The rule that keeps components testable stays: only route-level and feature components touch app state. Cobalt's own layout is unchanged. Issue #10.
 - **D13, `stock-cerebro-client`:** its features (watchlist, quotes, market news) move into `easy-finances`, rebuilt on that repo's stack, and the repo is archived once they ship. Tracked in that repo's epic for the move. Its 13 audit findings are not filed one by one, because the code is being retired, not fixed.
 
 For the record, these came out of the survey with no real contest: TypeScript, npm, React and Vite, Astro for content, Supabase, Cobalt, Vitest at 100% coverage, Playwright, ESLint flat config, husky, GitHub Actions, issue first, test first, conventional commits, `CLAUDE.md` as the rulebook. Reasons are on [The stack](standards/stack.md).

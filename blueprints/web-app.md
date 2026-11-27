@@ -43,8 +43,12 @@ Then copy the kit: [`kit/README.md`](../kit/README.md).
 src/
   main.tsx          Entry. Excluded from coverage: it only mounts the app
   app/              Router, providers, app-level state
-  routes/           One per route. May read app state
-  components/       UI, grouped as the repo chooses. Feature components may read app state; the rest take props
+  components/
+    atoms/          One element. Props only
+    molecules/      A few atoms. Props only
+    organisms/      A feature section. May read app state
+    templates/      Page frames. Props only
+    pages/          One per route
   lib/              Pure logic: domain rules, formatters, parsers, mappers
     supabase.ts     The client
     db.ts           Every read and write, in one place
@@ -63,17 +67,17 @@ public/_redirects   /*  /index.html  200
 
 ```mermaid
 flowchart TB
-    page["routes and feature components<br/><i>read state, call actions</i>"] --> state["app/ state + TanStack Query"]
+    page["pages/ and organisms/<br/><i>read state, call actions</i>"] --> state["app/ state + TanStack Query"]
     state --> db["lib/db.ts<br/><i>every Supabase call</i>"]
     db --> supa[("Supabase<br/>RLS decides")]
-    page --> view["every other component<br/><i>props in, markup out</i>"]
+    page --> view["atoms / molecules / templates<br/><i>props in, markup out</i>"]
     state --> logic["lib/*<br/><i>pure rules, tested alone</i>"]
 ```
 
 | Rule | Why |
 | --- | --- |
 | **Views hold no business logic.** Rules live in pure functions in `lib/` | They are tested without rendering anything |
-| **Only route-level and feature components touch app state.** Everything else takes props | Small pieces stay reusable and trivially testable |
+| **Only organisms and pages touch app state.** Atoms, molecules and templates take props | Small pieces stay reusable and trivially testable |
 | **All Supabase calls go through `lib/db.ts`** (or one file per domain) | One place to mock, one place to read what the app asks the database |
 | **Every table has RLS on, with explicit policies** | The browser holds the publishable key. Policies are the security |
 | **External APIs take an injected `fetch`** | Tests never touch the network |
@@ -97,7 +101,7 @@ In CI these are GitHub Actions **variables**, passed to the build step. Secrets 
 | Demo mode | With no Supabase variables set, the app runs on sample data. Good for reviews and first-time setup | One web app |
 | Stage, review, apply | Imported data lands in a staging table as a batch. The user sees the diff and approves it before anything is written to live tables | One web app |
 | End-to-end auth bypass | A dev-only flag set by Playwright's web server lets specs reach signed-in routes. Gated on the dev build so it cannot ship | `Travel-OS` |
-| Layer guard tests | A test that reads the import graph and fails when a component breaks the repo's own import rules, or rebuilds something Cobalt provides | `Travel-OS` |
+| Layer guard tests | A test that reads the import graph and fails when a component imports from a level above, or rebuilds something Cobalt provides | `Travel-OS` |
 | Keyless enrichment | Public APIs that need no key are called straight from the browser and fail silently | `Travel-OS` |
 
 ## Deploying

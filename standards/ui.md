@@ -93,10 +93,19 @@ Set `data-theme` on the `<html>` element instead of using `CobaltProvider`. Add 
 
 ## Component structure
 
-Each repo chooses how it groups components in `src/components/` and states it in its `CLAUDE.md`. No layout is required (D26). A repo that uses atomic design may keep it. These rules hold whatever the layout:
+Atomic design, the same five levels in every app and in Cobalt itself.
 
-- **Only route-level and feature components touch app state.** Everything else takes props. Small pieces stay reusable and are tested by rendering them with props.
-- **Views hold no business logic.** Logic lives in pure modules in `src/lib/` and is tested there.
+| Level | What | May import from | Touches app state? |
+| --- | --- | --- | --- |
+| atoms | One element: icon, chip, dot | atoms | No. Props only |
+| molecules | A few atoms working together | atoms, molecules | No. Props only |
+| organisms | A feature section: a board, a table, a modal | atoms, molecules, organisms | Yes |
+| templates | Page frames | all below | No. Props only |
+| pages | One per route | everything | Yes |
+
+- A level imports from its own level or below, never above. Guard it with a test that reads the import graph.
+- New UI goes in the lowest level that fits.
+- Views hold no business logic. Logic lives in pure modules in `src/lib/` and is tested there.
 - Guard "Cobalt first" with a test that fails when a hand-rolled copy of a Cobalt component appears.
 
 ## Inside Cobalt

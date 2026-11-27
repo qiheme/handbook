@@ -28,7 +28,7 @@ Status labels: **Adopted** (two or more active repos already do this), **In use*
 | Design system | **Cobalt** (`@q-labs/cobalt`). Use its components before writing your own | Adopted | Three repos. See [UI](ui.md) |
 | Styling | **Tailwind v4** for layout, with Cobalt's tokens mapped into the Tailwind theme. No raw hex values | In use (one repo). Proposed for content sites | One styling approach everywhere. One other app uses Tailwind without the tokens, and one uses the tokens without Tailwind. Existing plain-CSS-on-tokens sites are fine as they are |
 | Inside Cobalt itself | CSS Modules, tokens only | In use (one repo) | A library must not force Tailwind on its consumers |
-| Component structure | Not standardised. Each repo groups its components as it chooses and says how in its `CLAUDE.md` | Decided by the owner (D26) | The rule that keeps components testable stays: only route-level and feature components touch app state. See [UI](ui.md#component-structure) |
+| Component structure | Atomic design: atoms, molecules, organisms, templates, pages. A level imports from its own level or below | Adopted | Three repos. One repo enforces it with a test |
 | Formatting | **Prettier**: no semicolons, single quotes | Proposed | No active repo has a formatter, and the repos disagree on style. A formatter ends the argument and shrinks diffs |
 
 ## Backend and data

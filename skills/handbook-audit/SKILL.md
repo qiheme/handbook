@@ -68,7 +68,7 @@ Check each of these and give evidence (a file and line) for anything you report.
 | Testability | Logic in pure modules that take their dependencies as arguments. Coverage exclusions each have a written reason | `standards/testing.md` |
 | Data | Row-level security on every table. Schema changes as migration files that only add things | `standards/data.md` |
 | Security | Nothing secret behind a `VITE_` or `PUBLIC_` name. Server endpoints authenticate inside the handler. No token in a committed file | `standards/security.md` |
-| UI | Cobalt components used before hand-rolled ones. No raw hex values. Only route-level and feature components touch app state | `standards/ui.md` |
+| UI | Cobalt components used before hand-rolled ones. No raw hex values. Component levels import only from their own level or below | `standards/ui.md` |
 | Front end | Changed or key pages reviewed against the Front-End Checklist; `e2e/quality.spec.ts` present and passing | `standards/frontend-checklist.md` |
 | Docs | README has the standard sections and matches what the code does | `standards/repo-contract.md` |
 
