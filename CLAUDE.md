@@ -21,8 +21,8 @@ You are working in another repo and came here for the rules.
 
 ```
 README.md           Landing page and chooser
-standards/          One page per topic: stack, repo-contract, workflow, testing, ci-cd, data, security, ui,
-                    frontend-checklist, agents
+standards/          One page per topic: stack, repo-contract, workflow, testing, ci-cd, data, architecture,
+                    security, ui, frontend-checklist, agents
 blueprints/         One page per kind of project
 skills/             Agent skills other repos install into .claude/skills/: handbook-audit (with the
                     conformance script and its tests) and handbook-new-project

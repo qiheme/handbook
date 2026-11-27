@@ -49,6 +49,7 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | Storybook builds in CI, a story per component (D26) | not checked | not checked | not checked | — static site | 🟡 Storybook 8 | — static site |
 | JSDoc on every export, `eslint-plugin-jsdoc` in the lint (D27) | not checked | not checked | not checked | not checked | not checked | not checked |
 | `CLAUDE.md` | 🟢 | 🟢 | 🟢 | 🔴 | 🟢 | 🔴 |
+| [Architecture](standards/architecture.md) documents (Proposed, D22. Checked on 2026-11-27 for the two repos marked; the rest not checked) | not checked | not checked | 🟡 in review, not merged | not checked | 🔴 no `docs/` folder | not checked |
 | Agent pointer files, not copies | 🟡 none | 🔴 a copy | 🔴 a copy | 🔴 none | 🔴 a copy | 🔴 none |
 | `verify` skill | 🟢 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |
 | Issue forms + PR template | 🟢 | 🟡 forms only | 🔴 | 🔴 | 🟡 PR template only | 🔴 |
