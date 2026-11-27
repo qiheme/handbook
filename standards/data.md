@@ -85,7 +85,7 @@ How the files are made:
 
 | Pattern | Create a migration | Apply | Status |
 | --- | --- | --- | --- |
-| A. Browser-direct | Hand-written SQL in `supabase/migrations/`, named by the Supabase CLI: `supabase migration new <name>` | `npm run db:migrate`, which wraps `supabase db push --db-url "$DIRECT_URL"` | Proposed for new repos. Not yet proven in a repo |
+| A. Browser-direct | Hand-written SQL in `supabase/migrations/`, named by the Supabase CLI: `supabase migration new <name>` | `npm run db:migrate`, which wraps `supabase db push --db-url "$DIRECT_URL"` | Decided by the owner (D5) for new repos. Not yet proven in a repo |
 | B. Server-only | Edit `src/db/schema.ts`, then `npm run db:generate`. Commit the generated `drizzle/` files | `npm run db:migrate` | In use (one repo) |
 
 One existing repo uses its own naming (`YYYYMMDD_NNN_name.sql`) and its own runner, and requires every file to be safe to apply twice. That is an accepted variant: it works, it is tested, and renaming applied history is risk for no gain. New repos use the table above.

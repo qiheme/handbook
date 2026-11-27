@@ -43,13 +43,13 @@ Status: 🟢 meets the standard · 🟡 partly, or a small fix · 🔴 does not 
 | Netlify, built on Actions | 🔴 not deployed | 🟢 reference | 🔴 Vercel | 🟢 reference | — Pages | 🔴 Vercel |
 | PR preview | 🔴 | 🟢 | 🟡 not in the repo; left to Vercel | 🟢 | — | 🟡 not in the repo; left to Vercel |
 | Release: tag on merge | 🔴 none yet | 🟢 | 🔴 none | 🟢 | 🟢 Changesets | 🔴 none |
-| Every merge tagged; deploy only from the tag (Proposed, D21. Cells inferred from the kit these repos match; not re-checked) | 🔴 none yet | 🔴 tags only bumps; deploys the commit | 🔴 none | 🔴 tags only bumps; deploys the commit | — | 🔴 none |
+| Every merge tagged; deploy only from the tag (decided by the owner, D21. Cells inferred from the kit these repos match; not re-checked) | 🔴 none yet | 🔴 tags only bumps; deploys the commit | 🔴 none | 🔴 tags only bumps; deploys the commit | — | 🔴 none |
 | Migrations in CI and on release | 🟡 CI only | 🟢 both | 🔴 applied by hand | — | — | — |
 | [Front-End Checklist](standards/frontend-checklist.md): audited, `quality.spec.ts` in CI | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited | 🔴 not audited |
-| Storybook builds in CI, a story per component (D26) | not checked | not checked | not checked | — static site | 🟡 Storybook 8 | — static site |
-| JSDoc on every export, `eslint-plugin-jsdoc` in the lint (D27) | not checked | not checked | not checked | not checked | not checked | not checked |
+| Storybook builds in CI, a story per component (D26. `Travel-OS` checked on 2026-11-27) | not checked | not checked | 🔴 no Storybook, no story file | — static site | 🟡 Storybook 8 | — static site |
+| JSDoc on every export, `eslint-plugin-jsdoc` in the lint (D27. `Travel-OS` checked on 2026-11-27) | not checked | not checked | 🔴 plugin not in the lint | not checked | not checked | not checked |
 | `CLAUDE.md` | 🟢 | 🟢 | 🟢 | 🔴 | 🟢 | 🔴 |
-| [Architecture](standards/architecture.md) documents (Proposed, D22. Checked on 2026-11-27 for the two repos marked; the rest not checked) | not checked | not checked | 🟡 in review, not merged | not checked | 🔴 no `docs/` folder | not checked |
+| [Architecture](standards/architecture.md) documents (Proposed, D22. Checked on 2026-11-27 for the two repos marked; the rest not checked) | not checked | not checked | 🟢 | not checked | 🔴 no `docs/` folder | not checked |
 | Agent pointer files, not copies | 🟡 none | 🔴 a copy | 🔴 a copy | 🔴 none | 🔴 a copy | 🔴 none |
 | `verify` skill | 🟢 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |
 | Issue forms + PR template | 🟢 | 🟡 forms only | 🔴 | 🔴 | 🟡 PR template only | 🔴 |

@@ -72,7 +72,7 @@ Only documentation of public repos: Cobalt's Storybook and this handbook. Not ap
 
 ### Leaving Vercel
 
-Two repos still deploy to Vercel. New work does not. To move a static site: remove the Vercel adapter and add the three workflows. To move an app that uses Vercel Functions or Vercel Cron: move that code first. See [Functions](../blueprints/functions.md#moving-off-vercel-functions).
+Two repos still deploy to Vercel. New work does not, and both move: the owner decided on one host ([D1](../decisions.md)). To move a static site: remove the Vercel adapter and add the three workflows. To move an app that uses Vercel Functions or Vercel Cron: move that code first. See [Functions](../blueprints/functions.md#moving-off-vercel-functions).
 
 ## Previews are split in two, on purpose
 
@@ -93,7 +93,7 @@ A draft deploy to an alias (`pr-<number>--<site>.netlify.app`) cannot touch prod
 
 ### Apps and sites
 
-**Every merge is tagged, and production deploys only from a tag.** Proposed ([D21](../decisions.md)): no repo runs it yet. The two repos with a release workflow tag only when the version was bumped and deploy the merged commit directly.
+**Every merge is tagged, and production deploys only from a tag.** Decided by the owner ([D21](../decisions.md)). No repo runs it yet. The two repos with a release workflow tag only when the version was bumped and deploy the merged commit directly.
 
 Why: a tag names exactly what is live, every deploy can be rolled back to by name, and a commit nobody tagged cannot reach production.
 

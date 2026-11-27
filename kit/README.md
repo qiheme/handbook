@@ -86,7 +86,7 @@ Copying files is not enough. Each of these is a setting somewhere else.
 | The handbook skills and `audit.mjs` | New. The script has 95 tests at 100% line, branch and function coverage on Node 22 and 24, and was run against the eight other repos; its results matched the adoption table apart from two cells that were then corrected. Installing with the `skills` tool was checked from a local copy of this repo, not from GitHub. The skills' written steps have not yet been followed end to end by an agent in a real repo, and no repo lists deviations in the form the script reads yet |
 | `e2e/quality.spec.ts` | **Proposed.** New. Run here with Playwright 1.63 and axe 4.14 against a good page (7 tests pass) and a deliberately bad page (20 distinct failures reported). Typechecks under strict mode. Not yet run in a repo |
 | `CLAUDE.template.md`, issue forms, PR template | Merged from the four existing rulebooks |
-| `docs/*.template.md` | **Proposed.** Reduced from the three documents written for `Travel-OS`, which are in review there and not merged. Not yet filled in by a second repo |
+| `docs/*.template.md` | **Proposed.** Reduced from the three documents written for `Travel-OS`, which were merged there on 2026-11-27. Not yet filled in by a second repo |
 
 ## Changing the kit
 
