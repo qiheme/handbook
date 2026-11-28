@@ -463,7 +463,6 @@ describe('audit: a rule is only as binding as its label in the handbook', () => 
     'agent-pointers',
     'node-pin',
     'engines',
-    'no-vercel',
     'versions',
     'quality-spec',
     'security-headers',
@@ -484,10 +483,12 @@ describe('audit: a rule is only as binding as its label in the handbook', () => 
     assert.equal(result.summary.proposed, 2)
   })
 
-  it('a repo still on Vercel is told, not failed, for the host decision', () => {
+  it('a repo still on Vercel fails: the host decision (D1) is made', () => {
     const result = audit(conformingWebApp({ 'vercel.json': '{}' }))
     assert.equal(statusOf(result, 'no-vercel'), 'fail')
-    assert.equal(result.ok, true)
+    assert.equal(result.checks.find((c) => c.id === 'no-vercel').level, 'required')
+    assert.equal(result.ok, false)
+    assert.equal(result.summary.fail, 1)
   })
 })
 

@@ -77,7 +77,7 @@ Copying files is not enough. Each of these is a setting somewhere else.
 
 | Files | State |
 | --- | --- |
-| `workflows/*.yml` | Generalised from two repos where they run in production. Checked with `actionlint`. The combined form here (one CI file feeding both preview and release, with a `main` default branch and the optional migrate step) has **not** run end to end in a repo yet. Expect to fix small things on first use, and send the fix back here. `release.yml` tagging every merge and deploying from the tag is **Proposed** (D21): it has not run in any repo. Its tagging script was run against a local Git remote. The Storybook step in `ci.yml` (D26) is new and has not run in a repo |
+| `workflows/*.yml` | Generalised from two repos where they run in production. Checked with `actionlint`. The combined form here (one CI file feeding both preview and release, with a `main` default branch and the optional migrate step) has **not** run end to end in a repo yet. Expect to fix small things on first use, and send the fix back here. `release.yml` tagging every merge and deploying from the tag is decided by the owner (D21), but it has not run in any repo. Its tagging script was run against a local Git remote. The Storybook step in `ci.yml` (D26) is new and has not run in a repo |
 | `eslint.config.js`, `vitest.config.ts`, hooks, `app.css`, `db/*.sql` | Taken from a repo where they run. The lint and test configs were run against a scratch project. The three `no-eval` rules in the lint config are an addition, checked the same way. The JSDoc block (D27) is new and has not run in a repo: on 2026-11-27 it was run against a scratch project with ESLint 10 and `eslint-plugin-jsdoc` 65, where it failed undocumented exports (functions, arrow functions, function expressions, constants, `memo(...)` components, types and interfaces) and JSDoc types, passed documented and private code and test files, and `--fix` did not insert empty comments |
 | `playwright.config.ts` | Generalised from one repo. The `executablePath` line for cloud sessions is new |
 | `.prettierrc.json`, `dependabot.yml`, `_redirects` | **Proposed.** Not taken from a repo, and not yet deployed anywhere |
@@ -86,7 +86,7 @@ Copying files is not enough. Each of these is a setting somewhere else.
 | The handbook skills and `audit.mjs` | New. The script has 95 tests at 100% line, branch and function coverage on Node 22 and 24, and was run against the eight other repos; its results matched the adoption table apart from two cells that were then corrected. Installing with the `skills` tool was checked from a local copy of this repo, not from GitHub. The skills' written steps have not yet been followed end to end by an agent in a real repo, and no repo lists deviations in the form the script reads yet |
 | `e2e/quality.spec.ts` | **Proposed.** New. Run here with Playwright 1.63 and axe 4.14 against a good page (7 tests pass) and a deliberately bad page (20 distinct failures reported). Typechecks under strict mode. Not yet run in a repo |
 | `CLAUDE.template.md`, issue forms, PR template | Merged from the four existing rulebooks |
-| `docs/*.template.md` | **Proposed.** Reduced from the three documents written for `Travel-OS`, which are in review there and not merged. Not yet filled in by a second repo |
+| `docs/*.template.md` | **Proposed.** Reduced from the three documents written for `Travel-OS`, which were merged there on 2026-11-27. Not yet filled in by a second repo |
 
 ## Changing the kit
 

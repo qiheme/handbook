@@ -23,8 +23,8 @@ Status labels: **Adopted** (two or more active repos already do this), **In use*
 | Content sites | **Astro**, static output | Adopted | Both content sites. Ships no JavaScript by default |
 | Apps | **React** + **Vite** | Adopted | Every app |
 | Full-stack apps | **TanStack Start** (React, Vite, server functions) | In use (one repo) | Use only when the server must own the data. See [Full-stack app](../blueprints/full-stack-app.md) |
-| Routing | **TanStack Router** for new apps | Proposed | Same router as TanStack Start, so a web app can grow into a full-stack app without a rewrite. An existing React Router app stays as it is |
-| Server data in the browser | **TanStack Query** | Proposed | Caching, retries and loading states written once. Replaces hand-rolled fetch-in-effect code |
+| Routing | **TanStack Router** for new apps | Decided by the owner (D3) | Same router as TanStack Start, so a web app can grow into a full-stack app without a rewrite. An existing React Router app stays as it is |
+| Server data in the browser | **TanStack Query** | Decided by the owner (D3) | Caching, retries and loading states written once. Replaces hand-rolled fetch-in-effect code |
 | Design system | **Cobalt** (`@q-labs/cobalt`). Use its components before writing your own | Adopted | Three repos. See [UI](ui.md) |
 | Styling | **Tailwind v4** for layout, with Cobalt's tokens mapped into the Tailwind theme. No raw hex values | In use (one repo). Proposed for content sites | One styling approach everywhere. One other app uses Tailwind without the tokens, and one uses the tokens without Tailwind. Existing plain-CSS-on-tokens sites are fine as they are |
 | Inside Cobalt itself | CSS Modules, tokens only | In use (one repo) | A library must not force Tailwind on its consumers |
@@ -64,10 +64,10 @@ More: [Testing](testing.md).
 | Layer | Standard | Status | Why |
 | --- | --- | --- | --- |
 | CI | **GitHub Actions**: lint, typecheck, coverage, build, end-to-end, migrations | Adopted | Every repo with CI |
-| Hosting | **Netlify**. Built on GitHub Actions and uploaded prebuilt. Netlify never builds | Adopted | Two repos have the full pipeline. Two repos still deploy to Vercel |
+| Hosting | **Netlify**. Built on GitHub Actions and uploaded prebuilt. Netlify never builds | Adopted | Two repos have the full pipeline. Two repos still deploy to Vercel, and both move: decided by the owner (D1) |
 | Previews | One preview per PR, deployed by a trusted workflow that never runs PR code | Adopted | Two repos |
 | App releases | Version bumped by hand in the PR. Merge tags `v<version>` | Adopted | Two repos |
-| Production deploys | **Every merge is tagged** (`v<version>+<n>` when not bumped) and production deploys only from the tag | Proposed (D21) | No repo yet. The two with a release workflow deploy the merged commit, tagged or not |
+| Production deploys | **Every merge is tagged** (`v<version>+<n>` when not bumped) and production deploys only from the tag | Decided by the owner (D21) | No repo yet. The two with a release workflow deploy the merged commit, tagged or not |
 | Library releases | **Changesets**, published to GitHub Packages | In use (one repo) | Cobalt is the only library |
 | Docs and Storybook | GitHub Pages | Adopted | Cobalt's Storybook, this handbook |
 | Dependency updates | **Dependabot**, weekly, grouped | Proposed | Vitest is on four different majors across the repos. Nothing keeps them moving together |

@@ -16,8 +16,8 @@ It usually lives inside a [Web app](web-app.md) or [Static site](static-site.md)
 | Tests | Vitest in Node, 100% on `_shared/`. Entry files excluded | In use (one repo) |
 | Validation | zod on every input and every provider response | In use (one repo) |
 | Secrets | Supabase Function secrets | In use (one repo) |
-| Scheduled jobs | Supabase Cron (`pg_cron`) calling the function | Proposed. The one scheduled job today runs on Vercel Cron |
-| Deploy | Supabase CLI: `supabase functions deploy`, run from `release.yml` | Proposed. The reference pipeline deploys the site and the migrations but not the functions, and the repo does not record how they are deployed today |
+| Scheduled jobs | Supabase Cron (`pg_cron`) calling the function | Decided by the owner (O5). Not done in any repo yet: the one scheduled job today runs on Vercel Cron |
+| Deploy | Supabase CLI: `supabase functions deploy`, run from `release.yml` | Decided by the owner (O3). Not done in any repo yet: the reference pipeline deploys the site and the migrations but not the functions, and the repo does not record how they are deployed today |
 
 ## Why Supabase Edge Functions
 

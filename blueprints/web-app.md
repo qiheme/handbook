@@ -12,8 +12,8 @@ This is the default for anything with a login. Choose [Full-stack app](full-stac
 | --- | --- | --- |
 | Framework | React 19 + Vite | Adopted. Both reference repos are still on React 18 |
 | Language | TypeScript strict | Adopted (one of the two reference repos is still JavaScript) |
-| Routing | TanStack Router | Proposed. One repo uses React Router 6 and stays there |
-| Server data | TanStack Query | Proposed |
+| Routing | TanStack Router | Decided by the owner (D3). One repo uses React Router 6 and stays there |
+| Server data | TanStack Query | Decided by the owner (D3) |
 | Design | Cobalt components, Tailwind v4 on Cobalt tokens | Each half is in use in one web app; neither has both yet |
 | Data | `supabase-js` from the browser, row-level security on every table | Adopted |
 | Auth | Supabase Auth | Adopted |

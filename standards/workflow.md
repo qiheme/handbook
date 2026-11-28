@@ -109,7 +109,7 @@ Never, to get a green check: skip, disable or delete a test. Lower a coverage th
 
 ## 8. Release
 
-Merging to `main` tags the merged commit, then deploys that tag. A bumped version gets `v<version>` and a GitHub Release; any other merge gets the next build tag, `v<version>+<n>`. Nothing is deployed by hand, and nothing untagged is deployed. Proposed (D21). See [CI/CD](ci-cd.md#releases).
+Merging to `main` tags the merged commit, then deploys that tag. A bumped version gets `v<version>` and a GitHub Release; any other merge gets the next build tag, `v<version>+<n>`. Nothing is deployed by hand, and nothing untagged is deployed. Decided by the owner (D21); no repo runs it yet. See [CI/CD](ci-cd.md#releases).
 
 ## Planning
 

@@ -2,7 +2,7 @@
 
 How we write down what a system is made of, what it should become, and why. Three kinds of page, kept in the repo beside the code.
 
-**Status: Proposed** ([D22, D23](../decisions.md)). Being tried in `Travel-OS`, where the first set is in review. Until a second repo follows, treat this page as the recommended shape, not as established practice.
+**Status: Proposed** ([D22, D23](../decisions.md)). Being tried in `Travel-OS`, which has the first set. Until a second repo follows, treat this page as the recommended shape, not as established practice.
 
 ## The three documents
 

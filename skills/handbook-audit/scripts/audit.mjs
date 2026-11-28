@@ -450,7 +450,6 @@ const CHECKS = [
   },
   {
     id: 'no-vercel',
-    level: 'proposed',
     title: 'Not deployed to Vercel',
     page: 'standards/ci-cd.md',
     blueprints: WITH_PAGES,
@@ -767,7 +766,7 @@ export const GUIDANCE = {
   },
   'no-vercel': {
     fix: 'Move the site to Netlify with the kit pipeline. Server code on Vercel Functions or Vercel Cron moves first (`blueprints/functions.md`).',
-    why: 'Two hosts means two pipelines to maintain. This is decision D1 in the handbook.',
+    why: 'Two hosts means two pipelines to maintain. The owner decided on one host: decision D1 in the handbook.',
     size: 'L',
   },
   cobalt: {
